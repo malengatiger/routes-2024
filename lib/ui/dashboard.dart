@@ -21,7 +21,6 @@ import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/utils/route_distance_calculator.dart';
 import 'package:kasie_transie_library/utils/zip_handler.dart';
-import 'package:kasie_transie_library/widgets/auth/cell_auth_signin.dart';
 import 'package:kasie_transie_library/widgets/dash_widgets/generic.dart';
 import 'package:kasie_transie_library/widgets/language_and_color_chooser.dart';
 import 'package:kasie_transie_library/widgets/route_info_widget.dart';

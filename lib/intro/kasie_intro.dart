@@ -170,64 +170,67 @@ class KasieIntroState extends State<KasieIntro>
   }
 
   List<IntroPage> getItems(double width) {
+    List<int> indexes = [1,2,3,4,5,6,7,8,9,10];
+    indexes.shuffle();
+
     return [
       IntroPage(
         title: 'KasieTransie',
-        assetPath: 'assets/images/8.jpg',
+        assetPath: 'assets/images/${indexes[0]}.jpg',
         text: lorem,
         width: width,
       ),
       IntroPage(
         title: 'Associations',
-        assetPath: 'assets/images/1.jpg',
+        assetPath: 'assets/images/${indexes[1]}.jpg',
         text: lorem,
         width: width,
       ),
       IntroPage(
         title: 'People',
-        assetPath: 'assets/images/3.jpg',
+        assetPath: 'assets/images/${indexes[2]}.jpg',
         text: lorem,
         width: width,
       ),
       IntroPage(
         title: 'Marshals',
-        assetPath: 'assets/images/4.jpg',
+        assetPath: 'assets/images/${indexes[3]}.jpg',
         text: lorem,
         width: width,
       ),
       IntroPage(
         title: 'Thank You',
-        assetPath: 'assets/images/5.jpg',
+        assetPath: 'assets/images/${indexes[4]}.jpg',
         text: lorem,
         width: width,
       ),
       IntroPage(
         title: 'Thank You',
-        assetPath: 'assets/images/6.jpg',
+        assetPath: 'assets/images/${indexes[5]}.jpg',
         text: lorem,
         width: width,
       ),
       IntroPage(
         title: 'Thank You',
-        assetPath: 'assets/images/7.jpg',
+        assetPath: 'assets/images/${indexes[6]}.jpg',
         text: lorem,
         width: width,
       ),
       IntroPage(
         title: 'Thank You',
-        assetPath: 'assets/images/2.jpg',
+        assetPath: 'assets/images/${indexes[8]}.jpg',
         text: lorem,
         width: width,
       ),
       IntroPage(
         title: 'Thank You',
-        assetPath: 'assets/images/9.jpg',
+        assetPath: 'assets/images/${indexes[8]}.jpg',
         text: lorem,
         width: width,
       ),
       IntroPage(
         title: 'Thank You',
-        assetPath: 'assets/images/10.jpg',
+        assetPath: 'assets/images/${indexes[9]}.jpg',
         text: lorem,
         width: width,
       ),
