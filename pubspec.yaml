@@ -39,6 +39,7 @@ dependencies:
   carousel_slider: ^5.0.0
   google_fonts: ^6.2.1
   fluttertoast: ^8.2.8
+  google_maps_flutter_web: ^0.5.10
   pretty_print_json:
 dev_dependencies:
   flutter_test:
