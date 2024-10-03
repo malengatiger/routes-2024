@@ -9,7 +9,6 @@ import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/color_and_locale.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/data/data_schemas.dart';
-import 'package:kasie_transie_library/isolates/routes_isolate.dart';
 import 'package:kasie_transie_library/l10n/translation_handler.dart';
 import 'package:kasie_transie_library/maps/city_creator_map.dart';
 import 'package:kasie_transie_library/maps/landmark_creator_map.dart';
@@ -51,6 +50,7 @@ class DashboardState extends ConsumerState<Dashboard>
   Prefs prefs = GetIt.instance<Prefs>();
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   ZipHandler zipHandler = GetIt.instance<ZipHandler>();
+  SemCache semCache = GetIt.instance<SemCache>();
 
   RouteDistanceCalculator routeDistanceCalculator =
       GetIt.instance<RouteDistanceCalculator>();
@@ -160,11 +160,11 @@ class DashboardState extends ConsumerState<Dashboard>
       busy = true;
     });
     try {
-      if (user != null) {
+
         await _getRoutes(refresh);
         var cities = await zipHandler.getCities(user!.countryId!, false);
         citiesTotal = cities.length;
-      }
+
     } catch (e, stack) {
       pp('$mm ERROR $e : $stack');
       if (mounted) {
@@ -180,21 +180,19 @@ class DashboardState extends ConsumerState<Dashboard>
     }
   }
 
-  SemCache semCache = GetIt.instance<SemCache>();
   Future _getRoutes(bool refresh) async {
-    pp('$mm ... routeBuilder dashboard; getting routes ... refresh: $refresh');
+    pp('$mm ... routeBuilder dashboard; getting routes .... refresh: $refresh');
     try {
       setState(() {
         busy = true;
       });
-      var routesIsolate = GetIt.instance<RoutesIsolate>();
       if (kIsWeb) {
         routes = await zipHandler.getRoutes(
             associationId: widget.association.associationId!, refresh: false);
         pp('$mm ... routeBuilder dashboard; routes found by zipHandler: ${routes.length} ...');
       } else {
-        routes = await routesIsolate.getRoutes(
-            widget.association.associationId!, refresh);
+        routes = await semCache.getRoutes(
+            widget.association.associationId!);
       }
       routes.sort((a,b) => a.name!.compareTo(b.name!));
       await _countPoints();
@@ -208,7 +206,7 @@ class DashboardState extends ConsumerState<Dashboard>
     setState(() {
       busy = false;
     });
-    pp('$mm ... routeBuilder dashboard; routes: ${routes.length} ...');
+    pp('$mm ... routeBuilder dashboard; routes found: ${routes.length} ...');
   }
 
   bool popDetails = false;

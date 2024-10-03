@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
+import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/isolates/local_finder.dart';
-import 'package:kasie_transie_library/isolates/routes_isolate.dart';
 import 'package:kasie_transie_library/l10n/translation_handler.dart';
 import 'package:kasie_transie_library/maps/route_creator_map2.dart';
 import 'package:kasie_transie_library/utils/device_location_bloc.dart';
@@ -131,10 +131,10 @@ class RouteEditorState extends ConsumerState<RouteEditor>
 
   void _getRoutes() async {
     pp('$mm _getRoutes ...............');
-    var routesIsolate = GetIt.instance<RoutesIsolate>();
+    var routesIsolate = GetIt.instance<SemCache>();
 
     final x =
-        await routesIsolate.getRoutes(widget.association.associationId!, false);
+        await routesIsolate.getRoutes(widget.association.associationId!);
     setState(() {
       routes = x;
     });

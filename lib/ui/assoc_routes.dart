@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
+import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/color_and_locale.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
-import 'package:kasie_transie_library/isolates/routes_isolate.dart';
 import 'package:kasie_transie_library/l10n/translation_handler.dart';
 import 'package:kasie_transie_library/maps/association_route_maps.dart';
 import 'package:kasie_transie_library/maps/city_creator_map.dart';
@@ -104,6 +104,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
       }
     });
   }
+  SemCache semCache = GetIt.instance<SemCache>();
 
   void _getInitialData(bool refresh) async {
     setState(() {
@@ -116,7 +117,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
       if (selectedRoute != null) {
         selectedRouteId = selectedRoute!.routeId!;
       }
-      routes = await listApiDog.getRoutes(user!.associationId!, refresh);
+      routes = await semCache.getRoutes(user!.associationId!);
       routes.sort((a,b) => a.name!.compareTo(b.name!));
     } catch (e) {
       pp(e);
@@ -254,9 +255,9 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
     });
     try {
       user = prefs.getUser();
-      var routesIsolate = GetIt.instance<RoutesIsolate>();
+      var routesIsolate = GetIt.instance<SemCache>();
       if (user != null) {
-        routes = await routesIsolate.getRoutes(user!.associationId!, refresh);
+        routes = await routesIsolate.getRoutes(user!.associationId!);
       }
     } catch (e, stackTrace) {
       pp(stackTrace);

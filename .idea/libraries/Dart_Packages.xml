@@ -677,8 +677,8 @@
         <entry key="flutter_lints">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_lints-5.0.0/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_lints-4.0.0/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_lints-5.0.0/lib" />
             </list>
           </value>
         </entry>
@@ -1154,8 +1154,8 @@
         <entry key="lints">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/lints-5.0.0/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/lints-4.0.0/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/lints-5.0.0/lib" />
             </list>
           </value>
         </entry>

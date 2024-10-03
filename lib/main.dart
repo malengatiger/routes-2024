@@ -35,9 +35,9 @@ main() async {
     //TODO: REMOVE after test ....
 
     pp('$mx fbAuthUser: ${fbAuthedUser!.uid}');
-    pp("$mx .... fbAuthUser is cool! ......  🥬 🥬 🥬 on to the party!! \n ${await fbAuthedUser?.getIdToken()}");
+    pp("$mx .... fbAuthUser is cool! ......  🥬🥬🥬 on to the party!! \n ${await fbAuthedUser?.getIdToken()}");
   } else {
-    pp('$mx fbAuthUser: is null.  😈 👿Need to sign up or in. Authenticate the app!');
+    pp('$mx fbAuthUser: is null.  😈👿 Need to sign up or in. Authenticate the app!');
   }
   try {
     await RegisterServices.register();

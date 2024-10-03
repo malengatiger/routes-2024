@@ -20,7 +20,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   kasie_transie_library:
-    path: ../kasie_transie_library
+    path: ../../kasie/new_library/kasie_transie_library
 
   firebase_messaging_web: ^3.9.2
   focused_menu: ^1.0.5
