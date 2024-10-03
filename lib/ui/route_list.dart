@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
+import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:badges/badges.dart' as bd;
+import 'package:kasie_transie_library/utils/prefs.dart';
 
 class RouteList extends StatelessWidget {
-  const RouteList(
+  RouteList(
       {super.key,
         required this.navigateToMapViewer,
         required this.navigateToLandmarks,
@@ -25,8 +27,9 @@ class RouteList extends StatelessWidget {
 
   final List<lib.Route> routes;
   final lib.Route? currentRoute;
-
+  final Prefs prefs = GetIt.instance<Prefs>();
   List<FocusedMenuItem> _getMenuItems(lib.Route route, BuildContext context) {
+    //prefs.saveRoute(route);
     List<FocusedMenuItem> list = [];
 
     list.add(FocusedMenuItem(
@@ -37,6 +40,7 @@ class RouteList extends StatelessWidget {
           color: Theme.of(context).primaryColor,
         ),
         onPressed: () {
+          prefs.saveRoute(route);
           showRouteDetails(route);
         }));
     //
@@ -48,6 +52,7 @@ class RouteList extends StatelessWidget {
           color: Theme.of(context).primaryColor,
         ),
         onPressed: () {
+          prefs.saveRoute(route);
           navigateToMapViewer(route);
         }));
     //
@@ -58,6 +63,7 @@ class RouteList extends StatelessWidget {
           color: Theme.of(context).primaryColor,
         ),
         onPressed: () {
+          prefs.saveRoute(route);
           navigateToLandmarks(route);
         }));
     //
@@ -69,20 +75,11 @@ class RouteList extends StatelessWidget {
           color: Theme.of(context).primaryColor,
         ),
         onPressed: () {
+          prefs.saveRoute(route);
           navigateToCreatorMap(route);
         }));
 
-    // list.add(FocusedMenuItem(
-    //     title: Text('Calculate Route Distances',
-    //         style: myTextStyleMediumBlack(context)),
-    //     // backgroundColor: Theme.of(context).primaryColor,
-    //     trailingIcon: Icon(
-    //       Icons.calculate,
-    //       color: Theme.of(context).primaryColor,
-    //     ),
-    //     onPressed: () {
-    //       onCalculateDistances(route);
-    //     }));
+
     list.add(FocusedMenuItem(
         title: Text('Send Route Update Message',
             style: myTextStyleMediumBlack(context)),
@@ -92,6 +89,7 @@ class RouteList extends StatelessWidget {
           color: Theme.of(context).primaryColor,
         ),
         onPressed: () {
+          prefs.saveRoute(route);
           onSendRouteUpdateMessage(route);
         }));
     return list;
@@ -106,7 +104,7 @@ class RouteList extends StatelessWidget {
         shape: getRoundedBorder(radius: 16),
         child: Column(
           children: [
-            const SizedBox(height: 64,),
+             SizedBox(height: 64, child: Center(child: Text('Routes', style: myTextStyleMediumLarge(context, 36),))),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(top: 16.0),

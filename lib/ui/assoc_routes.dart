@@ -117,6 +117,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
         selectedRouteId = selectedRoute!.routeId!;
       }
       routes = await listApiDog.getRoutes(user!.associationId!, refresh);
+      routes.sort((a,b) => a.name!.compareTo(b.name!));
     } catch (e) {
       pp(e);
     }
@@ -253,6 +254,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
     });
     try {
       user = prefs.getUser();
+      var routesIsolate = GetIt.instance<RoutesIsolate>();
       if (user != null) {
         routes = await routesIsolate.getRoutes(user!.associationId!, refresh);
       }

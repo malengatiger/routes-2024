@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
+import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/color_and_locale.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/data/data_schemas.dart';
@@ -161,7 +162,7 @@ class DashboardState extends ConsumerState<Dashboard>
     try {
       if (user != null) {
         await _getRoutes(refresh);
-        var cities = await zipHandler.getCities(user!.countryId!);
+        var cities = await zipHandler.getCities(user!.countryId!, false);
         citiesTotal = cities.length;
       }
     } catch (e, stack) {
@@ -179,21 +180,25 @@ class DashboardState extends ConsumerState<Dashboard>
     }
   }
 
+  SemCache semCache = GetIt.instance<SemCache>();
   Future _getRoutes(bool refresh) async {
     pp('$mm ... routeBuilder dashboard; getting routes ... refresh: $refresh');
     try {
       setState(() {
         busy = true;
       });
+      var routesIsolate = GetIt.instance<RoutesIsolate>();
       if (kIsWeb) {
         routes = await zipHandler.getRoutes(
-            associationId: widget.association.associationId!);
+            associationId: widget.association.associationId!, refresh: false);
         pp('$mm ... routeBuilder dashboard; routes found by zipHandler: ${routes.length} ...');
       } else {
         routes = await routesIsolate.getRoutes(
             widget.association.associationId!, refresh);
       }
-      await _getLandmarks(refresh);
+      routes.sort((a,b) => a.name!.compareTo(b.name!));
+      await _countPoints();
+      await _countLandmarks();
     } catch (e, stack) {
       pp('$e, $stack');
       if (mounted) {
@@ -205,13 +210,6 @@ class DashboardState extends ConsumerState<Dashboard>
     });
     pp('$mm ... routeBuilder dashboard; routes: ${routes.length} ...');
   }
-
-  Future _getLandmarks(bool refresh) async {
-    routeLandmarks = await listApiDog.getAssociationRouteLandmarks(
-        widget.association.associationId!, false);
-    pp('$mm ... routeBuilder dashboard; routeLandmarks: ${routeLandmarks.length} ...');
-  }
-
 
   bool popDetails = false;
   lib.Route? route;
@@ -391,29 +389,12 @@ class DashboardState extends ConsumerState<Dashboard>
         transitionType: PageTransitionType.leftToRight);
   }
 
-  // Future<void> _navigateToPhoneAuth() async {
-  //   pp('$mm ............... _navigateToPhoneAuth');
-  //   user = await NavigationUtils.navigateTo(
-  //       context: context,
-  //       widget: CustomPhoneVerification(
-  //           onUserAuthenticated: (mUser) {},
-  //           onError: () {
-  //             pp('$mm onError from CustomPhoneVerification ... ');
-  //           },
-  //           onCancel: () {
-  //             pp('$mm onCancel from my CustomPhoneVerification');
-  //           },
-  //           onLanguageChosen: (lang) {
-  //             pp('$mm onLanguageChosen from CustomPhoneVerification');
-  //           }),
-  //       transitionType: PageTransitionType.leftToRight);
-  //
-  //   if (user != null) {
-  //     pp('$mm ............... back from _navigateToPhoneAuth with user: ${user!.name}');
-  //     _getData(false);
-  //   }
-  // }
-
+  _countPoints() async {
+    routePointsTotal = await semCache.countRoutePoints(widget.association.associationId!);
+  }
+  _countLandmarks() async {
+    routeLandmarksTotal = await semCache.countRouteLandmarks(widget.association.associationId!);
+  }
   Widget _getDashContent() {
     if (widget.association.associationName == null) {
       return Container(color: Colors.teal,);
@@ -434,7 +415,7 @@ class DashboardState extends ConsumerState<Dashboard>
       },
       citiesText: citiesText,
       citiesTotal: citiesTotal,
-      height: 800, association: widget.association,
+      height: 1200, association: widget.association,
     );
   }
 
@@ -442,7 +423,7 @@ class DashboardState extends ConsumerState<Dashboard>
   Widget build(BuildContext context) {
     final type = getThisDeviceType();
     var padding = 16.0;
-    var fontSize = 32.0;
+    var fontSize = 16.0;
     var centerTitle = true;
     if (type == 'phone') {
       padding = 12.0;
@@ -493,6 +474,7 @@ class DashboardState extends ConsumerState<Dashboard>
                   color: Theme.of(context).primaryColor,
                 )),
           ],
+          bottom: PreferredSize(preferredSize: Size.fromHeight(64), child: SizedBox()),
         ),
         body: Stack(
           children: [

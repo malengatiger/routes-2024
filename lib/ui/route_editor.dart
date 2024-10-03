@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
@@ -21,7 +22,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart' as responsive;
 import 'package:routes_2024/ui/route_detail_form_container.dart';
 import 'package:uuid/uuid.dart' as uu;
-import 'package:get_it/get_it.dart';
+
 class RouteEditor extends ConsumerStatefulWidget {
   const RouteEditor(
       {super.key,
@@ -84,6 +85,7 @@ class RouteEditorState extends ConsumerState<RouteEditor>
   double radiusInKM = 100;
   bool sendingRouteUpdateMessage = false;
   Prefs prefs = GetIt.instance<Prefs>();
+
   @override
   void initState() {
     _controller = AnimationController(vsync: this);
@@ -128,7 +130,8 @@ class RouteEditorState extends ConsumerState<RouteEditor>
   }
 
   void _getRoutes() async {
-        pp('$mm _getRoutes ...............');
+    pp('$mm _getRoutes ...............');
+    var routesIsolate = GetIt.instance<RoutesIsolate>();
 
     final x =
         await routesIsolate.getRoutes(widget.association.associationId!, false);
@@ -141,16 +144,16 @@ class RouteEditorState extends ConsumerState<RouteEditor>
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
 
   void _getUser() async {
-    user =  prefs.getUser();
-    country =  prefs.getCountry();
-    settingsModel =  prefs.getSettings();
+    user = prefs.getUser();
+    country = prefs.getCountry();
+    settingsModel = prefs.getSettings();
     if (settingsModel == null) {
       final res = await listApiDog.getSettings(user!.associationId!, false);
       if (res.isNotEmpty) {
         pp('$mm ${res.length} ${E.redDot} ${E.redDot} settings found.');
         myPrettyJsonPrint(res.first.toJson());
         prefs.saveSettings(res.first);
-        settingsModel =  prefs.getSettings();
+        settingsModel = prefs.getSettings();
         if (settingsModel == null) {
           pp('$mm ${E.redDot} ${E.redDot}${E.redDot} ${E.redDot} settings did not happen!!');
         } else {
@@ -239,8 +242,10 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     _controller.dispose();
     super.dispose();
   }
+
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   bool sending = false;
+
   Future<void> onSubmitRequested() async {
     pp('$mm ................................. onSubmitRequested ...');
     //todo - validate!
@@ -354,8 +359,10 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                   child: Text(yes),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    NavigationUtils.navigateTo(context: context, widget: RouteCreatorMap2(route: route), transitionType: PageTransitionType.leftToRight);
-
+                    NavigationUtils.navigateTo(
+                        context: context,
+                        widget: RouteCreatorMap2(route: route),
+                        transitionType: PageTransitionType.leftToRight);
                   },
                 )
               ],
@@ -395,12 +402,12 @@ class RouteEditorState extends ConsumerState<RouteEditor>
       pp(e);
       if (mounted) {
         showToast(
-                  duration: const Duration(seconds: 5),
-                  padding: 20,
-                  textStyle: myTextStyleMedium(context),
-                  backgroundColor: Colors.amber,
-                  message: 'Route Update message sent OK',
-                  context: context);
+            duration: const Duration(seconds: 5),
+            padding: 20,
+            textStyle: myTextStyleMedium(context),
+            backgroundColor: Colors.amber,
+            message: 'Route Update message sent OK',
+            context: context);
       }
     }
     setState(() {
@@ -433,7 +440,9 @@ class RouteEditorState extends ConsumerState<RouteEditor>
               return busy
                   ? Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Center(child: TimerWidget(title: searchingCities, isSmallSize: true)),
+                      child: Center(
+                          child: TimerWidget(
+                              title: searchingCities, isSmallSize: true)),
                     )
                   : sending
                       ? const Center(
@@ -526,7 +535,8 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                             }
                             return RouteListMinimum(
                               onRoutePicked: (route) {},
-                              association: widget.association, isMappable: false,
+                              association: widget.association,
+                              isMappable: false,
                             );
                           }),
                     ),
