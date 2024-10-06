@@ -428,8 +428,6 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                       NavigationUtils.navigateTo(
                           context: context,
                           widget: RouteEditor(
-                            dataApiDog: dataApiDog,
-                            prefs: prefs,
                             association: association!,
                           ),
                           transitionType: PageTransitionType.leftToRight);
@@ -455,7 +453,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                         ? const WaitingForGodot()
                         : ScreenTypeLayout.builder(
                             mobile: (ctx) {
-                              return RouteList(
+                              return RouteListWidget(
                                 navigateToMapViewer: navigateToMapViewer,
                                 navigateToLandmarks: navigateToLandmarks,
                                 navigateToCreatorMap: navigateToCreatorMap,
@@ -471,7 +469,9 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                     selectedRoute = r;
                                   });
                                   navigateToRouteInfo(r);
-                                },
+                                }, association: association!, onCreateNewRoute: (){
+                                  pp('$mm onCreateNewRoute');
+                              },
                               );
                             },
                             tablet: (ctx) {
@@ -483,7 +483,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                     ),
                                     SizedBox(
                                       width: (width / 2) - 60,
-                                      child: RouteList(
+                                      child: RouteListWidget(
                                         navigateToMapViewer:
                                             navigateToMapViewer,
                                         navigateToLandmarks:
@@ -497,7 +497,10 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                         onCalculateDistances: (r) {
                                           calculateDistances(r);
                                         },
-                                        showRouteDetails: (r) {},
+                                        showRouteDetails: (r) {}, association: association!, onCreateNewRoute: (){
+                                        pp('$mm onCreateNewRoute');
+
+                                      },
                                       ),
                                     ),
                                     const SizedBox(
@@ -523,7 +526,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                   children: [
                                     SizedBox(
                                       width: (width / 2) - 24,
-                                      child: RouteList(
+                                      child: RouteListWidget(
                                         navigateToMapViewer:
                                             navigateToMapViewer,
                                         navigateToLandmarks:
@@ -538,7 +541,10 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                         onCalculateDistances: (r) {
                                           calculateDistances(r);
                                         },
-                                        showRouteDetails: (route) {},
+                                        showRouteDetails: (route) {}, association: association!, onCreateNewRoute: (){
+                                        pp('$mm onCreateNewRoute');
+
+                                      },
                                       ),
                                     ),
                                     const SizedBox(
@@ -630,8 +636,6 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                     onTap: () {
                       if (association != null) {
                         NavigationUtils.navigateTo(context: context, widget: RouteEditor(
-                          dataApiDog: dataApiDog,
-                          prefs: prefs,
                           association: association!,
                         ), transitionType: PageTransitionType.leftToRight);
 

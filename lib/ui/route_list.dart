@@ -1,22 +1,26 @@
+import 'package:badges/badges.dart' as bd;
 import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/utils/functions.dart';
-import 'package:badges/badges.dart' as bd;
+import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:routes_2024/ui/route_editor.dart';
 
-class RouteList extends StatelessWidget {
-  RouteList(
+class RouteListWidget extends StatelessWidget {
+  RouteListWidget(
       {super.key,
-        required this.navigateToMapViewer,
-        required this.navigateToLandmarks,
-        required this.navigateToCreatorMap,
-        required this.routes,
-        this.currentRoute,
-        required this.onSendRouteUpdateMessage,
-        required this.onCalculateDistances, required this.showRouteDetails});
+      required this.navigateToMapViewer,
+      required this.navigateToLandmarks,
+      required this.navigateToCreatorMap,
+      required this.routes,
+      this.currentRoute,
+      required this.onSendRouteUpdateMessage,
+      required this.onCalculateDistances,
+      required this.showRouteDetails, required this.association, required this.onCreateNewRoute});
 
   final Function(lib.Route) navigateToMapViewer;
   final Function(lib.Route) navigateToLandmarks;
@@ -24,16 +28,19 @@ class RouteList extends StatelessWidget {
   final Function(lib.Route) onSendRouteUpdateMessage;
   final Function(lib.Route) onCalculateDistances;
   final Function(lib.Route) showRouteDetails;
-
+  final Function onCreateNewRoute;
   final List<lib.Route> routes;
   final lib.Route? currentRoute;
+  final lib.Association association;
   final Prefs prefs = GetIt.instance<Prefs>();
+
   List<FocusedMenuItem> _getMenuItems(lib.Route route, BuildContext context) {
     //prefs.saveRoute(route);
     List<FocusedMenuItem> list = [];
 
     list.add(FocusedMenuItem(
-        title: Text('Display Route Details', style: myTextStyleMediumBlack(context)),
+        title: Text('Display Route Details',
+            style: myTextStyleMediumBlack(context)),
         // backgroundColor: Theme.of(context).primaryColor,
         trailingIcon: Icon(
           Icons.map,
@@ -79,7 +86,6 @@ class RouteList extends StatelessWidget {
           navigateToCreatorMap(route);
         }));
 
-
     list.add(FocusedMenuItem(
         title: Text('Send Route Update Message',
             style: myTextStyleMediumBlack(context)),
@@ -95,6 +101,11 @@ class RouteList extends StatelessWidget {
     return list;
   }
 
+  _onCreateRoute() async {
+    pp('... _onCreateRoute ... ');
+    onCreateNewRoute();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -104,7 +115,27 @@ class RouteList extends StatelessWidget {
         shape: getRoundedBorder(radius: 16),
         child: Column(
           children: [
-             SizedBox(height: 64, child: Center(child: Text('Routes', style: myTextStyleMediumLarge(context, 36),))),
+            SizedBox(
+                height: 80,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    gapW32,
+                    Center(
+                      child: Text(
+                        'Routes',
+                        style: myTextStyleMediumLarge(context, 36),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Create new Route',
+                        onPressed: () {
+                          _onCreateRoute();
+                        },
+                        icon: Icon(Icons.add)),
+                    gapW32,
+                  ],
+                )),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(top: 16.0),
@@ -129,13 +160,16 @@ class RouteList extends StatelessWidget {
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0, vertical: 1.0),
+                                horizontal: 48.0, vertical: 1.0),
                             child: Card(
                               shape: getRoundedBorder(radius: 16),
                               elevation: elevation,
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
-                                child: Text('${rt.name}', style: myTextStyleSmall(context),),
+                                child: Text(
+                                  '${rt.name}',
+                                  style: myTextStyleSmall(context),
+                                ),
                               ),
                             ),
                           ),

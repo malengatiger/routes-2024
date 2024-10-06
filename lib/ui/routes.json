@@ -1,0 +1,1162 @@
+[
+  {
+    "_id": "6495708a5776ba2cd121db4a",
+    "routeId": "7a545212-9c66-4fdf-93f3-e2d176b6d4b8",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Pecanwood Estate  - Hartbeespoort",
+    "routeNumber": "",
+    "created": "2023-06-23T10:14:34.472808Z",
+    "color": "black",
+    "userId": "8UnQARfMOgdpj4BtqtmWRasNSop2",
+    "userName": "St. Vincent Peters-Maltbie",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.85,
+          -25.733333
+        ]
+      },
+      "startCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "startCityName": "Pecanwood Estate ",
+      "endCityId": "35b7bb0f-87ec-4cf7-b3f3-7fd439db6583",
+      "endCityName": "Hartbeespoort"
+    },
+    "calculatedDistances": [],
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route",
+    "updatedAt": "2024-10-03T05:08:49.001Z"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "649c7146142f8fd8047a30b2",
+    "routeId": "32feb2fb-5917-4c3e-942b-892837f34489",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Pecanwood Estate  - La Terraza at Service Station",
+    "routeNumber": "",
+    "created": "2023-06-28T17:43:34.171931Z",
+    "color": "white",
+    "userId": "8UnQARfMOgdpj4BtqtmWRasNSop2",
+    "userName": "St. Vincent Peters-Maltbie",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ],
+        "latitude": 0,
+        "longitude": 0
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.857746370136734,
+          -25.77664662096486
+        ],
+        "latitude": 0,
+        "longitude": 0
+      },
+      "startCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "startCityName": "Pecanwood Estate ",
+      "endCityId": "c0b0cb29-4846-48d8-8c96-9b1765a3acde",
+      "endCityName": "La Terraza at Service Station"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "649ddaccb9d0c3ad66cc3231",
+    "routeId": "7965392e-4890-41e8-ab10-96fc058143a9",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Pecanwood Estate  - Four Ways",
+    "routeNumber": "",
+    "created": "2023-06-29T19:26:04.009968Z",
+    "color": "amber",
+    "userId": "8UnQARfMOgdpj4BtqtmWRasNSop2",
+    "userName": "St. Vincent Peters-Maltbie",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ],
+        "latitude": 0,
+        "longitude": 0
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.999382,
+          -26.029018
+        ],
+        "latitude": 0,
+        "longitude": 0
+      },
+      "startCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "startCityName": "Pecanwood Estate ",
+      "endCityId": "556b5e3c-f48f-41d6-bb3c-bb421d612145",
+      "endCityName": "Four Ways"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route",
+    "updatedAt": "2024-10-02T11:02:41.603Z"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64b98c87920956583ddfdcd1",
+    "routeId": "ff17eeb1-5e7a-4d39-a09e-8ffed5dde0eb",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Pecanwood Estate  - Saulsville",
+    "routeNumber": "",
+    "created": "2023-07-20T19:35:35.295305Z",
+    "color": "indigo",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.057561,
+          -25.774195
+        ]
+      },
+      "startCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "startCityName": "Pecanwood Estate ",
+      "endCityId": "172bab34-dfeb-4b08-ac3b-69176d123816",
+      "endCityName": "Saulsville"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64b9ee3a2b8d28dd519ecbd1",
+    "routeId": "bac1f2f8-2f00-418f-ad58-305a3449bdcf",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Pecanwood Estate  - Cradle Corner",
+    "routeNumber": "",
+    "created": "2023-07-21T02:32:26.567153Z",
+    "color": "red",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.77250207960606,
+          -25.78682403563617
+        ]
+      },
+      "startCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "startCityName": "Pecanwood Estate ",
+      "endCityId": "87bafe8e-f8df-4105-8d1a-e28da6156e6b",
+      "endCityName": "Cradle Corner"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64b9ee802b8d28dd519ecbd2",
+    "routeId": "153d7712-a67f-4bfa-b832-91cfed494159",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Hartebeestpoort - Pecanwood Estate ",
+    "routeNumber": "",
+    "created": "2023-07-21T02:33:36.770504Z",
+    "color": "black",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.85,
+          -25.733333
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ]
+      },
+      "startCityId": "eb500b63-6de3-401e-a461-955facfbf81a",
+      "startCityName": "Hartebeestpoort",
+      "endCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "endCityName": "Pecanwood Estate "
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64ba6435a3e875b846937185",
+    "routeId": "d621f06f-c1c6-43e9-8bc7-d54ea0bce2e4",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "La Terraza at Service Station - Schoemansville",
+    "routeNumber": "",
+    "created": "2023-07-21T10:55:49.579873Z",
+    "color": "purple",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.857746370136734,
+          -25.77664662096486
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.873882,
+          -25.728685
+        ]
+      },
+      "startCityId": "c0b0cb29-4846-48d8-8c96-9b1765a3acde",
+      "startCityName": "La Terraza at Service Station",
+      "endCityId": "8c0e7b46-d4dd-4e41-baf1-f0a7ca630385",
+      "endCityName": "Schoemansville"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64bad9fe529482a702e65032",
+    "routeId": "99043717-336f-4714-9bbf-6d42be24ba48",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Four Ways - Bryanston",
+    "routeNumber": "",
+    "created": "2023-07-21T19:18:22.736093Z",
+    "color": "orange",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.999382,
+          -26.029018
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.028051,
+          -26.052106
+        ]
+      },
+      "startCityId": "556b5e3c-f48f-41d6-bb3c-bb421d612145",
+      "startCityName": "Four Ways",
+      "endCityId": "72ba5c04-87a8-4050-921b-13612a5b3eab",
+      "endCityName": "Bryanston"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64bb0553469ce6450d2920f0",
+    "routeId": "080844a7-b7e3-4a19-b21e-97b30398b941",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Four Ways - Rosebank",
+    "routeNumber": "",
+    "created": "2023-07-21T22:23:15.300540Z",
+    "color": "blue",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.999382,
+          -26.029018
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.04171003401279,
+          -26.14570201289322
+        ]
+      },
+      "startCityId": "556b5e3c-f48f-41d6-bb3c-bb421d612145",
+      "startCityName": "Four Ways",
+      "endCityId": "c1abc4c6-6d33-4184-aa8a-790dc0bb34cf",
+      "endCityName": "Rosebank"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64bb3cc794fe5d64e933660d",
+    "routeId": "7a80c9cc-2336-4b7d-9d01-a964f8d233cc",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Kosmos - Pecanwood Estate ",
+    "routeNumber": "",
+    "created": "2023-07-22T02:19:51.581451Z",
+    "color": "amber",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.852025,
+          -25.739123
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ]
+      },
+      "startCityId": "fdcf502d-8cdb-4dfb-a052-bbf485082649",
+      "startCityName": "Kosmos",
+      "endCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "endCityName": "Pecanwood Estate "
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64bb4f01ddce51bb083d19e3",
+    "routeId": "211ed451-258f-4570-93aa-b5997de64227",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Four Ways - Randburg",
+    "routeNumber": "",
+    "created": "2023-07-22T03:37:38.009727Z",
+    "color": "pink",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.999382,
+          -26.029018
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.00123,
+          -26.0941
+        ]
+      },
+      "startCityId": "556b5e3c-f48f-41d6-bb3c-bb421d612145",
+      "startCityName": "Four Ways",
+      "endCityId": "028bb21b-56d9-4015-adbe-4f3c99667577",
+      "endCityName": "Randburg"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route",
+    "updatedAt": "2024-10-04T00:12:13.115Z"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64bb52c2663b67177cba0a03",
+    "routeId": "47a7e61e-fd34-423a-9521-473bd5fa9ec9",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Hartebeestpoort - Saulsville",
+    "routeNumber": "",
+    "created": "2023-07-22T03:53:38.153766Z",
+    "color": "purple",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.85,
+          -25.733333
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.057561,
+          -25.774195
+        ]
+      },
+      "startCityId": "eb500b63-6de3-401e-a461-955facfbf81a",
+      "startCityName": "Hartebeestpoort",
+      "endCityId": "172bab34-dfeb-4b08-ac3b-69176d123816",
+      "endCityName": "Saulsville"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64bb59dc4723e88874cd5a81",
+    "routeId": "7e7da8c5-7ba2-4d7b-8c48-fdba25d7d027",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Kosmos - Brits",
+    "routeNumber": "",
+    "created": "2023-07-22T04:23:56.689923Z",
+    "color": "green",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.852025,
+          -25.739123
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.78022,
+          -25.63473
+        ]
+      },
+      "startCityId": "fdcf502d-8cdb-4dfb-a052-bbf485082649",
+      "startCityName": "Kosmos",
+      "endCityId": "a3439fb5-87c2-4c8f-b912-ad049eb64e1c",
+      "endCityName": "Brits"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64bb5bce4723e88874cd5a82",
+    "routeId": "2223ae63-4f6f-496b-8f9f-c553b96476ac",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Damdoryn - Brits",
+    "routeNumber": "",
+    "created": "2023-07-22T04:32:14.706481Z",
+    "color": "pink",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.830257080495358,
+          -25.726230934105658
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.78022,
+          -25.63473
+        ]
+      },
+      "startCityId": "49eabdeb-296f-472e-a14a-55553fde4f10",
+      "startCityName": "Damdoryn",
+      "endCityId": "a3439fb5-87c2-4c8f-b912-ad049eb64e1c",
+      "endCityName": "Brits"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64bb5d603e17ef68b4e0e1e6",
+    "routeId": "00471b40-f638-4d84-b5ba-77ce57d3ade0",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Hartebeestpoort - Damdoryn",
+    "routeNumber": "",
+    "created": "2023-07-22T04:38:56.391267Z",
+    "color": "indigo",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.85,
+          -25.733333
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.830257080495358,
+          -25.726230934105658
+        ]
+      },
+      "startCityId": "eb500b63-6de3-401e-a461-955facfbf81a",
+      "startCityName": "Hartebeestpoort",
+      "endCityId": "49eabdeb-296f-472e-a14a-55553fde4f10",
+      "endCityName": "Damdoryn"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64ca37c81e0bb38f9427c812",
+    "routeId": "83925780-af03-49f5-bde4-9ab648206b9a",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Pecanwood Estate  - Atteridgeville",
+    "routeNumber": "",
+    "created": "2023-08-02T11:02:32.543164Z",
+    "color": "pink",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/thermal-effort-366015.appspot.com/kasieMedia/qrcode_83925780-af03-49f5-bde4-9ab648206b9a_1690974153411.png?GoogleAccessId=firebase-adminsdk-8y4e9@thermal-effort-366015.iam.gserviceaccount.com&Expires=2006334155&Signature=SEPMCasYYcmK8J2uWxFCDeCeAAkC7GGJYsmvYZszg%2FCXhTKJmyjalS7Mw2I3yyuINK7wsaxalPLJO39H1Eknc4cYTsEYx0HylY%2BNuSrXzEN1sCJaCoKDDSAoL%2BBZDSCHAXy9q1RCuKjOvDi9td9h%2B2V%2Fmt3TjRWbWTUetFxoWrySYxECqm5lrrhhP4gCjjZHUe3RUnyLEzuj7enMI%2FmKsKqEtoucr%2FHqH1UP8zzsMi%2F4ekTKDERGH5Y86x5NZi20i6yDNy%2F52EUlfqpiDC%2FY0V2FFglMUQk891NRmnbaXx6n6in4b1TxuEsfDPPCH2REoo1G%2F1m8i%2Bm9MBV4TuXzAA%3D%3D",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.080728,
+          -25.770373
+        ]
+      },
+      "startCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "startCityName": "Pecanwood Estate ",
+      "endCityId": "afd8e828-4da4-41b5-8475-f8c30bb338d3",
+      "endCityName": "Atteridgeville"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route",
+    "updatedAt": "2024-10-02T01:12:38.232Z"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64ca67240e80a520568526ff",
+    "routeId": "1822aea9-8eb8-4045-9b73-e735b75abb01",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Kosmos - Pelindaba",
+    "routeNumber": "",
+    "created": "2023-08-02T14:24:36.735619Z",
+    "color": "teal",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/thermal-effort-366015.appspot.com/kasieMedia/qrcode_1822aea9-8eb8-4045-9b73-e735b75abb01_1690986279111.png?GoogleAccessId=79998394043-compute@developer.gserviceaccount.com&Expires=2006346279&Signature=DOq%2BXgRCVMztBkZiXSN%2FsboyJzYQWPmBHVXoLh676HiqgxckiezkeRtreV7ChRUnqBc5zhwLvFlILHdkRh8wXNONNGzwQf1qQK1EkCblwkT2VJCINiXwH0l1xVEt6U7lVLJW1FkqUwLMWpaQBKB%2BTvsBxizsYxc5fduyyJd1Q943nOYBmA7v7bGVyfCg97n9aMyU74kKM4bjmtAgmiw5NS1NvVNCzChtNfsuMLm7hXmK%2BkYLqoBHRgE%2B7SgLC3AglzKHU%2FRYb8eGIvMm6IwFcYTx%2BsaHTAaCYbhGB5JP8drPh6kAwvn81zMOGhJ0NgQdJsz39%2FhfBszAa%2BbCoJz2Eg%3D%3D",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.852025,
+          -25.739123
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.916667,
+          -25.783333
+        ]
+      },
+      "startCityId": "fdcf502d-8cdb-4dfb-a052-bbf485082649",
+      "startCityName": "Kosmos",
+      "endCityId": "d05f4aa0-e754-49d6-99e3-4a88048cdce4",
+      "endCityName": "Pelindaba"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route",
+    "updatedAt": "2024-10-02T08:54:28.034Z"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64ca717100843dc4b7ded59c",
+    "routeId": "a6757bd2-6352-46da-be1d-219d20972c86",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Spruitview  - Vosloorus",
+    "routeNumber": "",
+    "created": "2023-08-02T15:08:33.280468Z",
+    "color": "indigo",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/thermal-effort-366015.appspot.com/kasieMedia/qrcode_a6757bd2-6352-46da-be1d-219d20972c86_1690988914301.png?GoogleAccessId=79998394043-compute@developer.gserviceaccount.com&Expires=2006348915&Signature=TYNStrxKwS4DtcZB61nLi%2Bge8SmENKwnd4pePRA1Cv0UfRc9oG8kVl2FHI4ZCHyvKqsuJUDbZuqmlq1z6KiKjFDONUngTWp2cDiy3AmxfmIE7IQeOzLm0CCnv7ZjEW8sNTXY2%2BxXhPXzK0WwgpCtboaGVQOK3nmQlK4Rt9olKXokKrSaURHUM1JZzMPq5BY043Ol3byhA8%2B469oCGfgayxGhchSG2XqIDoNr2oUFJ18tUtGV90SqljTf4AeJOmKgTrtNUePHhpHROYla9fWRpOAWYJBYjuP8%2FRXUxvRNSjgfBcPNMgGpygbK3XsFtAULg2CHNWEGC3Gf6MHzz4hs0A%3D%3D",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.183011151850224,
+          -26.323274532947213
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.207561,
+          -26.357449
+        ]
+      },
+      "startCityId": "a262deea-b47b-4c75-923a-506741cf9a8c",
+      "startCityName": "Spruitview ",
+      "endCityId": "c6fd4933-4079-4bd1-a11d-d3eabc117ca1",
+      "endCityName": "Vosloorus"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64cad819d67ed50fe5082829",
+    "routeId": "19fd56d3-38b4-4943-bfdc-a61aebc22660",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Sandton - Johannesburg",
+    "routeNumber": "",
+    "created": "2023-08-02T22:26:33.639694Z",
+    "color": "purple",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/thermal-effort-366015.appspot.com/kasieMedia/qrcode_19fd56d3-38b4-4943-bfdc-a61aebc22660_1691015195288.png?GoogleAccessId=79998394043-compute@developer.gserviceaccount.com&Expires=2006375196&Signature=jCpnrzr0NA8FX5havu%2FgDueGmz5pCHrG29baqStLKf%2BAuU6pFqHYTIsdRBQUm%2FkvGqtvjADuJ2Jd0l%2FVfFLWr%2BozhMOo6jYZar50KRko6OTrsAm11SbtukGJO1%2BLHPtKkElDHXr%2BZX1iAxB9K232V279irH1EuzD4sRKjf6hQ%2BciTKxTifpmj9O%2FwOxiijsH5%2BHD3%2BIXMltlbV35%2BWf3338bHGLACqFjI8tQkEq6tcpfPgQA6KFnbn9sX1k5cuSglqix3P1CdqpgpKo6ppdZPDJe9HqkFrxobBYo%2FbGYXwpqRljcjom4hMiJiSJxdY8IBCEKAL9EPv84ReTNbpQmAQ%3D%3D",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.966667,
+          -26.05
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.04363,
+          -26.20227
+        ]
+      },
+      "startCityId": "50ded5bc-6e14-4321-abe7-76e4bf9e2ae5",
+      "startCityName": "Sandton",
+      "endCityId": "6dbbd56f-8a76-40cd-8df3-ad78a64106e2",
+      "endCityName": "Johannesburg"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64d0e87f6b2cece4dff2fb87",
+    "routeId": "2eaae0f8-496f-4b58-a2c1-b7cfff01c2cd",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Villa palms 70 - Sunnypark Mall",
+    "routeNumber": "",
+    "created": "2023-08-07T12:50:07.144473Z",
+    "color": "black",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/thermal-effort-366015.appspot.com/kasieMedia/qrcode_2eaae0f8-496f-4b58-a2c1-b7cfff01c2cd_1691412608897.png?GoogleAccessId=79998394043-compute@developer.gserviceaccount.com&Expires=2006772609&Signature=na413C1N2KhL9kPupVcWFjA43PhpATqORhzmgFC10vpC8tG1DgHi8Um9BeCfvsh7rzK9QHFtsai99mzlQfI%2F5e21XyhdICjF%2FvrY6oZ%2F6FejUZ1YsMgaMbkxp0SaVajpZsbyf4Pl8TGY7LXrcXODc5k5ii8SNb4vyDeSNZF0GybfQPKZSoXqbfmSjanBM%2Fs6xH5wyzUwisvWkEsyMog1JVKyj7yTdeu74o0VJf3xfgmJ3FBXBdJnj6ua4fUVSlo0Pd28nimnLyWIrNZtjziBvCjZoVSKecQFLQIcDJ6VJVWSORiyjEcmRXoK0M9HC86TJEj7%2F0nG%2F055mu%2Bz4ViXww%3D%3D",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.21104358881712,
+          -25.75416995188933
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.202817253768444,
+          -25.750956020245468
+        ]
+      },
+      "startCityId": "7e8a67ee-9b30-4a19-8665-404b7af8cf0b",
+      "startCityName": "Villa palms 70",
+      "endCityId": "030da468-365a-4da9-a4ee-ec2458c08ed7",
+      "endCityName": "Sunnypark Mall"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64dfdd330c068255b13405ae",
+    "routeId": "63324fc9-a0d7-41a1-92a7-8c292a3a0808",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Sandton Convention Centre - Gallagher Estate Convention Centre",
+    "routeNumber": "",
+    "created": "2023-08-18T21:05:55.621925Z",
+    "color": "pink",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/thermal-effort-366015.appspot.com/kasieMedia/qrcode_63324fc9-a0d7-41a1-92a7-8c292a3a0808_1692392756679.png?GoogleAccessId=firebase-adminsdk-8y4e9@thermal-effort-366015.iam.gserviceaccount.com&Expires=2007752759&Signature=eY8GJbDS3foZWKRLw3PXHAIayIxWxbs9GDVhFX5JwlPLDPdGDlXP2E%2B6YSO0n57HWI1kNmnOQfL0%2BKV52qI0twkMGcTladWbfIAv8N%2Fd8n0KlGMPFDGUPrUmTcIFH2IXY1Tl7Hj%2BwgExsKQKZuhQV4MgTNjadqPyBeNwm8%2F8ACCCDvPt3gl0FSZH6txMvvKKL2k0PcTfzpbPPRcpVAULlkgLZxDlsCpVBrAspLJ2cbifNSFZpsHP9u4Um8XxKLS22WAz8NSgHFaz4eAbjbxRrEzzVEl8G6ptwAlCEroNGoU5dyK%2Bg2AmBLtzgras6EILgiEhA4PhRBE7UYOBi59BRA%3D%3D",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.054914213716984,
+          -26.10528686146942
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.131295815110207,
+          -26.00201494465404
+        ]
+      },
+      "startCityId": "168d2d6d-266f-41be-ab11-401dda45d17f",
+      "startCityName": "Sandton Convention Centre",
+      "endCityId": "4ad97466-267c-4ad2-aa11-1fdb8bb8c37b",
+      "endCityName": "Gallagher Estate Convention Centre"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "calculatedDistances": [],
+    "_id": "64e0c299b25c9dc38516fad2",
+    "routeId": "b4bff1d7-50e0-4df6-8fa6-50f86c03f8de",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Alexandra - Johannesburg",
+    "routeNumber": "",
+    "created": "2023-08-19T13:24:41.277646Z",
+    "color": "amber",
+    "userId": "rtGy0aOveOMB7BUxemPo2go9H0p2",
+    "userName": "Donnie G Fredericks",
+    "active": 0,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/thermal-effort-366015.appspot.com/kasieMedia/qrcode_b4bff1d7-50e0-4df6-8fa6-50f86c03f8de_1692451481448.png?GoogleAccessId=firebase-adminsdk-8y4e9@thermal-effort-366015.iam.gserviceaccount.com&Expires=2007811483&Signature=dfVJsvxgXgyP5BXTEFYmV1BJWfYFVhaYfGlszp9Itc8z3flrUn0wEI39ZQfhGQz6biYE8VtwnYnbok3R4VdxLlhWnt9ibAhGXd26c9EjLE8d0Ltkbs9TkeCW7AqREySPpFC%2F7EJP9qGPZA4AzuIrkUOnKKb2Hujx4G2JK7CXVu9Ujl6gXIYKAXtvKbRVslV4C7PkeEK0MCaqMH6F96wikipTUsliwR9UiGRBxTp1mZpbOOlJ5lw15oMfO5B7Pn0U30Q6GTvuyMXrgLjwE2aiOoH0vYy27VFaLu5e5H96U8PL%2BFN%2B9w1sBGV%2BiB2WTGo%2BOMItlB%2FXtjD9esJRDFgCeQ%3D%3D",
+    "routeStartEnd": {
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.098836,
+          -26.105284
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.04363,
+          -26.20227
+        ]
+      },
+      "startCityId": "c650a558-6620-4c11-9521-66ecc5bd92bd",
+      "startCityName": "Alexandra",
+      "endCityId": "6dbbd56f-8a76-40cd-8df3-ad78a64106e2",
+      "endCityName": "Johannesburg"
+    },
+    "heading": 0,
+    "lengthInMetres": 0,
+    "_class": "com.boha.kasietransie.data.dto.Route"
+  },
+  {
+    "_id": "650dd182cad437c3fe1ee59b",
+    "routeId": "a063be8e-bb4f-47af-b0ea-a139b3d014dd",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Pecanwood Estate  - Sandton",
+    "routeNumber": "",
+    "created": "2023-09-22T17:40:18.857240Z",
+    "updated": null,
+    "color": "indigo",
+    "userId": "euzY3zViU4P76ZcUaiXTy7KStew2",
+    "userName": "Kedibone Maseko",
+    "activationDate": null,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/download/storage/v1/b/thermal-effort-366015.appspot.com/o/kasieMedia%2Fqrcode_route_1695404419022.png?generation=1695404421234788&alt=media",
+    "routeStartEnd": {
+      "startCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "startCityName": "Pecanwood Estate ",
+      "endCityId": "50ded5bc-6e14-4321-abe7-76e4bf9e2ae5",
+      "endCityName": "Sandton",
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.966667,
+          -26.05
+        ]
+      }
+    },
+    "calculatedDistances": [],
+    "heading": 0,
+    "lengthInMetres": 0,
+    "createdAt": "2023-09-22T17:40:21.916Z",
+    "updatedAt": "2023-09-22T17:40:21.916Z",
+    "__v": 0
+  },
+  {
+    "_id": "650f2f378a16895c51ced313",
+    "routeId": "674c1587-ccbb-44c1-920d-10aba2f68234",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Pimville - Johannesburg",
+    "routeNumber": "",
+    "created": "2023-09-23T18:32:23.927238Z",
+    "updated": null,
+    "color": "indigo",
+    "userId": "euzY3zViU4P76ZcUaiXTy7KStew2",
+    "userName": "Kedibone Maseko",
+    "activationDate": null,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/download/storage/v1/b/thermal-effort-366015.appspot.com/o/kasieMedia%2Fqrcode_route_1695493944131.png?generation=1695493946032198&alt=media",
+    "routeStartEnd": {
+      "startCityId": "85618bd7-22fc-48e9-9ff0-ddf4e040a910",
+      "startCityName": "Pimville",
+      "endCityId": "6dbbd56f-8a76-40cd-8df3-ad78a64106e2",
+      "endCityName": "Johannesburg",
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.906818,
+          -26.272301
+        ]
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.04363,
+          -26.20227
+        ]
+      }
+    },
+    "calculatedDistances": [],
+    "heading": 0,
+    "lengthInMetres": 0,
+    "createdAt": "2023-09-23T18:32:26.854Z",
+    "updatedAt": "2023-09-25T10:48:33.891Z",
+    "__v": 0
+  },
+  {
+    "_id": "670221b222b42f497ad93a87",
+    "routeId": "7cbee330-a56e-42de-8b7b-26f5003a48bd",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Kosmos - Hartebeestpoort",
+    "routeNumber": "",
+    "created": "2024-10-06T05:35:44.170Z",
+    "updated": null,
+    "color": "purple",
+    "userId": "9laYIPrQX1g1WEDuAdR5NZH2nAs1",
+    "userName": "Admin4 Administrator",
+    "activationDate": null,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/kasie2024_media/kasie2024_data/2f3faebd-6159-4b03-9857-9dad6d9a82ac/qrcode_route_1728192944195.png?GoogleAccessId=firebase-adminsdk-wtna4%40kasie2024.iam.gserviceaccount.com&Expires=2674272946&Signature=RA5yJ7ulR2GtjdaKWU%2FIC0GQbpK5OUH%2BG59RTt0t6Vn%2FJLBdIYg5C7Gr8%2BQPCDyd%2F9X2XX%2B6pCtb%2BVVGxo%2FshHPd9hdgc5GmtOxBMmY6b2iOJGcpb5ac0xaLVO61X7h5H7XtU9eq%2FnZLJCvPWg%2F8%2FDx8Fc3%2FNxEM8GPwEpfaoBorW4nSqv%2BkGyJGJFJXf7rPLiDiEJkM2u1BGhq7m5cPuI%2BjWCysSyL5U272KySzL%2FAfsnFI8lzxAfjCvalQOPTCNTcZ7vDdhT103tgulZklMp3neO%2BQ0WwmZ3E7VK%2BazlaAStIzJAdFBhTrZMWRG%2Bvj4E%2FniE8mwE9%2FFcqVsRHkIw%3D%3D",
+    "routeStartEnd": {
+      "startCityId": "fdcf502d-8cdb-4dfb-a052-bbf485082649",
+      "startCityName": "Kosmos",
+      "endCityId": "eb500b63-6de3-401e-a461-955facfbf81a",
+      "endCityName": "Hartebeestpoort",
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.852025,
+          -25.739123
+        ],
+        "latitude": null,
+        "longitude": null,
+        "geoHash": null
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.85,
+          -25.733333
+        ],
+        "latitude": null,
+        "longitude": null,
+        "geoHash": null
+      }
+    },
+    "calculatedDistances": [],
+    "heading": null,
+    "lengthInMetres": 0,
+    "createdAt": "2024-10-06T05:35:46.785Z",
+    "updatedAt": "2024-10-06T05:35:46.785Z",
+    "__v": 0
+  },
+  {
+    "_id": "6702265992dacb26414d7e8d",
+    "routeId": "9fff0f0e-7afc-459d-a1bd-512330829191",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "Pecanwood Estate  - Randburg",
+    "routeNumber": "",
+    "created": "2024-10-06T05:55:34.568Z",
+    "updated": null,
+    "color": "amber",
+    "userId": "9laYIPrQX1g1WEDuAdR5NZH2nAs1",
+    "userName": "Admin4 Administrator",
+    "activationDate": null,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/kasie2024_media/kasie2024_data/2f3faebd-6159-4b03-9857-9dad6d9a82ac/qrcode_route_1728194134610.png?GoogleAccessId=firebase-adminsdk-wtna4%40kasie2024.iam.gserviceaccount.com&Expires=2674274137&Signature=lwSn1NPyatAGl7wI6Zz%2B6x7mkoH1Y084rUFxIa1p0Y7lDsmhRHUERXxRutXNrDUTb8k1PTdTBbmZe%2BlIMpv9%2BTThb3uUVndaMccO5t9gIWhXKVnzRprsQsy7eFz89jhUbRarxULZy3KKXBUrbeErz%2F9r7lP3PS%2BBFbJUDLuN4HPpAts9pCBqKBANBxWtn%2F2vEIsbS7B9uDuHb%2BHDiqSM%2B7Ah1mckpImvQ%2BtGO8pCxR9msRw1poZM3%2BI4lSv6PI4lfcxOfHszfNLqLj%2B3yxMuFUvKVlsBZuiFEUXqYsE00l%2BAR3lUjrxln1fPamX%2FjtoO9Ybdi176%2BGkhLw8msq%2FcHw%3D%3D",
+    "routeStartEnd": {
+      "startCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "startCityName": "Pecanwood Estate ",
+      "endCityId": "028bb21b-56d9-4015-adbe-4f3c99667577",
+      "endCityName": "Randburg",
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ],
+        "latitude": null,
+        "longitude": null,
+        "geoHash": null
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          28.00123,
+          -26.0941
+        ],
+        "latitude": null,
+        "longitude": null,
+        "geoHash": null
+      }
+    },
+    "calculatedDistances": [],
+    "heading": null,
+    "lengthInMetres": 0,
+    "createdAt": "2024-10-06T05:55:37.244Z",
+    "updatedAt": "2024-10-06T05:55:37.244Z",
+    "__v": 0
+  },
+  {
+    "_id": "67022e2392dacb26414d7ee4",
+    "routeId": "27754400-13c6-40ac-839b-c3376da34eb6",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "La Terraza at Service Station - Pecanwood Estate ",
+    "routeNumber": "",
+    "created": "2024-10-06T06:28:49.450Z",
+    "updated": null,
+    "color": "black",
+    "userId": "9laYIPrQX1g1WEDuAdR5NZH2nAs1",
+    "userName": "Admin4 Administrator",
+    "activationDate": null,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/kasie2024_media/kasie2024_data/2f3faebd-6159-4b03-9857-9dad6d9a82ac/qrcode_route_1728196129486.png?GoogleAccessId=firebase-adminsdk-wtna4%40kasie2024.iam.gserviceaccount.com&Expires=2674276131&Signature=IZzyYj1kzUWZt4Rrn5sNmb3wsyGsONKWoy9mik4%2Bcf0jEil9xDicKRkgpbxpbvUXx3EioK%2BRAcRiwSSe8SLMbdr3X3azXS8Y%2BXVPmdahhGf2rpCMuDgRDb%2FH05gDD95f%2FzuC7tIc7bMXiA1gPgzMDkyifTEOKJWFfYF5meKH0aUGUuWsa0FAIV84tWVBGw1Rk53%2Ftwv39uMUrYTirlIpH6ahkS5S7nuxfL2JT2bHjBYPg0mimv5gHw9P8t%2FlhobsjxUak%2FGu8J%2BkNbvHunLy9n5%2BIXIienXDzCr8IaxBBDeI63aCLhp5pPpmCdrttLeylsVY0VH3OPJxFkFKkpR6ZA%3D%3D",
+    "routeStartEnd": {
+      "startCityId": "c0b0cb29-4846-48d8-8c96-9b1765a3acde",
+      "startCityName": "La Terraza at Service Station",
+      "endCityId": "19af5d0a-34d3-449f-9bbd-5ccd969e2ed4",
+      "endCityName": "Pecanwood Estate ",
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.857746370136734,
+          -25.77664662096486
+        ],
+        "latitude": null,
+        "longitude": null,
+        "geoHash": null
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.858264036476612,
+          -25.76399178942872
+        ],
+        "latitude": null,
+        "longitude": null,
+        "geoHash": null
+      }
+    },
+    "calculatedDistances": [],
+    "heading": null,
+    "lengthInMetres": 0,
+    "createdAt": "2024-10-06T06:28:51.952Z",
+    "updatedAt": "2024-10-06T06:28:51.952Z",
+    "__v": 0
+  },
+  {
+    "_id": "67022e4792dacb26414d7ee6",
+    "routeId": "49a79105-4550-47a5-b70c-2feba4d37142",
+    "countryId": "7a2328bf-915f-4194-82ae-6c220c046cac",
+    "countryName": "South Africa",
+    "name": "La Terraza at Service Station - Kosmos",
+    "routeNumber": "",
+    "created": "2024-10-06T06:29:25.687Z",
+    "updated": null,
+    "color": "pink",
+    "userId": "9laYIPrQX1g1WEDuAdR5NZH2nAs1",
+    "userName": "Admin4 Administrator",
+    "activationDate": null,
+    "associationId": "2f3faebd-6159-4b03-9857-9dad6d9a82ac",
+    "associationName": "The Most Awesome Taxi Association",
+    "qrCodeUrl": "https://storage.googleapis.com/kasie2024_media/kasie2024_data/2f3faebd-6159-4b03-9857-9dad6d9a82ac/qrcode_route_1728196165695.png?GoogleAccessId=firebase-adminsdk-wtna4%40kasie2024.iam.gserviceaccount.com&Expires=2674276167&Signature=WSAtl6nsLKiOhw51VQTZ9RAytwP4Bb3P5j66XgBNEJ9GAmqtVTb3KC%2BJn55ngo6%2By2PDIbFGBKk41uM9FhJ3JrA60K6a7vpJiFt48YtTkfqXrDwhjcYkR72cV4E27llHzjSk%2B8wOphrA1W25gEXTwtqxc4WupXov%2Fn9nQkx%2BbvyNzEJc%2FzkATvA7xplYiHMcIO0dp9OAGwyZrkZtTMsp58754v%2FnUF8bfv7jvsg8nvRgSqubQ%2Fr1wHMFdGgKbK%2BsV25kVJ%2BLfNHYi27LdML2WPQ3fhXQmTiJWWzvgwjrtDmYPB0w9l79KPQP81s9PdFiU6KuS5EQ84iHI8RJ33YcaA%3D%3D",
+    "routeStartEnd": {
+      "startCityId": "c0b0cb29-4846-48d8-8c96-9b1765a3acde",
+      "startCityName": "La Terraza at Service Station",
+      "endCityId": "fdcf502d-8cdb-4dfb-a052-bbf485082649",
+      "endCityName": "Kosmos",
+      "startCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.857746370136734,
+          -25.77664662096486
+        ],
+        "latitude": null,
+        "longitude": null,
+        "geoHash": null
+      },
+      "endCityPosition": {
+        "type": "Point",
+        "coordinates": [
+          27.852025,
+          -25.739123
+        ],
+        "latitude": null,
+        "longitude": null,
+        "geoHash": null
+      }
+    },
+    "calculatedDistances": [],
+    "heading": null,
+    "lengthInMetres": 0,
+    "createdAt": "2024-10-06T06:29:27.139Z",
+    "updatedAt": "2024-10-06T06:29:27.139Z",
+    "__v": 0
+  }
+]

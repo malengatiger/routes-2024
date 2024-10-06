@@ -1,14 +1,15 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/color_and_locale.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/data/data_schemas.dart';
+import 'package:kasie_transie_library/data/route_bag.dart';
 import 'package:kasie_transie_library/l10n/translation_handler.dart';
 import 'package:kasie_transie_library/maps/city_creator_map.dart';
 import 'package:kasie_transie_library/maps/landmark_creator_map.dart';
@@ -29,7 +30,7 @@ import 'package:kasie_transie_library/widgets/tiny_bloc.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/route_editor.dart';
-import 'package:get_it/get_it.dart';
+
 import 'assoc_routes.dart';
 import 'route_list.dart';
 
@@ -121,13 +122,7 @@ class DashboardState extends ConsumerState<Dashboard>
 
   void _control() async {
     user = prefs.getUser();
-    //
-    // try {
-    //   fcmBloc.subscribeToTopics('RouteBuilder');
-    // } catch (e) {
-    //   pp(e);
-    // }
-    _getData(false);
+    _getData();
   }
 
   void _listen() async {
@@ -147,24 +142,24 @@ class DashboardState extends ConsumerState<Dashboard>
     }
   }
 
-  int citiesTotal = 0;
+  int routeCitiesTotal = 0;
 
-  Future _getData(bool refresh) async {
-    pp('$mm ................... get data for routeBuilder dashboard ... refresh: $refresh');
+  Future _getData() async {
+    pp('\n\n$mm ................... get data for routeBuilder dashboard ...');
     user = prefs.getUser();
     if (user == null) {
       throw Exception('Blown up! No User');
     }
-    pp('\n\n ...cached user found: ${user!.toJson()}\n');
     setState(() {
       busy = true;
     });
     try {
-
-        await _getRoutes(refresh);
-        var cities = await zipHandler.getCities(user!.countryId!, false);
-        citiesTotal = cities.length;
-
+      pp('\n\n ... will call zipHandler ...\n');
+      var routeData = await zipHandler.getRoutes(
+          associationId: widget.association.associationId!);
+      var cities = await zipHandler.getCities(user!.countryId!, false);
+      pp('$mm ...  dashboard; country cities found by zipHandler: ${cities.length} ...\n\n');
+      await _populate(routeData);
     } catch (e, stack) {
       pp('$mm ERROR $e : $stack');
       if (mounted) {
@@ -173,40 +168,27 @@ class DashboardState extends ConsumerState<Dashboard>
       }
     }
     //
-    if (mounted) {
-      setState(() {
-        busy = false;
-      });
-    }
-  }
-
-  Future _getRoutes(bool refresh) async {
-    pp('$mm ... routeBuilder dashboard; getting routes .... refresh: $refresh');
-    try {
-      setState(() {
-        busy = true;
-      });
-      if (kIsWeb) {
-        routes = await zipHandler.getRoutes(
-            associationId: widget.association.associationId!, refresh: false);
-        pp('$mm ... routeBuilder dashboard; routes found by zipHandler: ${routes.length} ...');
-      } else {
-        routes = await semCache.getRoutes(
-            widget.association.associationId!);
-      }
-      routes.sort((a,b) => a.name!.compareTo(b.name!));
-      await _countPoints();
-      await _countLandmarks();
-    } catch (e, stack) {
-      pp('$e, $stack');
-      if (mounted) {
-        showErrorSnackBar(message: '$e', context: context);
-      }
-    }
     setState(() {
       busy = false;
     });
-    pp('$mm ... routeBuilder dashboard; routes found: ${routes.length} ...');
+  }
+
+  Future<void> _populate(RouteData routeData) async {
+    routes = routeData.routes;
+    routeLandmarks = routeData.landmarks;
+    routes.sort((a, b) => a.name!.compareTo(b.name!));
+    routeLandmarksTotal = routeData.landmarks.length;
+    routeCitiesTotal = routeData.cities.length;
+    routesTotal = routes.length;
+    routePointsTotal =
+        await semCache.countRoutePoints(widget.association.associationId!);
+    routes.sort((a, b) => a.name!.compareTo(b.name!));
+
+    pp('\n\nAssociation Route Data');
+    pp('$mm ...  dashboard; routes found by zipHandler: 🥬$routesTotal ...');
+    pp('$mm ...  dashboard; routeLandmarks found by zipHandler: 🥬 $routeLandmarksTotal ...');
+    pp('$mm ...  dashboard; routePoints found by zipHandler: 🥬 $routePointsTotal ...');
+    pp('$mm ...  dashboard; routeCities found by zipHandler: 🥬 $routeCitiesTotal ...');
   }
 
   bool popDetails = false;
@@ -387,41 +369,18 @@ class DashboardState extends ConsumerState<Dashboard>
         transitionType: PageTransitionType.leftToRight);
   }
 
-  _countPoints() async {
-    routePointsTotal = await semCache.countRoutePoints(widget.association.associationId!);
-  }
-  _countLandmarks() async {
-    routeLandmarksTotal = await semCache.countRouteLandmarks(widget.association.associationId!);
-  }
-  Widget _getDashContent() {
-    if (widget.association.associationName == null) {
-      return Container(color: Colors.teal,);
-    }
-    return DashContent(
-      user: user!,
-      routesText: routesText,
-      workWithRoutes: workWithRoutes,
-      landmarksText: landmarksText,
-      routePointsText: routePointsText,
-      routePointsTotal: routePointsTotal,
-      routeLandmarksTotal: routeLandmarksTotal,
-      routesTotal: routes.length,
-      heightPadding: 52,
-      crossAxisCount: 2,
-      onNavigateToRoutes: () {
-        navigateToRoutes();
-      },
-      citiesText: citiesText,
-      citiesTotal: citiesTotal,
-      height: 1200, association: widget.association,
-    );
+  _onCreateNewRoute() async {
+    NavigationUtils.navigateTo(
+        context: context,
+        widget: RouteEditor(association: widget.association),
+        transitionType: PageTransitionType.leftToRight);
   }
 
   @override
   Widget build(BuildContext context) {
     final type = getThisDeviceType();
     var padding = 16.0;
-    var fontSize = 16.0;
+    var fontSize = 20.0;
     var centerTitle = true;
     if (type == 'phone') {
       padding = 12.0;
@@ -443,6 +402,7 @@ class DashboardState extends ConsumerState<Dashboard>
                 onPressed: () {
                   _navigateToCityCreator();
                 },
+                tooltip: 'Create new Place (city, town, kasie) etc.',
                 icon: Icon(
                   Icons.edit,
                   color: Theme.of(context).primaryColor,
@@ -451,28 +411,32 @@ class DashboardState extends ConsumerState<Dashboard>
                 onPressed: () {
                   _navigateToColor();
                 },
+                tooltip: 'Change your colours',
                 icon: Icon(
                   Icons.color_lens,
                   color: Theme.of(context).primaryColor,
                 )),
             IconButton(
                 onPressed: () {
-                  _getData(true);
+                  _getData();
                 },
+                tooltip: 'Refresh the association route data',
                 icon: Icon(
                   Icons.refresh,
                   color: Theme.of(context).primaryColor,
                 )),
-            IconButton(
-                onPressed: () {
-                  navigateToRoutes();
-                },
-                icon: Icon(
-                  Icons.route,
-                  color: Theme.of(context).primaryColor,
-                )),
+            gapW32,
+            // IconButton(
+            //     onPressed: () {
+            //       navigateToRoutes();
+            //     },
+            //     icon: Icon(
+            //       Icons.route,
+            //       color: Theme.of(context).primaryColor,
+            //     )),
           ],
-          bottom: PreferredSize(preferredSize: Size.fromHeight(64), child: SizedBox()),
+          bottom: PreferredSize(
+              preferredSize: Size.fromHeight(36), child: SizedBox()),
         ),
         body: Stack(
           children: [
@@ -480,7 +444,27 @@ class DashboardState extends ConsumerState<Dashboard>
               mobile: (ctx) {
                 return Stack(
                   children: [
-                    user == null ? gapW16 : _getDashContent(),
+                    user == null
+                        ? gapW16
+                        : DashContent(
+                            user: user!,
+                            routesText: routesText,
+                            workWithRoutes: workWithRoutes,
+                            landmarksText: landmarksText,
+                            routePointsText: routePointsText,
+                            routePointsTotal: routePointsTotal,
+                            routeLandmarksTotal: routeLandmarksTotal,
+                            routesTotal: routes.length,
+                            heightPadding: 48,
+                            crossAxisCount: 2,
+                            onNavigateToRoutes: () {
+                              navigateToRoutes();
+                            },
+                            citiesText: citiesText,
+                            citiesTotal: routeCitiesTotal,
+                            height: 1200,
+                            association: widget.association,
+                          ),
                   ],
                 );
               },
@@ -493,31 +477,59 @@ class DashboardState extends ConsumerState<Dashboard>
                           children: [
                             SizedBox(
                               width: (width / 2) + 60,
-                              child: _getDashContent(),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                child: DashContent(
+                                  user: user!,
+                                  routesText: routesText,
+                                  workWithRoutes: workWithRoutes,
+                                  landmarksText: landmarksText,
+                                  routePointsText: routePointsText,
+                                  routePointsTotal: routePointsTotal,
+                                  routeLandmarksTotal: routeLandmarksTotal,
+                                  routesTotal: routes.length,
+                                  heightPadding: 48,
+                                  crossAxisCount: 2,
+                                  onNavigateToRoutes: () {
+                                    navigateToRoutes();
+                                  },
+                                  citiesText: citiesText,
+                                  citiesTotal: routeCitiesTotal,
+                                  height: 1200,
+                                  association: widget.association,
+                                ),
+                              ),
                             ),
                             SizedBox(
                               width: (width / 2) - 60,
-                              child: RouteList(
-                                navigateToMapViewer: (r) {
-                                  navigateToMapViewer(r);
-                                },
-                                navigateToLandmarks: (r) {
-                                  navigateToLandmarks(r);
-                                },
-                                navigateToCreatorMap: (r) {
-                                  navigateToCreatorMap(r);
-                                },
-                                routes: routes,
-                                onSendRouteUpdateMessage: (r) {
-                                  onSendRouteUpdateMessage(r);
-                                },
-                                onCalculateDistances: (r) {
-                                  _calculateDistances(r);
-                                },
-                                showRouteDetails: (r) {
-                                  popupDetails(r);
-                                },
-                              ),
+                              child: Padding(
+                                  padding: EdgeInsets.only(right: 24),
+                                  child: RouteListWidget(
+                                    navigateToMapViewer: (r) {
+                                      navigateToMapViewer(r);
+                                    },
+                                    navigateToLandmarks: (r) {
+                                      navigateToLandmarks(r);
+                                    },
+                                    navigateToCreatorMap: (r) {
+                                      navigateToCreatorMap(r);
+                                    },
+                                    routes: routes,
+                                    onSendRouteUpdateMessage: (r) {
+                                      onSendRouteUpdateMessage(r);
+                                    },
+                                    onCalculateDistances: (r) {
+                                      _calculateDistances(r);
+                                    },
+                                    showRouteDetails: (r) {
+                                      popupDetails(r);
+                                    },
+                                    association: widget.association,
+                                    onCreateNewRoute: () {
+                                      _onCreateNewRoute();
+                                    },
+                                  )),
                             ),
                           ],
                         );
@@ -529,11 +541,29 @@ class DashboardState extends ConsumerState<Dashboard>
                           children: [
                             SizedBox(
                               width: (width / 2) + 40,
-                              child: _getDashContent(),
+                              child: DashContent(
+                                user: user!,
+                                routesText: routesText,
+                                workWithRoutes: workWithRoutes,
+                                landmarksText: landmarksText,
+                                routePointsText: routePointsText,
+                                routePointsTotal: routePointsTotal,
+                                routeLandmarksTotal: routeLandmarksTotal,
+                                routesTotal: routes.length,
+                                heightPadding: 48,
+                                crossAxisCount: 2,
+                                onNavigateToRoutes: () {
+                                  navigateToRoutes();
+                                },
+                                citiesText: citiesText,
+                                citiesTotal: routeCitiesTotal,
+                                height: 1200,
+                                association: widget.association,
+                              ),
                             ),
                             SizedBox(
                               width: (width / 2) - 40,
-                              child: RouteList(
+                              child: RouteListWidget(
                                 navigateToMapViewer: (r) {
                                   navigateToMapViewer(r);
                                 },
@@ -552,6 +582,10 @@ class DashboardState extends ConsumerState<Dashboard>
                                 },
                                 showRouteDetails: (r) {
                                   popupDetails(r);
+                                },
+                                association: widget.association,
+                                onCreateNewRoute: () {
+                                  _onCreateNewRoute();
                                 },
                               ),
                             ),
@@ -653,8 +687,6 @@ class DashboardState extends ConsumerState<Dashboard>
                       NavigationUtils.navigateTo(
                           context: context,
                           widget: RouteEditor(
-                            dataApiDog: dataApiDog,
-                            prefs: prefs,
                             association: widget.association,
                           ),
                           transitionType: PageTransitionType.leftToRight);
@@ -689,7 +721,7 @@ class DashboardState extends ConsumerState<Dashboard>
                       style: myTextStyleSmall(context),
                     ),
                     onTap: () {
-                      _getData(true);
+                      _getData();
                     },
                   ),
                 ],
@@ -737,7 +769,8 @@ class DashContent extends StatelessWidget {
       required this.crossAxisCount,
       required this.heightPadding,
       required this.citiesText,
-      required this.citiesTotal, required this.association});
+      required this.citiesTotal,
+      required this.association});
 
   final lib.User user;
   final lib.Association association;
@@ -754,11 +787,11 @@ class DashContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
         elevation: 4,
+        shape: getDefaultRoundedBorder(),
         child: SizedBox(
           height: height,
           child: Column(
@@ -772,32 +805,14 @@ class DashContent extends StatelessWidget {
                     context, Theme.of(context).primaryColor, 18),
               ),
               const SizedBox(
-                height: 8,
+                height: 16,
               ),
               Text(
                 user.name,
                 style: myTextStyleSmall(context),
               ),
               SizedBox(
-                height: heightPadding,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: SizedBox(
-                    width: 400,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.roundabout_left),
-                      style: const ButtonStyle(
-                        elevation: WidgetStatePropertyAll(8.0),
-                      ),
-                      onPressed: () {
-                        onNavigateToRoutes();
-                      },
-                      label: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(workWithRoutes),
-                      ),
-                    )),
+                height: 8,
               ),
               SizedBox(
                 height: heightPadding,
@@ -817,8 +832,8 @@ class DashContent extends StatelessWidget {
                         TotalWidget(
                             caption: routesText,
                             number: routesTotal,
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 28,
+                            color: Colors.green,
+                            fontSize: 40,
                             onTapped: () {}),
                         TotalWidget(
                             caption: landmarksText,

@@ -1,9 +1,9 @@
-import 'package:badges/badges.dart' as bd;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
+import 'package:kasie_transie_library/utils/image_grid.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:page_transition/page_transition.dart';
@@ -44,7 +44,9 @@ class AssociationListState extends State<AssociationList>
       busy = true;
     });
     try {
-      associations = await api.getAssociations(false);
+      associations = await api.getAssociations(refresh);
+      associations
+          .sort((a, b) => a.associationName!.compareTo(b.associationName!));
       pp('$mm ... getting associations:  🍎 ${associations.length} found.');
     } catch (e) {
       pp('$mm error: $e');
@@ -72,47 +74,82 @@ class AssociationListState extends State<AssociationList>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Associations',
-          style: myTextStyleLarge(context),
-        ),
-        actions: [
-          IconButton(onPressed: (){
-            _getAssociations(true);
-          }, icon: Icon(Icons.refresh)),
-        ]
-      ),
+          title: Text(
+            'Associations',
+            style: myTextStyleLarge(context),
+          ),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  _getAssociations(true);
+                },
+                icon: Icon(Icons.refresh)),
+          ]),
       body: SafeArea(
         child: Stack(
           children: [
-            ScreenTypeLayout.builder(mobile: (_){
-              return AssociationList();
-            }, tablet: (_){
-              return AssScaffold(leftWidget: AssociationList(), rightWidget: Container(color:Colors.teal));
-            }, desktop: (_){
-              return AssScaffold(leftWidget: AssociationList(), rightWidget: Container(color:Colors.blue));
-            },),
+            ScreenTypeLayout.builder(
+              mobile: (_) {
+                return getWidget();
+              },
+              tablet: (_) {
+                return AssScaffold(
+                    leftWidget: getWidget(), rightWidget: Container(color: Colors.purple));
+              },
+              desktop: (_) {
+                return AssScaffold(
+                    leftWidget: getWidget(), rightWidget: Container(color: Colors.orange));
+              },
+            ),
           ],
         ),
       ),
     );
   }
+
+  Widget getWidget() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+      child: ListView.builder(
+          itemCount: associations.length,
+          itemBuilder: (_, index) {
+            var ass = associations[index];
+            return GestureDetector(
+                onTap: () {
+                  _navigateToDashboard(ass);
+                },
+                child: Card(
+                    elevation: 8,
+                    child: ListTile(
+                        title: Text(ass.associationName!),
+                        subtitle: Text(
+                          ass.countryName ?? 'NOT AVAILABLE',
+                          style: myTextStyleSmall(context),
+                        ),
+                        leading: Icon(Icons.car_crash_rounded))));
+          }),
+    );
+  }
 }
 
 class AssScaffold extends StatelessWidget {
-  const AssScaffold({super.key, required this.leftWidget, required this.rightWidget});
+  const AssScaffold(
+      {super.key, required this.leftWidget, required this.rightWidget});
 
   final Widget leftWidget, rightWidget;
+
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
     return Scaffold(
-      body: Row(
-        children: [
-          SizedBox(width: (width / 2) - 24, child: leftWidget),
-          SizedBox(width: (width / 2) - 24, child: rightWidget),
-        ],
-      )
-    );
+        body: Padding(
+            padding: EdgeInsets.symmetric(vertical: 48, horizontal: 48),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(width: (width / 2) - 128, child: leftWidget),
+                SizedBox(width: (width / 2) - 48, child: rightWidget),
+              ],
+            )));
   }
 }

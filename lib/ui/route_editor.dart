@@ -7,6 +7,7 @@ import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
+import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/isolates/local_finder.dart';
 import 'package:kasie_transie_library/l10n/translation_handler.dart';
 import 'package:kasie_transie_library/maps/route_creator_map2.dart';
@@ -24,16 +25,9 @@ import 'package:routes_2024/ui/route_detail_form_container.dart';
 import 'package:uuid/uuid.dart' as uu;
 
 class RouteEditor extends ConsumerStatefulWidget {
-  const RouteEditor(
-      {super.key,
-      this.route,
-      required this.dataApiDog,
-      required this.prefs,
-      required this.association});
+  const RouteEditor({super.key, this.route, required this.association});
 
   final lib.Route? route;
-  final DataApiDog dataApiDog;
-  final Prefs prefs;
   final lib.Association association;
 
   @override
@@ -51,7 +45,8 @@ class RouteEditorState extends ConsumerState<RouteEditor>
   lib.User? user;
   lib.Country? country;
   List<lib.Route> routes = [];
-
+  final DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
+  final Prefs prefs = GetIt.instance<Prefs>();
   String colorString = 'black';
   Color color = Colors.black;
   lib.SettingsModel? settingsModel;
@@ -84,7 +79,6 @@ class RouteEditorState extends ConsumerState<RouteEditor>
   bool _showTheFuckingSearch = false;
   double radiusInKM = 100;
   bool sendingRouteUpdateMessage = false;
-  Prefs prefs = GetIt.instance<Prefs>();
 
   @override
   void initState() {
@@ -129,12 +123,12 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     setState(() {});
   }
 
+  SemCache semCache = GetIt.instance<SemCache>();
+
   void _getRoutes() async {
     pp('$mm _getRoutes ...............');
-    var routesIsolate = GetIt.instance<SemCache>();
 
-    final x =
-        await routesIsolate.getRoutes(widget.association.associationId!);
+    final x = await semCache.getRoutes(widget.association.associationId!);
     setState(() {
       routes = x;
     });
@@ -156,6 +150,7 @@ class RouteEditorState extends ConsumerState<RouteEditor>
         settingsModel = prefs.getSettings();
         if (settingsModel == null) {
           pp('$mm ${E.redDot} ${E.redDot}${E.redDot} ${E.redDot} settings did not happen!!');
+          settingsModel = getDefaultSettings();
         } else {
           pp('$mm we seem to be good now ${E.leaf2} what the fuck!');
           myPrettyJsonPrint(settingsModel!.toJson());
@@ -167,35 +162,35 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     _getRoutes();
   }
 
+  SettingsModel getDefaultSettings() {
+    var s = lib.SettingsModel.name();
+    s.associationId = widget.association.associationId;
+    s.commuterGeofenceRadius = 150;
+    s.commuterSearchMinutes = 30;
+    s.vehicleGeoQueryRadius = 100;
+    s.vehicleSearchMinutes = 30;
+    s.loiteringDelay = 30;
+    s.geofenceRadius = 150;
+    s.locale = 'en';
+    return s;
+  }
+
   void findCitiesByLocation(double radius) async {
     setState(() {
       busy = true;
     });
     try {
-      pp('... starting findCitiesByLocation 1...');
+      pp('... starting findCitiesByLocation ...');
       final loc = await locationBloc.getLocation();
-      user = prefs.getUser();
-      pp('... ended location GPS .2..');
-
-      _cities = await localFinder.findNearestCities(
+      var f = LocationFinderParameter(
+          associationId: widget.association.associationId!,
           latitude: loc.latitude,
+          limit: 300,
           longitude: loc.longitude,
-          radiusInMetres: (radius + 2) * 1000);
+          radiusInKM: radius * 1000);
+      _cities = await listApiDog.findCitiesByLocation(f);
 
-      pp('$mm cities found on realm cache by location: ${_cities.length} cities within $radius km ....');
-      //todo - deal with magic number - put limit in settings
-
-      if (_cities.isEmpty) {
-        _cities = await listApiDog.findCitiesByLocation(LocationFinderParameter(
-            associationId: user!.associationId!,
-            latitude: loc.latitude,
-            longitude: loc.longitude,
-            limit: 2000,
-            radiusInKM: radius));
-
-        radiusInKM = radius;
-        pp('$mm cities found by location: ${_cities.length} cities within $radius km ....');
-      }
+      pp('$mm cities found by location: ${_cities.length} cities within $radius km ....');
     } catch (e) {
       pp(e);
     }
@@ -206,6 +201,21 @@ class RouteEditorState extends ConsumerState<RouteEditor>
 
   lib.City? startCity, endCity;
 
+  _onRoutePicked(lib.Route route) async {
+    pp('\n\n$mm route picked: ${route.toJson()}');
+
+    var sCity = await semCache.getCity(route.routeStartEnd!.startCityId!);
+    var eCity = await semCache.getCity(route.routeStartEnd!.endCityId!);
+    startCity = sCity;
+    endCity = eCity;
+    _nameController.text = route.name!;
+    _routeNumberController.text = route.routeNumber?? '';
+
+    setState(() {
+
+    });
+
+  }
   Future<void> findNearestStartCity() async {
     _setRouteName();
     setState(() {
@@ -243,7 +253,6 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     super.dispose();
   }
 
-  DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   bool sending = false;
 
   Future<void> onSubmitRequested() async {
@@ -302,8 +311,8 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     final route = lib.Route(
       routeNumber: _routeNumberController.value.text,
       routeId: const uu.Uuid().v4(),
-      associationId: user!.associationId,
-      associationName: user!.associationName,
+      associationId: widget.association.associationId!,
+      associationName: widget.association.associationName,
       lengthInMetres: 0,
       routeStartEnd: se,
       created: DateTime.now().toUtc().toIso8601String(),
@@ -321,8 +330,18 @@ class RouteEditorState extends ConsumerState<RouteEditor>
       await dataApiDog.addRoute(route);
       pp('$mm ... route has been added ...');
       myPrettyJsonPrint(route.toJson());
+      _resetFields();
       if (mounted) {
-        _showDialog(route);
+        //_showDialog(route);
+        showToast(
+          message: 'Route has been created successfully: ${route.name}',
+          backgroundColor: Colors.green.shade700,
+          textStyle: myTextStyleMediumBoldWithColor(
+              context: context, color: Colors.white, fontSize: 20),
+          context: context,
+          padding: 28.0,
+          duration: const Duration(seconds: 5),
+        );
       }
     } catch (e) {
       pp(e);
@@ -336,6 +355,13 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     setState(() {
       sending = false;
     });
+  }
+
+  _resetFields() {
+    _nameController.text = '';
+    _routeNumberController.text = '';
+    startCity = null;
+    endCity = null;
   }
 
   void _showDialog(lib.Route route) {
@@ -425,156 +451,226 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     final width = MediaQuery.of(context).size.width;
     return SafeArea(
         child: Scaffold(
-      appBar: AppBar(
-        title: Text(
-          routeEditor,
-          style: myTextStyleLarge(context),
-        ),
-        bottom: const PreferredSize(
-            preferredSize: Size.fromHeight(8), child: Column()),
-      ),
-      body: Stack(
-        children: [
-          responsive.ScreenTypeLayout.builder(
-            mobile: (ctx) {
-              return busy
-                  ? Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Center(
-                          child: TimerWidget(
-                              title: searchingCities, isSmallSize: true)),
-                    )
-                  : sending
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 4,
-                            backgroundColor: Colors.indigo,
-                          ),
-                        )
-                      : RouteDetailFormContainer(
-                          formKey: _formKey,
-                          onSendRouteUpdateMessage: onSendRouteUpdateMessage,
-                          onRouteStartSearch: findNearestStartCity,
-                          onRouteEndSearch: findNearestEndCity,
-                          color: color,
-                          nameController: _nameController,
-                          routeNumberController: _routeNumberController,
-                          nearestEnd: endCity,
-                          nearestStart: startCity,
-                          onSubmit: onSubmitRequested,
-                          onColorSelected: (c, s) {
-                            setState(() {
-                              color = c;
-                              colorString = s;
-                            });
-                          },
-                          onRefresh: (radius) {
-                            radiusInKM = radius;
-                            findCitiesByLocation(radius);
-                          },
-                          radiusInKM: 100,
-                          numberOfCities: _cities.length,
-                          createUpdate: createOrUpdate,
-                          routeName: routeName,
-                          routeColor: routeColor,
-                          pleaseEnterRouteName: pleaseEnterRouteName,
-                          routeEnd: routeEnd,
-                          routeStart: routeStart,
-                          tapBelowToStart: tapBelowToStart,
-                          saveRoute: saveRoute,
-                          selectSearchArea: selectSerachArea,
+            appBar: AppBar(
+              title: Text(
+                routeEditor,
+                style: myTextStyleLarge(context),
+              ),
+              bottom: const PreferredSize(
+                  preferredSize: Size.fromHeight(8), child: Column()),
+            ),
+            body: Padding(
+              padding: EdgeInsets.symmetric(vertical: 64, horizontal: 64),
+              child: Stack(
+                children: [
+                  responsive.ScreenTypeLayout.builder(
+                    mobile: (ctx) {
+                      return busy
+                          ? Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Center(
+                                  child: TimerWidget(
+                                      title: searchingCities,
+                                      isSmallSize: true)),
+                            )
+                          : sending
+                              ? const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 4,
+                                    backgroundColor: Colors.indigo,
+                                  ),
+                                )
+                              : RouteDetailFormContainer(
+                                  formKey: _formKey,
+                                  onSendRouteUpdateMessage:
+                                      onSendRouteUpdateMessage,
+                                  onRouteStartSearch: findNearestStartCity,
+                                  onRouteEndSearch: findNearestEndCity,
+                                  color: color,
+                                  nameController: _nameController,
+                                  routeNumberController: _routeNumberController,
+                                  nearestEnd: endCity,
+                                  nearestStart: startCity,
+                                  onSubmit: onSubmitRequested,
+                                  onColorSelected: (c, s) {
+                                    setState(() {
+                                      color = c;
+                                      colorString = s;
+                                    });
+                                  },
+                                  onRefresh: (radius) {
+                                    radiusInKM = radius;
+                                    findCitiesByLocation(radius);
+                                  },
+                                  radiusInKM: 100,
+                                  numberOfCities: _cities.length,
+                                  createUpdate: createOrUpdate,
+                                  routeName: routeName,
+                                  routeColor: routeColor,
+                                  pleaseEnterRouteName: pleaseEnterRouteName,
+                                  routeEnd: routeEnd,
+                                  routeStart: routeStart,
+                                  tapBelowToStart: tapBelowToStart,
+                                  saveRoute: saveRoute,
+                                  selectSearchArea: selectSerachArea,
+                                );
+                    },
+                    tablet: (ctx) {
+                      return responsive.OrientationLayoutBuilder(
+                          portrait: (ctx) {
+                        return Row(
+                          children: [
+                            SizedBox(
+                              width: (width / 2) + 48,
+                              child: RouteDetailFormContainer(
+                                formKey: _formKey,
+                                onSendRouteUpdateMessage:
+                                    onSendRouteUpdateMessage,
+                                numberOfCities: _cities.length,
+                                onRouteStartSearch: findNearestStartCity,
+                                onRouteEndSearch: findNearestEndCity,
+                                color: color,
+                                selectSearchArea: selectSerachArea,
+                                saveRoute: saveRoute,
+                                radiusInKM: radiusInKM,
+                                nameController: _nameController,
+                                routeNumberController: _routeNumberController,
+                                nearestEnd: endCity,
+                                nearestStart: startCity,
+                                onSubmit: onSubmitRequested,
+                                createUpdate: createOrUpdate,
+                                routeName: routeName,
+                                routeColor: routeColor,
+                                pleaseEnterRouteName: pleaseEnterRouteName,
+                                routeEnd: routeEnd,
+                                routeStart: routeStart,
+                                tapBelowToStart: tapBelowToStart,
+                                onColorSelected: (c, s) {
+                                  setState(() {
+                                    color = c;
+                                    colorString = s;
+                                  });
+                                },
+                                onRefresh: (radius) {
+                                  radiusInKM = radius;
+                                  findCitiesByLocation(radius);
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: (width / 2) - 48,
+                              child: StreamBuilder<List<lib.Route>>(
+                                  stream: listApiDog.routeStream,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      routes = snapshot.data!;
+                                    }
+                                    return RouteListMinimum(
+                                      onRoutePicked: (route) {
+                                        pp('$mm route has been picked ...');
+                                        _onRoutePicked(route);
+                                      },
+                                      association: widget.association,
+                                      isMappable: false,
+                                    );
+                                  }),
+                            ),
+                          ],
                         );
-            },
-            tablet: (ctx) {
-              return responsive.OrientationLayoutBuilder(portrait: (ctx) {
-                return Row(
-                  children: [
-                    SizedBox(
-                      width: (width / 2) + 48,
-                      child: RouteDetailFormContainer(
-                        formKey: _formKey,
-                        onSendRouteUpdateMessage: onSendRouteUpdateMessage,
-                        numberOfCities: _cities.length,
-                        onRouteStartSearch: findNearestStartCity,
-                        onRouteEndSearch: findNearestEndCity,
-                        color: color,
-                        selectSearchArea: selectSerachArea,
-                        saveRoute: saveRoute,
-                        radiusInKM: radiusInKM,
-                        nameController: _nameController,
-                        routeNumberController: _routeNumberController,
-                        nearestEnd: endCity,
-                        nearestStart: startCity,
-                        onSubmit: onSubmitRequested,
-                        createUpdate: createOrUpdate,
-                        routeName: routeName,
-                        routeColor: routeColor,
-                        pleaseEnterRouteName: pleaseEnterRouteName,
-                        routeEnd: routeEnd,
-                        routeStart: routeStart,
-                        tapBelowToStart: tapBelowToStart,
-                        onColorSelected: (c, s) {
-                          setState(() {
-                            color = c;
-                            colorString = s;
-                          });
-                        },
-                        onRefresh: (radius) {
-                          radiusInKM = radius;
-                          findCitiesByLocation(radius);
-                        },
-                      ),
-                    ),
-                    SizedBox(
-                      width: (width / 2) - 48,
-                      child: StreamBuilder<List<lib.Route>>(
-                          stream: listApiDog.routeStream,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              routes = snapshot.data!;
-                            }
-                            return RouteListMinimum(
-                              onRoutePicked: (route) {},
-                              association: widget.association,
-                              isMappable: false,
-                            );
-                          }),
-                    ),
-                  ],
-                );
-              });
-            },
-          ),
-          _showTheFuckingSearch
-              ? Positioned(
-                  top: 8.0,
-                  left: leftPadding,
-                  right: leftPadding,
-                  child: SizedBox(
-                    width: 600,
-                    height: 800,
-                    child: CitySearch(
-                      title: findStartCity ? startOfRoute : endOfRoute,
-                      showScaffold: true,
-                      onCitySelected: (c) {
-                        pp('.... city at start: ${c.name}');
-                        if (findEndCity) {
-                          endCity = c;
-                        }
-                        if (findStartCity) {
-                          startCity = c;
-                        }
-                        _setRouteName();
-                        setState(() {
-                          _showTheFuckingSearch = false;
-                        });
-                      },
-                      cities: _cities,
-                    ),
-                  ))
-              : const SizedBox(),
-        ],
-      ),
-    ));
+                      });
+                    },
+                    desktop: (ctx) {
+                      return responsive.OrientationLayoutBuilder(
+                          portrait: (ctx) {
+                        return Row(
+                          children: [
+                            SizedBox(
+                              width: (width / 2),
+                              child: RouteDetailFormContainer(
+                                formKey: _formKey,
+                                onSendRouteUpdateMessage:
+                                    onSendRouteUpdateMessage,
+                                numberOfCities: _cities.length,
+                                onRouteStartSearch: findNearestStartCity,
+                                onRouteEndSearch: findNearestEndCity,
+                                color: color,
+                                selectSearchArea: selectSerachArea,
+                                saveRoute: saveRoute,
+                                radiusInKM: radiusInKM,
+                                nameController: _nameController,
+                                routeNumberController: _routeNumberController,
+                                nearestEnd: endCity,
+                                nearestStart: startCity,
+                                onSubmit: onSubmitRequested,
+                                createUpdate: createOrUpdate,
+                                routeName: routeName,
+                                routeColor: routeColor,
+                                pleaseEnterRouteName: pleaseEnterRouteName,
+                                routeEnd: routeEnd,
+                                routeStart: routeStart,
+                                tapBelowToStart: tapBelowToStart,
+                                onColorSelected: (c, s) {
+                                  setState(() {
+                                    color = c;
+                                    colorString = s;
+                                  });
+                                },
+                                onRefresh: (radius) {
+                                  radiusInKM = radius;
+                                  findCitiesByLocation(radius);
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: (width / 2) - 160,
+                              child: StreamBuilder<List<lib.Route>>(
+                                  stream: listApiDog.routeStream,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      routes = snapshot.data!;
+                                    }
+                                    return RouteListMinimum(
+                                      onRoutePicked: (route) {},
+                                      association: widget.association,
+                                      isMappable: false,
+                                    );
+                                  }),
+                            ),
+                          ],
+                        );
+                      });
+                    },
+                  ),
+                  _showTheFuckingSearch
+                      ? Positioned(
+                          bottom: 8.0,
+                          left: leftPadding,
+                          right: leftPadding,
+                          child: SizedBox(
+                            width: 460,
+                            height: 800,
+                            child: CitySearch(
+                              title: findStartCity ? startOfRoute : endOfRoute,
+                              showScaffold: true,
+                              onCitySelected: (c) {
+                                pp('.... city at start: ${c.name}');
+                                if (findEndCity) {
+                                  endCity = c;
+                                }
+                                if (findStartCity) {
+                                  startCity = c;
+                                }
+                                _setRouteName();
+                                setState(() {
+                                  _showTheFuckingSearch = false;
+                                });
+                              },
+                              cities: _cities,
+                            ),
+                          ))
+                      : const SizedBox(),
+                ],
+              ),
+            )));
   }
 }
