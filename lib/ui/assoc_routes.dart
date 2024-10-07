@@ -170,6 +170,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
           context: context,
           widget: RouteMapViewer(
             routeId: route.routeId!,
+            associationId: route.associationId!,
             onRouteUpdated: () {
               pp('\n\n$mm onRouteUpdated ... do something Boss!');
               _refresh(true);
@@ -209,7 +210,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
     NavigationUtils.navigateTo(
         context: context,
         widget: RouteInfoWidget(
-          routeId: route.routeId,
+          routeId: route.routeId!,
           onClose: () {
             Navigator.of(context).pop();
           },
@@ -218,7 +219,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
           },
           onColorChanged: (color, string) {
             _sendColorChange(color, string);
-          },
+          }, associationId: widget.associationId,
         ),
         transitionType: PageTransitionType.leftToRight);
   }
@@ -509,14 +510,15 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                     SizedBox(
                                       width: (width / 2),
                                       child: RouteInfoWidget(
-                                        routeId: selectedRouteId,
+                                        routeId: selectedRouteId!,
+
                                         onClose: () {},
                                         onColorChanged: (color, string) {
                                           _sendColorChange(color, string);
                                         },
                                         onNavigateToMapViewer: () {
                                           navigateToMapViewer(selectedRoute!);
-                                        },
+                                        }, associationId: widget.associationId,
                                       ),
                                     ),
                                   ],
@@ -541,10 +543,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                         onCalculateDistances: (r) {
                                           calculateDistances(r);
                                         },
-                                        showRouteDetails: (route) {}, association: association!, onCreateNewRoute: (){
-                                        pp('$mm onCreateNewRoute');
-
-                                      },
+                                        showRouteDetails: (route) {}, association: association!, onCreateNewRoute: (){},
                                       ),
                                     ),
                                     const SizedBox(
@@ -553,14 +552,14 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                     SizedBox(
                                       width: (width / 2),
                                       child: RouteInfoWidget(
-                                        routeId: selectedRouteId,
+                                        routeId: selectedRouteId!,
                                         onClose: () {},
                                         onNavigateToMapViewer: () {
                                           navigateToMapViewer(selectedRoute!);
                                         },
                                         onColorChanged: (color, string) {
                                           _sendColorChange(color, string);
-                                        },
+                                        }, associationId: widget.associationId,
                                       ),
                                     ),
                                   ],

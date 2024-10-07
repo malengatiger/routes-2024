@@ -123,7 +123,7 @@ class RouteListWidget extends StatelessWidget {
                     gapW32,
                     Center(
                       child: Text(
-                        'Routes',
+                        'Taxi Routes',
                         style: myTextStyleMediumLarge(context, 36),
                       ),
                     ),
@@ -164,11 +164,14 @@ class RouteListWidget extends StatelessWidget {
                             child: Card(
                               shape: getRoundedBorder(radius: 16),
                               elevation: elevation,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  '${rt.name}',
-                                  style: myTextStyleSmall(context),
+                              child: ListTile(
+                                leading: Text('${index + 1}', style: myTextStyleMediumLargeWithColor(context, Theme.of(context).primaryColor, 14),),
+                                title: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
+                                    '${rt.name}',
+                                    style: myTextStyleSmall(context),
+                                  ),
                                 ),
                               ),
                             ),

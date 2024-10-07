@@ -248,16 +248,19 @@ class DashboardState extends ConsumerState<Dashboard>
       );
       await dataApiDog.sendRouteUpdateMessage(req);
       pp('$mm onSendRouteUpdateMessage happened OK! ${E.nice}');
-    } catch (e) {
-      pp(e);
       if (mounted) {
         showToast(
             duration: const Duration(seconds: 5),
             padding: 20,
             textStyle: myTextStyleMedium(context),
-            backgroundColor: Colors.amber,
+            backgroundColor: Colors.green,
             message: 'Route Update message sent OK',
             context: context);
+      }
+    } catch (e) {
+      pp(e);
+      if (mounted) {
+        showErrorSnackBar(message: '$e', context: context);
       }
     }
     setState(() {
@@ -315,6 +318,7 @@ class DashboardState extends ConsumerState<Dashboard>
           context: context,
           widget: RouteMapViewer(
             routeId: route.routeId!,
+            associationId: route.associationId!,
             onRouteUpdated: () {
               pp('\n\n$mm onRouteUpdated ... do something Boss!');
               // _refresh(true);
@@ -603,7 +607,7 @@ class DashboardState extends ConsumerState<Dashboard>
                     left: padding,
                     right: padding,
                     child: RouteInfoWidget(
-                      routeId: route!.routeId,
+                      routeId: route!.routeId!,
                       onClose: () {
                         setState(() {
                           popDetails = false;
@@ -614,7 +618,7 @@ class DashboardState extends ConsumerState<Dashboard>
                       },
                       onColorChanged: (color, stringColor) {
                         _sendColorChange(color, stringColor);
-                      },
+                      }, associationId: route!.associationId!,
                     ))
                 : const SizedBox(),
             busy
