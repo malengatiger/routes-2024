@@ -157,8 +157,11 @@ class DashboardState extends ConsumerState<Dashboard>
       pp('\n\n ... will call zipHandler ...\n');
       var routeData = await zipHandler.getRoutes(
           associationId: widget.association.associationId!);
-      var cities = await zipHandler.getCities(user!.countryId!, false);
-      pp('$mm ...  dashboard; country cities found by zipHandler: ${cities.length} ...\n\n');
+      var c = await semCache.getCities();
+      if (c.isEmpty) {
+        var cities = await zipHandler.getCities(user!.countryId!, false);
+        pp('$mm ...  dashboard; country cities found by zipHandler: ${cities.length} ...\n\n');
+      }
       await _populate(routeData);
     } catch (e, stack) {
       pp('$mm ERROR $e : $stack');
@@ -180,15 +183,14 @@ class DashboardState extends ConsumerState<Dashboard>
     routeLandmarksTotal = routeData.landmarks.length;
     routeCitiesTotal = routeData.cities.length;
     routesTotal = routes.length;
-    routePointsTotal =
-        await semCache.countRoutePoints(widget.association.associationId!);
+    routePointsTotal = routeData.routePoints.length;
     routes.sort((a, b) => a.name!.compareTo(b.name!));
 
-    pp('\n\nAssociation Route Data');
-    pp('$mm ...  dashboard; routes found by zipHandler: 🥬$routesTotal ...');
-    pp('$mm ...  dashboard; routeLandmarks found by zipHandler: 🥬 $routeLandmarksTotal ...');
-    pp('$mm ...  dashboard; routePoints found by zipHandler: 🥬 $routePointsTotal ...');
-    pp('$mm ...  dashboard; routeCities found by zipHandler: 🥬 $routeCitiesTotal ...');
+    pp('\n\n$mm Association Route Data');
+    pp('$mm ...  dashboard; routes found : 🥬$routesTotal ...');
+    pp('$mm ...  dashboard; routeLandmarks found : 🥬 $routeLandmarksTotal ...');
+    pp('$mm ...  dashboard; routePoints found : 🥬 $routePointsTotal ...');
+    pp('$mm ...  dashboard; routeCities found : 🥬 $routeCitiesTotal ...');
   }
 
   bool popDetails = false;
