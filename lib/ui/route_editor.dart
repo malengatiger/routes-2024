@@ -529,6 +529,7 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                                   stream: listApiDog.routeStream,
                                   builder: (context, snapshot) {
                                     if (snapshot.hasData) {
+                                      pp('$mm snapshot has routes: ${snapshot.data!.length}');
                                       routes = snapshot.data!;
                                     }
                                     return RouteListMinimum(

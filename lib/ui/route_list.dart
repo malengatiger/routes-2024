@@ -20,7 +20,9 @@ class RouteListWidget extends StatelessWidget {
       this.currentRoute,
       required this.onSendRouteUpdateMessage,
       required this.onCalculateDistances,
-      required this.showRouteDetails, required this.association, required this.onCreateNewRoute});
+      required this.showRouteDetails,
+      required this.association,
+      required this.onCreateNewRoute});
 
   final Function(lib.Route) navigateToMapViewer;
   final Function(lib.Route) navigateToLandmarks;
@@ -128,7 +130,7 @@ class RouteListWidget extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Create new Route',
+                        tooltip: 'Create new Route',
                         onPressed: () {
                           _onCreateRoute();
                         },
@@ -141,8 +143,12 @@ class RouteListWidget extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 16.0),
                 child: bd.Badge(
                   position: bd.BadgePosition.topEnd(end: 12, top: -20),
-                  badgeContent: Text('${routes.length}', style: TextStyle(color: Colors.white),),
-                  badgeStyle: const bd.BadgeStyle(padding: EdgeInsets.all(16), elevation: 16),
+                  badgeContent: Text(
+                    '${routes.length}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  badgeStyle: const bd.BadgeStyle(
+                      padding: EdgeInsets.all(16), elevation: 16),
                   child: ListView.builder(
                       itemCount: routes.length,
                       itemBuilder: (ctx, index) {
@@ -165,7 +171,19 @@ class RouteListWidget extends StatelessWidget {
                               shape: getRoundedBorder(radius: 16),
                               elevation: elevation,
                               child: ListTile(
-                                leading: Text('${index + 1}', style: myTextStyleMediumLargeWithColor(context, Theme.of(context).primaryColor, 14),),
+                                leading: Container(
+                                  height: 24, width: 24,
+                                  color: getColor(rt.color!) ,
+                                  child: Center(
+                                    child: Text(
+                                      '${index + 1}',
+                                      style: myTextStyleMediumLargeWithColor(
+                                          context,
+                                          rt.color == 'white'? Colors.black:Colors.white,
+                                          14),
+                                    ),
+                                  ),
+                                ),
                                 title: Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Text(
