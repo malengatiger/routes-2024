@@ -1,14 +1,14 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:kasie_transie_library/widgets/auth/email_auth_container.dart';
 import 'package:kasie_transie_library/auth/phone_auth_signin2.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
-import 'package:kasie_transie_library/auth/email_auth_signin.dart';
-import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
@@ -63,58 +63,54 @@ class KasieIntroState extends State<KasieIntro>
       pp('$mm ... the device should be ready for sign in or registration');
       return;
     }
-    var ass = prefs.getAssociation();
-    if (ass != null) {
-      pp('$mm cached assoc: ${ass.associationName} ....... ');
-    }
     pp('$mm '
         '🥬🥬🥬auth is DEFINITELY authenticated and OK');
     authed = true;
 
     if (user!.associationId! == 'ADMIN') {
-        associations = await dog.getAssociations(false);
-        if (associations.isEmpty) {
-          if (mounted) {
-            showErrorSnackBar(
-                message: 'No Associations found', context: context);
-          }
-          return;
-        }
+      associations = await dog.getAssociations(false);
+      if (associations.isEmpty) {
         if (mounted) {
-          if (ass == null) {
-            NavigationUtils.navigateTo(
-                context: context,
-                widget: AssociationList(),
-                transitionType: PageTransitionType.leftToRight);
-          } else {
-            NavigationUtils.navigateTo(
-                context: context,
-                widget: Dashboard(ass),
-                transitionType: PageTransitionType.leftToRight);
-          }
+          showErrorSnackBar(message: 'No Associations found', context: context);
         }
-      } else {
-        //normal association admin user ....
+        return;
+      }
+      if (mounted) {
         NavigationUtils.navigateTo(
             context: context,
-            widget: Dashboard(ass!),
+            widget: AssociationList(),
             transitionType: PageTransitionType.leftToRight);
       }
+    } else {
+      //normal association admin user ....
+      var ass = prefs.getAssociation();
+      if (ass != null) {
+        NavigationUtils.navigateTo(
+            context: context,
+            widget: Dashboard(ass),
+            transitionType: PageTransitionType.leftToRight);
+      }
+    }
 
     pp('$mm ... setting state, 💙authed = $authed  💙 ${user!.toJson()} 💙');
     setState(() {});
   }
 
   onSignInWithEmail() async {
-    pp('$mm ...  onSignInWithEmail');
-    NavigationUtils.navigateTo(
+    pp('$mm ...  onSignInWithEmail; ... starting ...');
+    var ok = await NavigationUtils.navigateTo(
         context: context,
-        widget: EmailAuthSignin(onGoodSignIn: () {
-          onSuccessfulSignIn();
-        }, onSignInError: () {
-          showSnackBar(message: "Sign In failed", context: context);
-        }),
+        widget: const EmailAuthContainer(),
         transitionType: PageTransitionType.leftToRight);
+
+    pp('$mm ...  onSignInWithEmail; ... back from sign in, result: $ok ...');
+    if (ok) {
+      onSuccessfulSignIn();
+    } else {
+      if (mounted) {
+        showToast(message: 'Sign in failed', context: context);
+      }
+    }
   }
 
   onSignInWithPhone() async {
@@ -136,8 +132,6 @@ class KasieIntroState extends State<KasieIntro>
   onRegister() {
     pp('$mm ... onRegister ....');
   }
-
-  void onSignIn() async {}
 
   void onSuccessfulSignIn() {
     var user = prefs.getUser();
@@ -170,7 +164,7 @@ class KasieIntroState extends State<KasieIntro>
   }
 
   List<IntroPage> getItems(double width) {
-    List<int> indexes = [1,2,3,4,5,6,7,8,9,10];
+    List<int> indexes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     indexes.shuffle();
 
     return [

@@ -210,7 +210,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
     NavigationUtils.navigateTo(
         context: context,
         widget: RouteInfoWidget(
-          routeId: route.routeId!,
+          route: route,
           onClose: () {
             Navigator.of(context).pop();
           },
@@ -219,7 +219,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
           },
           onColorChanged: (color, string) {
             _sendColorChange(color, string);
-          }, associationId: widget.associationId,
+          },
         ),
         transitionType: PageTransitionType.leftToRight);
   }
@@ -246,7 +246,10 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
   void _navigateToCityCreator() {
     NavigationUtils.navigateTo(
         context: context,
-        widget: const CityCreatorMap(),
+        widget:  CityCreatorMap(onCityAdded: (c ) {
+          pp('$mm ... city added: ${c.name}');
+
+        },),
         transitionType: PageTransitionType.leftToRight);
   }
 
@@ -508,9 +511,9 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                       width: 32,
                                     ),
                                     SizedBox(
-                                      width: (width / 2),
-                                      child: RouteInfoWidget(
-                                        routeId: selectedRouteId!,
+                                      width: (width / 2) - 48,
+                                      child: selectedRoute == null? gapW32: RouteInfoWidget(
+                                        route: selectedRoute!,
 
                                         onClose: () {},
                                         onColorChanged: (color, string) {
@@ -518,7 +521,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                         },
                                         onNavigateToMapViewer: () {
                                           navigateToMapViewer(selectedRoute!);
-                                        }, associationId: widget.associationId,
+                                        },
                                       ),
                                     ),
                                   ],
@@ -551,15 +554,15 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                     ),
                                     SizedBox(
                                       width: (width / 2),
-                                      child: RouteInfoWidget(
-                                        routeId: selectedRouteId!,
+                                      child: selectedRoute == null? gapW32: RouteInfoWidget(
+                                        route: selectedRoute!,
                                         onClose: () {},
                                         onNavigateToMapViewer: () {
                                           navigateToMapViewer(selectedRoute!);
                                         },
                                         onColorChanged: (color, string) {
                                           _sendColorChange(color, string);
-                                        }, associationId: widget.associationId,
+                                        },
                                       ),
                                     ),
                                   ],
@@ -620,7 +623,10 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                         style: myTextStyleSmall(context)),
                     onTap: () {
                       pp('$mm navigate to city creator map .......');
-                      NavigationUtils.navigateTo(context: context, widget: const CityCreatorMap(), transitionType: PageTransitionType.leftToRight);
+                      NavigationUtils.navigateTo(context: context, widget:  CityCreatorMap(onCityAdded: (c ) {
+                        pp('$mm ... city added: ${c.name}');
+
+                      },), transitionType: PageTransitionType.leftToRight);
                     },
                   ),
                   const SizedBox(

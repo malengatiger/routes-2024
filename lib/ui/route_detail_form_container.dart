@@ -1,10 +1,9 @@
+import 'package:badges/badges.dart' as bd;
 import 'package:flutter/material.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
-import 'package:badges/badges.dart' as bd;
 import 'package:kasie_transie_library/widgets/city_widget.dart';
 import 'package:kasie_transie_library/widgets/color_picker.dart';
-
 
 class RouteDetailFormContainer extends StatelessWidget {
   const RouteDetailFormContainer(
@@ -29,7 +28,9 @@ class RouteDetailFormContainer extends StatelessWidget {
       required this.routeEnd,
       required this.routeColor,
       required this.pleaseEnterRouteName,
-      required this.routeName, required this.saveRoute, required this.selectSearchArea});
+      required this.routeName,
+      required this.saveRoute,
+      required this.selectSearchArea});
 
   final GlobalKey<FormState> formKey;
   final Function onRouteStartSearch;
@@ -46,7 +47,8 @@ class RouteDetailFormContainer extends StatelessWidget {
       tapBelowToStart,
       routeStart,
       routeEnd,
-      routeColor, saveRoute,
+      routeColor,
+      saveRoute,
       selectSearchArea,
       pleaseEnterRouteName,
       routeName;
@@ -62,15 +64,9 @@ class RouteDetailFormContainer extends StatelessWidget {
         padding: const EdgeInsets.all(4.0),
         child: Column(
           children: [
-            const SizedBox(
-              height: 12,
-            ),
-            Text(
-              createUpdate,
-              style: myTextStyleMedium(context),
-            ),
-             SizedBox(
-              height: type == 'phone'? 24: 48,
+
+            SizedBox(
+              height: type == 'phone' ? 24 : 48,
             ),
             Expanded(
                 child: SingleChildScrollView(
@@ -85,39 +81,7 @@ class RouteDetailFormContainer extends StatelessWidget {
                         const SizedBox(
                           height: 28,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              tapBelowToStart,
-                              style: myTextStyleSmall(context),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 28,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            onRouteStartSearch();
-                          },
-                          child: CityWidget(
-                            city: nearestStart,
-                            title: routeStart,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 32,
-                        ),
-                        GestureDetector(
-                            onTap: () {
-                              onRouteEndSearch();
-                            },
-                            child: CityWidget(
-                                city: nearestEnd, title: routeEnd)),
-                        const SizedBox(
-                          height: 28,
-                        ),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -190,16 +154,60 @@ class RouteDetailFormContainer extends StatelessWidget {
                             const SizedBox(
                               width: 12,
                             ),
-                            bd.Badge(
-                                badgeContent: Text('$numberOfCities', style: myTextStyleTiny(context),),
-                                badgeStyle: const bd.BadgeStyle(
-                                  elevation: 8,
-                                  badgeColor: Colors.teal,
-                                  padding: EdgeInsets.all(12.0),
-                                )),
                           ],
                         ),
 
+                        const SizedBox(
+                          height: 24,
+                        ),
+                        Row(mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            bd.Badge(
+                                badgeContent: Text(
+                                  '$numberOfCities',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                badgeStyle: const bd.BadgeStyle(
+                                  elevation: 8,
+                                  badgeColor: Colors.black,
+                                  padding: EdgeInsets.all(20.0),
+                                )),
+                            gapW32,
+                            const Text('Cities/Town and Places to pick from'),
+                          ],
+                        ),
+                        gapH32,
+                        gapH32,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              tapBelowToStart,
+                              style: myTextStyleSmall(context),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            onRouteStartSearch();
+                          },
+                          child: CityWidget(
+                            city: nearestStart,
+                            title: routeStart,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 32,
+                        ),
+                        GestureDetector(
+                            onTap: () {
+                              onRouteEndSearch();
+                            },
+                            child:
+                            CityWidget(city: nearestEnd, title: routeEnd)),
                         const SizedBox(
                           height: 28,
                         ),
@@ -227,7 +235,7 @@ class RouteDetailFormContainer extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                             Text(routeColor),
+                            Text(routeColor),
                             const SizedBox(
                               width: 24,
                             ),
@@ -257,15 +265,19 @@ class RouteDetailFormContainer extends StatelessWidget {
                             }),
                           ],
                         ),
-                         SizedBox(
-                          height: type == 'phone'? 48:100,
+                        SizedBox(
+                          height: type == 'phone' ? 48 : 100,
                         ),
-                        SizedBox(width: 300,
+                        SizedBox(
+                          width: 300,
                           child: ElevatedButton(
+                              style: ButtonStyle(
+                                elevation: WidgetStatePropertyAll(8),
+                              ),
                               onPressed: () {
                                 onSubmit();
                               },
-                              child:  Padding(
+                              child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 20.0, vertical: 20),
                                 child: Text(saveRoute),

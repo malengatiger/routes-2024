@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kasie_transie_library/bloc/register_services.dart';
 import 'package:kasie_transie_library/bloc/theme_bloc.dart';
+import 'package:kasie_transie_library/data/color_and_locale.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/utils/functions.dart';
+import 'package:kasie_transie_library/utils/theme.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:get_it/get_it.dart';
@@ -17,7 +19,7 @@ import 'intro/splash_page.dart';
 late FirebaseApp firebaseApp;
 fb.User? fbAuthedUser;
 const mx = '🔵🔵🔵🔵 🍅 KasieTransie RouteBuilder : main  🍅 🔵🔵';
-
+late ColorAndLocale colorAndLocale;
 Future<void>
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +48,8 @@ main() async {
     pp(e);
   }
   Prefs prefs = GetIt.instance<Prefs>();
-  // await temporarySignOut(prefs);
+  colorAndLocale = prefs.getColorAndLocale();
+
   me = prefs.getUser();
   if (me != null) {
     myPrettyJsonPrint(me!.toJson());
@@ -83,14 +86,24 @@ class KasieTransieApp extends ConsumerWidget {
                 'build: theme index has been set to ${snapshot.data!.themeIndex}'
                 '  and locale == ${snapshot.data!.locale.toString()}');
             themeIndex = snapshot.data!.themeIndex;
+          } else {
+            themeIndex = colorAndLocale.themeIndex;
           }
 
           return MaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'KasieTransie',
-              theme: themeBloc.getTheme(themeIndex).darkTheme,
-              darkTheme: themeBloc.getTheme(themeIndex).darkTheme,
-              themeMode: ThemeMode.system,
+              theme: ThemeData(
+                colorScheme: MaterialTheme.lightScheme(),
+                useMaterial3: true,
+                primaryColor: Colors.teal,
+                primaryColorDark: Colors.teal.shade900,
+                primaryColorLight: Colors.teal.shade300,
+              ),
+
+              // theme: themeBloc.getTheme(themeIndex).darkTheme,
+              // darkTheme: themeBloc.getTheme(themeIndex).darkTheme,
+              // themeMode: ThemeMode.system,
               home: AnimatedSplashScreen(
                 splash: const SplashWidget(),
                 animationDuration: const Duration(milliseconds: 2000),

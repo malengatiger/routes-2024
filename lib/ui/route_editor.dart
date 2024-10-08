@@ -10,16 +10,13 @@ import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/isolates/local_finder.dart';
 import 'package:kasie_transie_library/l10n/translation_handler.dart';
-import 'package:kasie_transie_library/maps/route_creator_map2.dart';
 import 'package:kasie_transie_library/utils/device_location_bloc.dart';
 import 'package:kasie_transie_library/utils/emojis.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
-import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/widgets/city_selection.dart';
 import 'package:kasie_transie_library/widgets/route_list_minimum.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart' as responsive;
 import 'package:routes_2024/ui/route_detail_form_container.dart';
 import 'package:uuid/uuid.dart' as uu;
@@ -77,16 +74,34 @@ class RouteEditorState extends ConsumerState<RouteEditor>
   bool findStartCity = false;
   bool findEndCity = false;
   bool _showTheFuckingSearch = false;
-  double radiusInKM = 100;
+  double radiusInKM = 500;
   bool sendingRouteUpdateMessage = false;
 
   @override
   void initState() {
     _controller = AnimationController(vsync: this);
     super.initState();
-    _setTexts();
-    _getUser();
-    findCitiesByLocation(radiusInKM);
+    _control();
+  }
+
+  void _control() async {
+    setState(() {
+      busy = true;
+    });
+    try {
+      await _setTexts();
+      await _getUser();
+      await _getRoutes();
+      await findCitiesByLocation();
+    } catch (e) {
+      pp(e);
+      if (mounted) {
+        showErrorSnackBar(message: '$e', context: context);
+      }
+    }
+    setState(() {
+      busy = false;
+    });
   }
 
   Future _setTexts() async {
@@ -125,19 +140,13 @@ class RouteEditorState extends ConsumerState<RouteEditor>
 
   SemCache semCache = GetIt.instance<SemCache>();
 
-  void _getRoutes() async {
-    pp('$mm _getRoutes ...............');
-
-    final x = await semCache.getRoutes(widget.association.associationId!);
-    setState(() {
-      routes = x;
-    });
-    pp('$mm _getRoutes ............... routes: ${routes.length}');
-  }
-
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
 
-  void _getUser() async {
+  _getRoutes() async {
+    routes = await semCache.getRoutes(widget.association.associationId!);
+  }
+
+  Future _getUser() async {
     user = prefs.getUser();
     country = prefs.getCountry();
     settingsModel = prefs.getSettings();
@@ -159,7 +168,6 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     } else {
       pp('$mm ${E.nice} ${E.nice} ${E.nice} ${E.nice} -- nice, check sign in widget!!');
     }
-    _getRoutes();
   }
 
   SettingsModel getDefaultSettings() {
@@ -175,28 +183,29 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     return s;
   }
 
-  void findCitiesByLocation(double radius) async {
-    setState(() {
-      busy = true;
-    });
+  Future findCitiesByLocation() async {
     try {
-      pp('... starting findCitiesByLocation ...');
       final loc = await locationBloc.getLocation();
+      pp('... starting findCitiesByLocation ... lng: ${loc.latitude} lat: ${loc.longitude}');
       var f = LocationFinderParameter(
           associationId: widget.association.associationId!,
           latitude: loc.latitude,
-          limit: 300,
+          limit: 500,
           longitude: loc.longitude,
-          radiusInKM: radius * 1000);
-      _cities = await listApiDog.findCitiesByLocation(f);
+          radiusInKM: radiusInKM);
 
-      pp('$mm cities found by location: ${_cities.length} cities within $radius km ....');
+      _cities = await listApiDog.findCitiesByLocation(f);
+      pp('$mm cities found by location: ${_cities.length} cities within $radiusInKM km ....');
+      if (_cities.isEmpty) {
+        if (mounted) {
+          showErrorSnackBar(
+              message: 'No cities/towns/places found. Cannot execute!',
+              context: context);
+        }
+      }
     } catch (e) {
       pp(e);
     }
-    setState(() {
-      busy = false;
-    });
   }
 
   lib.City? startCity, endCity;
@@ -209,13 +218,11 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     startCity = sCity;
     endCity = eCity;
     _nameController.text = route.name!;
-    _routeNumberController.text = route.routeNumber?? '';
+    _routeNumberController.text = route.routeNumber ?? '';
 
-    setState(() {
-
-    });
-
+    setState(() {});
   }
+
   Future<void> findNearestStartCity() async {
     _setRouteName();
     setState(() {
@@ -364,47 +371,6 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     endCity = null;
   }
 
-  void _showDialog(lib.Route route) {
-    showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: Text(
-                nextStep,
-                style: myTextStyleLarge(context),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text(no),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: Text(yes),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    NavigationUtils.navigateTo(
-                        context: context,
-                        widget: RouteCreatorMap2(route: route),
-                        transitionType: PageTransitionType.leftToRight);
-                  },
-                )
-              ],
-              content: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(doYouWantToMap),
-                      ),
-                    ],
-                  )));
-        });
-  }
 
   void onSendRouteUpdateMessage() async {
     pp("$mm onSendRouteUpdateMessage .........");
@@ -500,9 +466,9 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                                   },
                                   onRefresh: (radius) {
                                     radiusInKM = radius;
-                                    findCitiesByLocation(radius);
+                                    findCitiesByLocation();
                                   },
-                                  radiusInKM: 100,
+                                  radiusInKM: 200,
                                   numberOfCities: _cities.length,
                                   createUpdate: createOrUpdate,
                                   routeName: routeName,
@@ -553,7 +519,7 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                                 },
                                 onRefresh: (radius) {
                                   radiusInKM = radius;
-                                  findCitiesByLocation(radius);
+                                  findCitiesByLocation();
                                 },
                               ),
                             ),
@@ -617,7 +583,7 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                                 },
                                 onRefresh: (radius) {
                                   radiusInKM = radius;
-                                  findCitiesByLocation(radius);
+                                  findCitiesByLocation();
                                 },
                               ),
                             ),
@@ -665,10 +631,16 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                                   _showTheFuckingSearch = false;
                                 });
                               },
-                              cities: _cities,
+                              cities: _cities, onCityAdded: (c ) {
+                                pp('$mm ... city added: ${c.name}');
+                                findCitiesByLocation();
+                            },
                             ),
                           ))
                       : const SizedBox(),
+                  busy? Positioned(
+                    child: Center( child: TimerWidget(title: 'Finding cities, towns and places ...', isSmallSize: true),)
+                  ): gapW32,
                 ],
               ),
             )));

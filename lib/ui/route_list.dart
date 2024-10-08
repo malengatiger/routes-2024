@@ -141,8 +141,8 @@ class RouteListWidget extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 16.0),
                 child: bd.Badge(
                   position: bd.BadgePosition.topEnd(end: 12, top: -20),
-                  badgeContent: Text('${routes.length}'),
-                  badgeStyle: const bd.BadgeStyle(padding: EdgeInsets.all(16)),
+                  badgeContent: Text('${routes.length}', style: TextStyle(color: Colors.white),),
+                  badgeStyle: const bd.BadgeStyle(padding: EdgeInsets.all(16), elevation: 16),
                   child: ListView.builder(
                       itemCount: routes.length,
                       itemBuilder: (ctx, index) {
@@ -170,7 +170,7 @@ class RouteListWidget extends StatelessWidget {
                                   padding: const EdgeInsets.all(16.0),
                                   child: Text(
                                     '${rt.name}',
-                                    style: myTextStyleSmall(context),
+                                    style: myTextStyleMediumLarge(context, 16),
                                   ),
                                 ),
                               ),

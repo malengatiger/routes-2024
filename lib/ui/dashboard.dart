@@ -198,9 +198,18 @@ class DashboardState extends ConsumerState<Dashboard>
 
   void popupDetails(lib.Route route) {
     this.route = route;
-    setState(() {
-      popDetails = true;
-    });
+
+    NavigationUtils.navigateTo(
+        context: context,
+        widget: RouteInfoWidget(
+          route: route,
+          onClose: () {
+            Navigator.of(context).pop();
+          },
+          onNavigateToMapViewer: () {},
+          onColorChanged: (color, str) {},
+        ),
+        transitionType: PageTransitionType.leftToRight);
   }
 
   @override
@@ -371,7 +380,9 @@ class DashboardState extends ConsumerState<Dashboard>
   void _navigateToCityCreator() {
     NavigationUtils.navigateTo(
         context: context,
-        widget: const CityCreatorMap(),
+        widget:  CityCreatorMap(onCityAdded: (c ) {
+          pp('$mm ... city added: ${c.name}');
+        },),
         transitionType: PageTransitionType.leftToRight);
   }
 
@@ -600,27 +611,6 @@ class DashboardState extends ConsumerState<Dashboard>
                 });
               },
             ),
-            popDetails
-                ? Positioned(
-                    top: 0,
-                    bottom: 0,
-                    left: padding,
-                    right: padding,
-                    child: RouteInfoWidget(
-                      routeId: route!.routeId!,
-                      onClose: () {
-                        setState(() {
-                          popDetails = false;
-                        });
-                      },
-                      onNavigateToMapViewer: () {
-                        navigateToMapViewer(route!);
-                      },
-                      onColorChanged: (color, stringColor) {
-                        _sendColorChange(color, stringColor);
-                      }, associationId: route!.associationId!,
-                    ))
-                : const SizedBox(),
             busy
                 ? const Positioned(
                     child: Center(
@@ -676,7 +666,9 @@ class DashboardState extends ConsumerState<Dashboard>
                       pp('$mm navigate to city creator map .......');
                       NavigationUtils.navigateTo(
                           context: context,
-                          widget: const CityCreatorMap(),
+                          widget: CityCreatorMap(onCityAdded: (c ) {
+                            pp('$mm ... city added: ${c.name}');
+                          },),
                           transitionType: PageTransitionType.leftToRight);
                     },
                   ),
@@ -807,11 +799,11 @@ class DashContent extends StatelessWidget {
               ),
               Text(
                 association.associationName!,
-                style: myTextStyleMediumLargeWithColor(
-                    context, Theme.of(context).primaryColor, 18),
+                style: myTextStyleMediumLarge(
+                    context, 24),
               ),
               const SizedBox(
-                height: 16,
+                height: 32,
               ),
               Text(
                 user.name,
@@ -838,25 +830,21 @@ class DashContent extends StatelessWidget {
                         TotalWidget(
                             caption: routesText,
                             number: routesTotal,
-                            color: Colors.green,
                             fontSize: 40,
                             onTapped: () {}),
                         TotalWidget(
                             caption: landmarksText,
                             number: routeLandmarksTotal,
-                            color: Theme.of(context).primaryColor,
                             fontSize: 28,
                             onTapped: () {}),
                         TotalWidget(
                             caption: routePointsText,
                             number: routePointsTotal,
-                            color: Colors.grey.shade600,
                             fontSize: 28,
                             onTapped: () {}),
                         TotalWidget(
                             caption: citiesText,
                             number: citiesTotal,
-                            color: Colors.grey.shade600,
                             fontSize: 28,
                             onTapped: () {}),
                       ],

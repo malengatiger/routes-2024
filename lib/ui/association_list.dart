@@ -74,8 +74,9 @@ class AssociationListState extends State<AssociationList>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
           title: Text(
-            'Associations',
+            'Taxi Associations/Organizations',
             style: myTextStyleLarge(context),
           ),
           actions: [
@@ -84,6 +85,7 @@ class AssociationListState extends State<AssociationList>
                   _getAssociations(true);
                 },
                 icon: Icon(Icons.refresh)),
+            gapW32,
           ]),
       body: SafeArea(
         child: Stack(
@@ -94,11 +96,11 @@ class AssociationListState extends State<AssociationList>
               },
               tablet: (_) {
                 return AssScaffold(
-                    leftWidget: getWidget(), rightWidget: Container(color: Colors.purple));
+                    leftWidget: getWidget(), rightWidget: ImageGrid(crossAxisCount: 3,));
               },
               desktop: (_) {
                 return AssScaffold(
-                    leftWidget: getWidget(), rightWidget: Container(color: Colors.orange));
+                    leftWidget: getWidget(), rightWidget: ImageGrid(crossAxisCount: 3,));
               },
             ),
           ],
@@ -121,12 +123,12 @@ class AssociationListState extends State<AssociationList>
                 child: Card(
                     elevation: 8,
                     child: ListTile(
-                        title: Text(ass.associationName!),
+                        title: Text(ass.associationName!, style: myTextStyleMediumLarge(context,  20),),
                         subtitle: Text(
                           ass.countryName ?? 'NOT AVAILABLE',
                           style: myTextStyleSmall(context),
                         ),
-                        leading: Icon(Icons.car_crash_rounded))));
+                        leading: Icon(Icons.car_crash_rounded, color: Theme.of(context).primaryColor))));
           }),
     );
   }
