@@ -13,6 +13,7 @@ import 'package:kasie_transie_library/utils/theme.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:get_it/get_it.dart';
+import 'package:routes_2024/ui/association/association_main.dart';
 import 'firebase_options.dart';
 import 'intro/kasie_intro.dart';
 import 'intro/splash_page.dart';
@@ -109,7 +110,7 @@ class KasieTransieApp extends ConsumerWidget {
                 animationDuration: const Duration(milliseconds: 2000),
                 curve: Curves.easeInCirc,
                 splashIconSize: 160.0,
-                nextScreen: const KasieIntro(),
+                nextScreen: const AssociationMain(),
                 splashTransition: SplashTransition.fadeTransition,
                 pageTransitionType: PageTransitionType.leftToRight,
                 backgroundColor: Colors.teal.shade900,
