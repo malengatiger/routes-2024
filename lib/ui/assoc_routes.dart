@@ -432,7 +432,9 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                       NavigationUtils.navigateTo(
                           context: context,
                           widget: RouteEditor(
-                            association: association!,
+                            association: association!, onRouteAdded: (r ) {
+                            _getInitialData(true);
+                          },
                           ),
                           transitionType: PageTransitionType.leftToRight);
                     }
@@ -461,7 +463,6 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                 navigateToMapViewer: navigateToMapViewer,
                                 navigateToLandmarks: navigateToLandmarks,
                                 navigateToCreatorMap: navigateToCreatorMap,
-                                routes: routes,
                                 onSendRouteUpdateMessage: (route) {
                                   onSendRouteUpdateMessage(route);
                                 },
@@ -494,7 +495,6 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                             navigateToLandmarks,
                                         navigateToCreatorMap:
                                             navigateToCreatorMap,
-                                        routes: routes,
                                         onSendRouteUpdateMessage: (route) {
                                           onSendRouteUpdateMessage(route);
                                         },
@@ -539,7 +539,6 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                                         navigateToCreatorMap:
                                             navigateToCreatorMap,
                                         currentRoute: selectedRoute,
-                                        routes: routes,
                                         onSendRouteUpdateMessage: (route) {
                                           onSendRouteUpdateMessage(route);
                                         },
@@ -641,7 +640,10 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
                     onTap: () {
                       if (association != null) {
                         NavigationUtils.navigateTo(context: context, widget: RouteEditor(
-                          association: association!,
+                          association: association!, onRouteAdded: (r ) {
+                          _getInitialData(true);
+
+                        },
                         ), transitionType: PageTransitionType.leftToRight);
 
                       }

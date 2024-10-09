@@ -13,19 +13,20 @@ import 'package:kasie_transie_library/l10n/translation_handler.dart';
 import 'package:kasie_transie_library/utils/device_location_bloc.dart';
 import 'package:kasie_transie_library/utils/emojis.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
+import 'package:kasie_transie_library/utils/image_grid.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/widgets/city_selection.dart';
-import 'package:kasie_transie_library/widgets/route_list_minimum.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:responsive_builder/responsive_builder.dart' as responsive;
 import 'package:routes_2024/ui/route_detail_form_container.dart';
 import 'package:uuid/uuid.dart' as uu;
 
 class RouteEditor extends ConsumerStatefulWidget {
-  const RouteEditor({super.key, this.route, required this.association});
+  const RouteEditor({required this.onRouteAdded, super.key, this.route, required this.association});
 
   final lib.Route? route;
   final lib.Association association;
+  final Function(lib.Route) onRouteAdded;
 
   @override
   ConsumerState createState() => RouteEditorState();
@@ -334,17 +335,18 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     );
 
     try {
-      await dataApiDog.addRoute(route);
+      var res = await dataApiDog.addRoute(route);
       pp('$mm ... route has been added ...');
-      myPrettyJsonPrint(route.toJson());
+      myPrettyJsonPrint(res.toJson());
       _resetFields();
+      widget.onRouteAdded(res);
       if (mounted) {
         //_showDialog(route);
         showToast(
-          message: 'Route has been created successfully: ${route.name}',
+          message: 'Route has been created:\n ${route.name}',
           backgroundColor: Colors.green.shade700,
           textStyle: myTextStyleMediumBoldWithColor(
-              context: context, color: Colors.white, fontSize: 20),
+              context: context, color: Colors.white, fontSize: 16),
           context: context,
           padding: 28.0,
           duration: const Duration(seconds: 5),
@@ -353,9 +355,8 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     } catch (e) {
       pp(e);
       if (mounted) {
-        showSnackBar(
-            duration: const Duration(seconds: 15),
-            message: 'Route failed: $e',
+        showErrorToast(
+            message: '$e',
             context: context);
       }
     }
@@ -370,7 +371,6 @@ class RouteEditorState extends ConsumerState<RouteEditor>
     startCity = null;
     endCity = null;
   }
-
 
   void onSendRouteUpdateMessage() async {
     pp("$mm onSendRouteUpdateMessage .........");
@@ -483,68 +483,54 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                     },
                     tablet: (ctx) {
                       return responsive.OrientationLayoutBuilder(
-                          portrait: (ctx) {
-                        return Row(
-                          children: [
-                            SizedBox(
-                              width: (width / 2) + 48,
-                              child: RouteDetailFormContainer(
-                                formKey: _formKey,
-                                onSendRouteUpdateMessage:
-                                    onSendRouteUpdateMessage,
-                                numberOfCities: _cities.length,
-                                onRouteStartSearch: findNearestStartCity,
-                                onRouteEndSearch: findNearestEndCity,
-                                color: color,
-                                selectSearchArea: selectSerachArea,
-                                saveRoute: saveRoute,
-                                radiusInKM: radiusInKM,
-                                nameController: _nameController,
-                                routeNumberController: _routeNumberController,
-                                nearestEnd: endCity,
-                                nearestStart: startCity,
-                                onSubmit: onSubmitRequested,
-                                createUpdate: createOrUpdate,
-                                routeName: routeName,
-                                routeColor: routeColor,
-                                pleaseEnterRouteName: pleaseEnterRouteName,
-                                routeEnd: routeEnd,
-                                routeStart: routeStart,
-                                tapBelowToStart: tapBelowToStart,
-                                onColorSelected: (c, s) {
-                                  setState(() {
-                                    color = c;
-                                    colorString = s;
-                                  });
-                                },
-                                onRefresh: (radius) {
-                                  radiusInKM = radius;
-                                  findCitiesByLocation();
-                                },
+                        portrait: (ctx) {
+                          return Row(
+                            children: [
+                              SizedBox(
+                                width: (width / 2) + 48,
+                                child: RouteDetailFormContainer(
+                                  formKey: _formKey,
+                                  onSendRouteUpdateMessage:
+                                      onSendRouteUpdateMessage,
+                                  numberOfCities: _cities.length,
+                                  onRouteStartSearch: findNearestStartCity,
+                                  onRouteEndSearch: findNearestEndCity,
+                                  color: color,
+                                  selectSearchArea: selectSerachArea,
+                                  saveRoute: saveRoute,
+                                  radiusInKM: radiusInKM,
+                                  nameController: _nameController,
+                                  routeNumberController: _routeNumberController,
+                                  nearestEnd: endCity,
+                                  nearestStart: startCity,
+                                  onSubmit: onSubmitRequested,
+                                  createUpdate: createOrUpdate,
+                                  routeName: routeName,
+                                  routeColor: routeColor,
+                                  pleaseEnterRouteName: pleaseEnterRouteName,
+                                  routeEnd: routeEnd,
+                                  routeStart: routeStart,
+                                  tapBelowToStart: tapBelowToStart,
+                                  onColorSelected: (c, s) {
+                                    setState(() {
+                                      color = c;
+                                      colorString = s;
+                                    });
+                                  },
+                                  onRefresh: (radius) {
+                                    radiusInKM = radius;
+                                    findCitiesByLocation();
+                                  },
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              width: (width / 2) - 48,
-                              child: StreamBuilder<List<lib.Route>>(
-                                  stream: listApiDog.routeStream,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      pp('$mm snapshot has routes: ${snapshot.data!.length}');
-                                      routes = snapshot.data!;
-                                    }
-                                    return RouteListMinimum(
-                                      onRoutePicked: (route) {
-                                        pp('$mm route has been picked ...');
-                                        _onRoutePicked(route);
-                                      },
-                                      association: widget.association,
-                                      isMappable: false,
-                                    );
-                                  }),
-                            ),
-                          ],
-                        );
-                      });
+                              SizedBox(
+                                width: (width / 2) - 64,
+                                child: ImageGrid(crossAxisCount: 3),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                     desktop: (ctx) {
                       return responsive.OrientationLayoutBuilder(
@@ -552,7 +538,7 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                         return Row(
                           children: [
                             SizedBox(
-                              width: (width / 2),
+                              width: (width / 2) - 200,
                               child: RouteDetailFormContainer(
                                 formKey: _formKey,
                                 onSendRouteUpdateMessage:
@@ -589,26 +575,15 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                               ),
                             ),
                             SizedBox(
-                              width: (width / 2) - 160,
-                              child: StreamBuilder<List<lib.Route>>(
-                                  stream: listApiDog.routeStream,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      routes = snapshot.data!;
-                                    }
-                                    return RouteListMinimum(
-                                      onRoutePicked: (route) {},
-                                      association: widget.association,
-                                      isMappable: false,
-                                    );
-                                  }),
+                              width: (width / 2) - 80,
+                              child: ImageGrid(crossAxisCount: 3),
                             ),
                           ],
                         );
                       });
                     },
                   ),
-                  _showTheFuckingSearch
+                  _showTheFuckingSearch && _cities.isNotEmpty
                       ? Positioned(
                           bottom: 8.0,
                           left: leftPadding,
@@ -632,16 +607,30 @@ class RouteEditorState extends ConsumerState<RouteEditor>
                                   _showTheFuckingSearch = false;
                                 });
                               },
-                              cities: _cities, onCityAdded: (c ) {
+                              cities: _cities,
+                              onCityAdded: (c) {
                                 pp('$mm ... city added: ${c.name}');
                                 findCitiesByLocation();
-                            },
+                              },
                             ),
                           ))
                       : const SizedBox(),
-                  busy? Positioned(
-                    child: Center( child: TimerWidget(title: 'Finding cities, towns and places ...', isSmallSize: true),)
-                  ): gapW32,
+                  busy
+                      ? Positioned(
+                          child: Center(
+                          child: TimerWidget(
+                              title: 'Finding cities, towns and places ...',
+                              isSmallSize: false),
+                        ))
+                      : gapW32,
+                  sending
+                      ? Positioned(
+                      child: Center(
+                        child: TimerWidget(
+                            title: 'Adding route to database',
+                            isSmallSize: false),
+                      ))
+                      : gapW32,
                 ],
               ),
             )));

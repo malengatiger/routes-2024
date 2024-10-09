@@ -389,7 +389,9 @@ class DashboardState extends ConsumerState<Dashboard>
   _onCreateNewRoute() async {
     NavigationUtils.navigateTo(
         context: context,
-        widget: RouteEditor(association: widget.association),
+        widget: RouteEditor(association: widget.association, onRouteAdded: (r ) {
+          _getData();
+        },),
         transitionType: PageTransitionType.leftToRight);
   }
 
@@ -532,7 +534,6 @@ class DashboardState extends ConsumerState<Dashboard>
                                     navigateToCreatorMap: (r) {
                                       navigateToCreatorMap(r);
                                     },
-                                    routes: routes,
                                     onSendRouteUpdateMessage: (r) {
                                       onSendRouteUpdateMessage(r);
                                     },
@@ -590,7 +591,6 @@ class DashboardState extends ConsumerState<Dashboard>
                                 navigateToCreatorMap: (r) {
                                   navigateToCreatorMap(r);
                                 },
-                                routes: routes,
                                 onSendRouteUpdateMessage: (r) {
                                   onSendRouteUpdateMessage(r);
                                 },
@@ -617,7 +617,7 @@ class DashboardState extends ConsumerState<Dashboard>
                     child: Padding(
                       padding: EdgeInsets.all(24.0),
                       child: TimerWidget(
-                          title: 'Data refreshing ...', isSmallSize: true),
+                          title: 'Data refreshing ...', isSmallSize: false),
                     ),
                   ))
                 : gapH16,
@@ -685,7 +685,9 @@ class DashboardState extends ConsumerState<Dashboard>
                       NavigationUtils.navigateTo(
                           context: context,
                           widget: RouteEditor(
-                            association: widget.association,
+                            association: widget.association, onRouteAdded: (r ) {
+                              _getData();
+                          },
                           ),
                           transitionType: PageTransitionType.leftToRight);
                     },
@@ -731,24 +733,6 @@ class DashboardState extends ConsumerState<Dashboard>
     );
   }
 
-  void _sendColorChange(Color color, stringColor) async {
-    pp('$mm send color change to : $color');
-    setState(() {
-      busy = true;
-    });
-    try {
-      selectedRoute = await dataApiDog.updateRouteColor(
-          routeId: selectedRoute!.routeId!, color: stringColor);
-    } catch (e) {
-      pp(e);
-      if (mounted) {
-        showSnackBar(message: 'Colour update failed\n$e', context: context);
-      }
-    }
-    setState(() {
-      busy = false;
-    });
-  }
 }
 
 class DashContent extends StatelessWidget {
