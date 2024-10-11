@@ -70,6 +70,7 @@ class VehiclesEditState extends State<VehiclesEdit>
   }
 
   List<Vehicle> cars = [];
+  String? result;
   void _getCars() async {
     cars = await listApiDog.getCarsFromBackend(widget.association.associationId!);
     setState(() {
@@ -153,20 +154,21 @@ class VehiclesEditState extends State<VehiclesEdit>
     });
 
     try {
-      var result = await dataApiDog.importVehiclesFromCSV(
+      var addCarsResponse = await dataApiDog.importVehiclesFromCSV(
           csvFile!, widget.association.associationId!);
       _getCars();
       if (mounted) {
-        var msg = '🌿 Vehicles added: ${result!.cars.length} errors: ${result.errors.length}';
+        var msg = '🌿 Vehicles added: ${addCarsResponse!.cars.length} errors: ${addCarsResponse.errors.length}';
+        result = msg;
         showOKToast(message: msg, context: context);
       }
     } catch (e, s) {
       pp('$e $s');
+      result = '$e';
       if (mounted) {
         showErrorToast(message: '$e', context: context);
       }
     }
-
     setState(() {
       busy = false;
     });
@@ -365,6 +367,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                       padding: EdgeInsets.all(20),
                                       child: Text('Submit'))),
                             ),
+                      result == null? gapW32: Text('$result!')
                     ],
                   )),
             ),

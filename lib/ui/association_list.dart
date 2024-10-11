@@ -57,7 +57,7 @@ class AssociationListState extends State<AssociationList>
           color: Theme.of(context).primaryColor,
         ),
         onPressed: () {
-          _navigateToDashboard(ass);
+          _navigateToRoutesDash(ass);
         }));
     //
     list.add(FocusedMenuItem(
@@ -104,7 +104,7 @@ class AssociationListState extends State<AssociationList>
 
   Prefs prefs = GetIt.instance<Prefs>();
 
-  _navigateToDashboard(Association ass) {
+  _navigateToRoutesDash(Association ass) {
     pp('$mm ... _navigateToDashboard ...');
     prefs.saveAssociation(ass);
     NavigationUtils.navigateTo(
@@ -167,29 +167,41 @@ class AssociationListState extends State<AssociationList>
             var ass = associations[index];
             return GestureDetector(
                 onTap: () {
-                  _navigateToDashboard(ass);
+                  _navigateToRoutesDash(ass);
                 },
-                child: FocusedMenuHolder(
-                  onPressed: () {
-                    pp('💛️️ tapped FocusedMenuHolder ...');
-                  },
-                  menuItems: _getMenuItems(ass, context),
-                  animateMenuItems: true,
-                  openWithTap: true,
-                  child: Card(
-                      elevation: 8,
-                      child: ListTile(
-                          title: Text(
-                            ass.associationName!,
-                            style: myTextStyleMediumLarge(context, 20),
-                          ),
-                          subtitle: Text(
-                            ass.countryName ?? 'NOT AVAILABLE',
-                            style: myTextStyleSmall(context),
-                          ),
-                          leading: Icon(Icons.car_crash_rounded,
-                              color: Theme.of(context).primaryColor))),
-                ));
+                child: Card(
+                    elevation: 8,
+                    child: ListTile(
+                        title: Text(
+                          ass.associationName!,
+                          style: myTextStyleMediumLarge(context, 20),
+                        ),
+                        subtitle: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  ass.countryName ?? 'NOT AVAILABLE',
+                                  style: myTextStyleSmall(context),
+                                ),
+                              ],
+                            ),
+                            gapH8,
+                            Row(mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                TextButton(onPressed: (){
+                                  _navigateToRoutesDash(ass);
+                                }, child: Text('Manage Routes')),
+                                gapW32,
+                                TextButton(onPressed: (){
+                                  _navigateToData(ass);
+                                }, child: Text('Manage Data')),
+                              ],
+                            )
+                          ],
+                        ),
+                        leading: Icon(Icons.car_crash_rounded,
+                            color: Theme.of(context).primaryColor))));
           }),
     );
   }

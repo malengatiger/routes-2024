@@ -98,7 +98,7 @@ class KasieIntroState extends State<KasieIntro>
 
   onSignInWithEmail() async {
     pp('$mm ...  onSignInWithEmail; ... starting ...');
-    var ok = await NavigationUtils.navigateTo(
+    bool ok = await NavigationUtils.navigateTo(
         context: context,
         widget: const EmailAuthContainer(),
         transitionType: PageTransitionType.leftToRight);
@@ -108,7 +108,7 @@ class KasieIntroState extends State<KasieIntro>
       onSuccessfulSignIn();
     } else {
       if (mounted) {
-        showToast(message: 'Sign in failed', context: context);
+        showErrorToast(message: 'Sign in bad, Boss!', context: context);
       }
     }
   }
@@ -138,13 +138,15 @@ class KasieIntroState extends State<KasieIntro>
     if (user != null) {
       if (user.associationId == 'ADMIN') {
         if (mounted) {
-          NavigationUtils.navigateTo(
+          showOKToast(message: 'Sign in good, Boss!', context: context);
+        NavigationUtils.navigateTo(
               context: context,
               widget: const AssociationList(),
               transitionType: PageTransitionType.leftToRight);
         }
       } else {
         if (mounted) {
+          showOKToast(message: 'Sign in good, Boss!', context: context);
           NavigationUtils.navigateTo(
               context: context,
               widget:

@@ -1,16 +1,19 @@
-ownerName,cellphone,vehicleReg,model,make,year,passengerCapacity
-Jerry Smith,+27729990211,FPB 54 GP,Quantum,Toyota,2024,16
-Jerry Smith,+27729990211,FFB 77 GP,Quantum,Toyota,2022,16
-Jerry Smith,+27729990211,RFN 21 GP,Quantum,Toyota,2022,16
-Jerry Smith,+27729990211,FPM 24 GP,Quantum,Toyota,2023,16
-Tommy Johnson,+27729990112,PDM 61 GP,Quantum,Toyota,2020,16
-David Jensen-Peters,+27729990113,PMR 58 GP,Quantum,Toyota,2018,16
-Pen Ferreira,+27729990114,DMR 68 GP,Quantum,Toyota,2014,16
-Samuel Hunter,+27729990115,FMD 55 GP,Quantum,Toyota,2019,16
-Bernard Peters,+27729990116,FXM 33 GP,Quantum,Toyota,2019,16
-Frank Johns,+27729990117,GTB 80 GP,Quantum,Toyota,2024,16
-Frank Johns,+27729990117,GTB 82 GP,Quantum,Toyota,2024,16
-Frank Johns,+27729990117,GTB 83 GP,Quantum,Toyota,2024,16
-Frank Johns,+27729990117,GTB 84 GP,Quantum,Toyota,2024,16
-Frank Johns,+27729990117,GTB 85 GP,Quantum,Toyota,2024,16
-Frank Johns,+27729990117,GTB 81 GP,Quantum,Toyota,2024,16
+ownerName,vehicleReg,model,make,year,passengerCapacity
+MaryAnne Manganyi,FNN 54 GP,Quantum,Toyota,2024,16
+MaryAnne Manganyi,FKN 77 GP,Quantum,Toyota,2022,16
+MaryAnne Manganyi,RFN 21 GP,Quantum,Toyota,2022,16
+MaryAnne Manganyi,FNG 24 GP,Quantum,Toyota,2023,16
+Qinny Marule,RNM 61 GP,Quantum,Toyota,2020,16
+Doris Jensen-Fred,GCN 58 GP,Quantum,Toyota,2018,16
+Darleen P Ferreira,GCN 68 GP,Quantum,Toyota,2014,16
+Gregory Hunter,GND 55 GP,Quantum,Toyota,2019,16
+Nancy S. Jones,GNM 33 GP,Quantum,Toyota,2019,16
+Jimmy G  Nkuna,TTG 80 GP,Quantum,Toyota,2024,16
+Jimmy G  Nkuna,TTG 82 GP,Quantum,Toyota,2024,16
+Jimmy G  Nkuna,TTG 83 GP,Quantum,Toyota,2024,16
+Jimmy G  Nkuna,TTG 84 GP,Quantum,Toyota,2024,16
+Jimmy G  Nkuna,TTG 85 GP,Quantum,Toyota,2024,16
+Jimmy G  Nkuna,TTG 81 GP,Quantum,Toyota,2024,16
+Danielle Fiona Smith,PQB 88 GP,Quantum,Toyota,2024,16
+Danielle Fiona Smith,QPD 32 GP,Quantum,Toyota,2024,16
+Gregory Hunter,PQD 35 GP,Quantum,Toyota,2022,16
