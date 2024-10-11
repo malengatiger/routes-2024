@@ -110,7 +110,7 @@ class KasieTransieApp extends ConsumerWidget {
                 animationDuration: const Duration(milliseconds: 2000),
                 curve: Curves.easeInCirc,
                 splashIconSize: 160.0,
-                nextScreen: const AssociationMain(),
+                nextScreen: const KasieIntro(),
                 splashTransition: SplashTransition.fadeTransition,
                 pageTransitionType: PageTransitionType.leftToRight,
                 backgroundColor: Colors.teal.shade900,

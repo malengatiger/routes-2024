@@ -34,16 +34,16 @@ import 'package:routes_2024/ui/route_editor.dart';
 import 'assoc_routes.dart';
 import 'route_list.dart';
 
-class Dashboard extends ConsumerStatefulWidget {
-  const Dashboard(this.association, {super.key});
+class RouteDataWidget extends ConsumerStatefulWidget {
+  const RouteDataWidget(this.association, {super.key});
 
   final Association association;
 
   @override
-  ConsumerState createState() => DashboardState();
+  ConsumerState createState() => RouteDataState();
 }
 
-class DashboardState extends ConsumerState<Dashboard>
+class RouteDataState extends ConsumerState<RouteDataWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   static const mm = '😡😡😡😡 RouteBuilder Dashboard: 💪 ';

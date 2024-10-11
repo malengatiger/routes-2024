@@ -41,8 +41,10 @@ dependencies:
   fluttertoast: ^8.2.8
   google_maps_flutter_web: ^0.5.10
   flutter_popup: ^3.3.0
-  sidebarx: ^0.17.1
+  file_picker: ^8.1.2
+  universal_io: ^2.2.2
   pretty_print_json:
+  universal_html: ^2.2.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

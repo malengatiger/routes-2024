@@ -11,6 +11,7 @@ class AssociationMain extends StatefulWidget {
   const AssociationMain({super.key, this.association});
 
   final Association? association;
+
   @override
   AssociationMainState createState() => AssociationMainState();
 }
@@ -26,6 +27,10 @@ class AssociationMainState extends State<AssociationMain>
     super.initState();
     if (widget.association == null) {
       currentWidget = AssociationEdit();
+    } else {
+      currentWidget = AssociationEdit(
+        association: widget.association,
+      );
     }
   }
 
@@ -39,23 +44,32 @@ class AssociationMainState extends State<AssociationMain>
   Widget? currentWidget;
 
   getWidget() {
-    pp('$mm getting widget : $index');
+    pp('$mm getting current widget : $index');
     late Widget mWidget;
     switch (index) {
       case 0:
-        currentWidget = AssociationEdit();
+        if (widget.association != null) {
+          currentWidget = UsersEdit(association: widget.association!,);
+        }
         break;
       case 1:
-        currentWidget = UsersEdit();
+        if (widget.association != null) {
+          currentWidget = VehiclesEdit(
+            association: widget.association!,
+          );
+        }
         break;
       case 2:
-        currentWidget = VehiclesEdit();
-        break;
-      case 3:
         currentWidget = RoutesEdit();
         break;
+
       default:
-        currentWidget = Container(color: Colors.teal);
+        currentWidget = Container(
+          color: Colors.red,
+          child: Center(
+            child: Text('WTF?'),
+          ),
+        );
     }
 
     setState(() {});
@@ -66,7 +80,12 @@ class AssociationMainState extends State<AssociationMain>
     var width = MediaQuery.sizeOf(context).width;
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Association Data Manager'),
+          title: Text(
+            widget.association == null
+                ? 'Association Data Manager'
+                : widget.association!.associationName!,
+            style: myTextStyleMediumLargeWithSize(context, 24),
+          ),
         ),
         body: SafeArea(
             child: Stack(
@@ -102,9 +121,9 @@ class AssociationMainState extends State<AssociationMain>
                       child: currentWidget == null
                           ? Container(color: Colors.teal)
                           : Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Card(elevation: 8, child: currentWidget!),
-                          ),
+                              padding: const EdgeInsets.all(20.0),
+                              child: Card(elevation: 8, child: currentWidget!),
+                            ),
                     ),
                   ],
                 );
@@ -142,19 +161,12 @@ class KasieNavigation extends StatelessWidget {
                 ],
               )),
           gapH32,
+          gapH32,
+          gapH32,
+
           GestureDetector(
             onTap: () {
               onTapped(0);
-            },
-            child: ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Create Association'),
-            ),
-          ),
-          gapH32,
-          GestureDetector(
-            onTap: () {
-              onTapped(1);
             },
             child: ListTile(
               leading: Icon(Icons.people),
@@ -164,7 +176,7 @@ class KasieNavigation extends StatelessWidget {
           gapH32,
           GestureDetector(
             onTap: () {
-              onTapped(2);
+              onTapped(1);
             },
             child: ListTile(
               leading: Icon(Icons.car_crash_rounded),
@@ -172,15 +184,7 @@ class KasieNavigation extends StatelessWidget {
             ),
           ),
           gapH32,
-          GestureDetector(
-            onTap: () {
-              onTapped(3);
-            },
-            child: ListTile(
-              leading: Icon(Icons.roundabout_right),
-              title: Text('Manage Association Routes'),
-            ),
-          ),
+
         ],
       ),
     );

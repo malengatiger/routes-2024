@@ -16,7 +16,7 @@ import 'package:routes_2024/intro/intro_carousel.dart';
 
 import '../ui/assoc_routes.dart';
 import '../ui/association_list.dart';
-import '../ui/dashboard.dart';
+import '../ui/route_data_widget.dart';
 import 'intro_page_one.dart';
 
 class KasieIntro extends StatefulWidget {
@@ -87,7 +87,7 @@ class KasieIntroState extends State<KasieIntro>
       if (ass != null) {
         NavigationUtils.navigateTo(
             context: context,
-            widget: Dashboard(ass),
+            widget: RouteDataWidget(ass),
             transitionType: PageTransitionType.leftToRight);
       }
     }
@@ -346,7 +346,7 @@ class KasieIntroState extends State<KasieIntro>
               case 1:
                 NavigationUtils.navigateTo(
                     context: context,
-                    widget: Dashboard(associations[0]),
+                    widget: RouteDataWidget(associations[0]),
                     transitionType: PageTransitionType.leftToRight);
             }
           }

@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
+import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/widgets/country_selection.dart';
 
 class AssociationEdit extends StatefulWidget {
@@ -23,6 +24,7 @@ class AssociationEditState extends State<AssociationEdit>
   void initState() {
     _controller = AnimationController(vsync: this);
     super.initState();
+    _setup();
   }
 
   @override
@@ -38,7 +40,7 @@ class AssociationEditState extends State<AssociationEdit>
   TextEditingController adminFirstNameController =
       TextEditingController(text: 'Administrator');
   TextEditingController adminLastNameController =
-  TextEditingController(text: 'ADMIN');
+      TextEditingController(text: 'ADMIN');
   TextEditingController emailController =
       TextEditingController(text: 'admin1@association.com');
   TextEditingController cellphoneController =
@@ -47,6 +49,18 @@ class AssociationEditState extends State<AssociationEdit>
       TextEditingController(text: 'pass123');
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   bool busy = false;
+  Prefs prefs = GetIt.instance<Prefs>();
+  void _setup() async {
+    if (widget.association != null) {
+      nameController.text = widget.association!.associationName!;
+      adminLastNameController.text = widget.association!.adminUserLastName!;
+      adminFirstNameController.text = widget.association!.adminUserFirstName!;
+      emailController.text = widget.association!.adminEmail!;
+      cellphoneController.text = widget.association!.adminCellphone!;
+      country = prefs.getCountry();
+      setState(() {});
+    }
+  }
 
   _onSubmit() async {
     pp('$mm on submit wanted ...');
@@ -54,36 +68,44 @@ class AssociationEditState extends State<AssociationEdit>
       return;
     }
     if (country == null) {
-      showErrorToast(message: 'Please select the country', context: context, );
+      showErrorToast(
+        message: 'Please select the country',
+        context: context,
+      );
       return;
     }
-
-   association = Association(
-      associationId: '${DateTime.now().millisecondsSinceEpoch}',
-      associationName: nameController.text,
-      countryId: country!.countryId,
-      countryName: country!.name,
-      adminUserFirstName: adminFirstNameController.text,
-      adminUserLastName: adminLastNameController.text,
-      adminCellphone: cellphoneController.text,
-      adminEmail: emailController.text,
-      password: passwordController.text,
-    );
     setState(() {
       busy = true;
     });
-    try {
-      var res = await dataApiDog.registerAssociation(association!);
-      if (mounted) {
-        showOKToast(
-            message: 'Association registered on KasieTransie',
-            context: context);
+    if (widget.association == null) {
+      association = Association(
+        associationId: '${DateTime.now().millisecondsSinceEpoch}',
+        associationName: nameController.text,
+        countryId: country!.countryId,
+        countryName: country!.name,
+        adminUserFirstName: adminFirstNameController.text,
+        adminUserLastName: adminLastNameController.text,
+        adminCellphone: cellphoneController.text,
+        adminEmail: emailController.text,
+        password: passwordController.text,
+      );
+
+      try {
+        var res = await dataApiDog.registerAssociation(association!);
+        if (mounted) {
+          showOKToast(
+              message: 'Association registered on KasieTransie',
+              context: context);
+        }
+      } catch (e, s) {
+        pp('$e $s');
+        if (mounted) {
+          showErrorToast(message: '$e', context: context);
+        }
       }
-    } catch (e, s) {
-      pp('$e $s');
-      if (mounted) {
-        showErrorToast(message: '$e', context: context);
-      }
+    } else {
+      //TODO - update the Association
+      pp('$mm  update the Association ...');
     }
     setState(() {
       busy = false;
@@ -131,10 +153,10 @@ class AssociationEditState extends State<AssociationEdit>
                       country == null
                           ? gapH32
                           : Text(
-                        country!.name!,
-                        style: myTextStyleMediumLarge(context, 28),
-                      ),
-                      country == null? gapH8: gapH32,
+                              country!.name!,
+                              style: myTextStyleMediumLarge(context, 28),
+                            ),
+                      country == null ? gapH8 : gapH32,
                       TextFormField(
                         controller: nameController,
                         keyboardType: TextInputType.name,

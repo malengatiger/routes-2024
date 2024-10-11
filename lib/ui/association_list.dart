@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:focused_menu/focused_menu.dart';
+import 'package:focused_menu/modals.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
@@ -8,7 +10,8 @@ import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import 'package:routes_2024/ui/dashboard.dart';
+import 'package:routes_2024/ui/association/association_main.dart';
+import 'package:routes_2024/ui/route_data_widget.dart';
 
 class AssociationList extends StatefulWidget {
   const AssociationList({super.key});
@@ -30,6 +33,46 @@ class AssociationListState extends State<AssociationList>
     _controller = AnimationController(vsync: this);
     super.initState();
     _getAssociations(false);
+  }
+
+  _navigateToRoutes(Association ass) async {}
+  _navigateToData(Association ass) async {
+    NavigationUtils.navigateTo(
+        context: context,
+        widget: AssociationMain(
+          association: ass,
+        ),
+        transitionType: PageTransitionType.leftToRight);
+  }
+
+  List<FocusedMenuItem> _getMenuItems(Association ass, BuildContext context) {
+    //prefs.saveRoute(route);
+    List<FocusedMenuItem> list = [];
+
+    list.add(FocusedMenuItem(
+        title: Text('Manage Routes', style: myTextStyleMediumBlack(context)),
+        // backgroundColor: Theme.of(context).primaryColor,
+        trailingIcon: Icon(
+          Icons.roundabout_right,
+          color: Theme.of(context).primaryColor,
+        ),
+        onPressed: () {
+          _navigateToDashboard(ass);
+        }));
+    //
+    list.add(FocusedMenuItem(
+        title: Text('Manage Staff and Vehicles',
+            style: myTextStyleMediumBlack(context)),
+        // backgroundColor: Theme.of(context).primaryColor,
+        trailingIcon: Icon(
+          Icons.car_crash_rounded,
+          color: Theme.of(context).primaryColor,
+        ),
+        onPressed: () {
+          _navigateToData(ass);
+        }));
+
+    return list;
   }
 
   @override
@@ -66,7 +109,7 @@ class AssociationListState extends State<AssociationList>
     prefs.saveAssociation(ass);
     NavigationUtils.navigateTo(
         context: context,
-        widget: Dashboard(ass),
+        widget: RouteDataWidget(ass),
         transitionType: PageTransitionType.leftToRight);
   }
 
@@ -74,7 +117,7 @@ class AssociationListState extends State<AssociationList>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
+          centerTitle: true,
           title: Text(
             'Taxi Associations/Organizations',
             style: myTextStyleLarge(context),
@@ -96,11 +139,17 @@ class AssociationListState extends State<AssociationList>
               },
               tablet: (_) {
                 return AssScaffold(
-                    leftWidget: getWidget(), rightWidget: ImageGrid(crossAxisCount: 3,));
+                    leftWidget: getWidget(),
+                    rightWidget: ImageGrid(
+                      crossAxisCount: 3,
+                    ));
               },
               desktop: (_) {
                 return AssScaffold(
-                    leftWidget: getWidget(), rightWidget: ImageGrid(crossAxisCount: 3,));
+                    leftWidget: getWidget(),
+                    rightWidget: ImageGrid(
+                      crossAxisCount: 3,
+                    ));
               },
             ),
           ],
@@ -120,15 +169,27 @@ class AssociationListState extends State<AssociationList>
                 onTap: () {
                   _navigateToDashboard(ass);
                 },
-                child: Card(
-                    elevation: 8,
-                    child: ListTile(
-                        title: Text(ass.associationName!, style: myTextStyleMediumLarge(context,  20),),
-                        subtitle: Text(
-                          ass.countryName ?? 'NOT AVAILABLE',
-                          style: myTextStyleSmall(context),
-                        ),
-                        leading: Icon(Icons.car_crash_rounded, color: Theme.of(context).primaryColor))));
+                child: FocusedMenuHolder(
+                  onPressed: () {
+                    pp('💛️️ tapped FocusedMenuHolder ...');
+                  },
+                  menuItems: _getMenuItems(ass, context),
+                  animateMenuItems: true,
+                  openWithTap: true,
+                  child: Card(
+                      elevation: 8,
+                      child: ListTile(
+                          title: Text(
+                            ass.associationName!,
+                            style: myTextStyleMediumLarge(context, 20),
+                          ),
+                          subtitle: Text(
+                            ass.countryName ?? 'NOT AVAILABLE',
+                            style: myTextStyleSmall(context),
+                          ),
+                          leading: Icon(Icons.car_crash_rounded,
+                              color: Theme.of(context).primaryColor))),
+                ));
           }),
     );
   }
