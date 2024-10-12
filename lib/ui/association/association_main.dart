@@ -169,8 +169,8 @@ class KasieNavigation extends StatelessWidget {
               onTapped(0);
             },
             child: ListTile(
-              leading: Icon(Icons.people),
-              title: Text('Manage Association Staff'),
+              leading: Icon(Icons.people, size: 48, color: Theme.of(context).primaryColor),
+              title: Text('Manage Staff'),
             ),
           ),
           gapH32,
@@ -179,8 +179,8 @@ class KasieNavigation extends StatelessWidget {
               onTapped(1);
             },
             child: ListTile(
-              leading: Icon(Icons.car_crash_rounded),
-              title: Text('Manage Association Vehicles'),
+              leading: Icon(Icons.car_crash_rounded, size: 48, color: Theme.of(context).primaryColor,),
+              title: Text('Manage Vehicles'),
             ),
           ),
           gapH32,

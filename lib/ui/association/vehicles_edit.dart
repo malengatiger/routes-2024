@@ -13,6 +13,7 @@ class VehiclesEdit extends StatefulWidget {
 
   final Association association;
   final Vehicle? vehicle;
+
   @override
   VehiclesEditState createState() => VehiclesEditState();
 }
@@ -39,14 +40,17 @@ class VehiclesEditState extends State<VehiclesEdit>
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController registrationController =
-      TextEditingController(text: 'BMB 435 GP');
+      TextEditingController();
   TextEditingController makeController = TextEditingController(text: 'Toyota');
-  TextEditingController modelController = TextEditingController(text: 'Quantum');
+  TextEditingController modelController =
+      TextEditingController(text: 'Quantum');
   TextEditingController yearController = TextEditingController(text: '2024');
   TextEditingController capacityController = TextEditingController(text: '16');
 
-  TextEditingController ownerNameController = TextEditingController(text: 'John Mathebula');
-  TextEditingController cellphoneController = TextEditingController(text: '+27724457766');
+  TextEditingController ownerNameController =
+      TextEditingController(text: 'John Mathebula');
+  TextEditingController cellphoneController =
+      TextEditingController(text: '+27724457766');
 
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
@@ -54,6 +58,7 @@ class VehiclesEditState extends State<VehiclesEdit>
   bool busy = false;
   Prefs prefs = GetIt.instance<Prefs>();
   Vehicle? vehicle;
+
   void _setup() async {
     if (widget.vehicle != null) {
       registrationController.text = widget.vehicle!.vehicleReg!;
@@ -71,24 +76,19 @@ class VehiclesEditState extends State<VehiclesEdit>
 
   List<Vehicle> cars = [];
   String? result;
-  void _getCars() async {
-    cars = await listApiDog.getCarsFromBackend(widget.association.associationId!);
-    setState(() {
 
-    });
+  void _getCars() async {
+    cars =
+        await listApiDog.getCarsFromBackend(widget.association.associationId!);
+    setState(() {});
   }
+
   _onSubmit() async {
     pp('$mm on submit wanted ...');
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    if (country == null) {
-      showErrorToast(
-        message: 'Please select the country',
-        context: context,
-      );
-      return;
-    }
+
     setState(() {
       busy = true;
     });
@@ -96,12 +96,16 @@ class VehiclesEditState extends State<VehiclesEdit>
       vehicle = Vehicle(
         vehicleId: '${DateTime.now().millisecondsSinceEpoch}',
         associationId: widget.association.associationId!,
-        associationName: registrationController.text,
-        countryId: country!.countryId,
+        associationName: widget.association.associationName,
+        vehicleReg: registrationController.text,
+        countryId: widget.association.countryId,
+        created: DateTime.now().toUtc().toIso8601String(),
         make: makeController.text,
         model: modelController.text,
         passengerCapacity: int.parse(capacityController.text),
         year: yearController.text,
+        ownerName: ownerNameController.text,
+        ownerCellphone: cellphoneController.text
       );
 
       try {
@@ -127,6 +131,7 @@ class VehiclesEditState extends State<VehiclesEdit>
   }
 
   PlatformFile? csvFile;
+
   void _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -158,7 +163,8 @@ class VehiclesEditState extends State<VehiclesEdit>
           csvFile!, widget.association.associationId!);
       _getCars();
       if (mounted) {
-        var msg = '🌿 Vehicles added: ${addCarsResponse!.cars.length} errors: ${addCarsResponse.errors.length}';
+        var msg =
+            '🌿 Vehicles added: ${addCarsResponse!.cars.length} errors: ${addCarsResponse.errors.length}';
         result = msg;
         showOKToast(message: msg, context: context);
       }
@@ -177,12 +183,12 @@ class VehiclesEditState extends State<VehiclesEdit>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: SafeArea(
           child: Stack(
         children: [
           Center(
-            child: SizedBox(width: 500,
+            child: SizedBox(
+              width: 500,
               child: Form(
                   key: _formKey,
                   child: Column(
@@ -218,8 +224,13 @@ class VehiclesEditState extends State<VehiclesEdit>
                                   style: ButtonStyle(
                                       // backgroundColor: WidgetStatePropertyAll(
                                       //     Colors.blue.shade800),
-                                      backgroundColor: WidgetStateProperty.all<Color>(Colors.blue), // Change button color
-                                      foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                                      backgroundColor:
+                                          WidgetStateProperty.all<Color>(
+                                              Colors.blue),
+                                      // Change button color
+                                      foregroundColor:
+                                          WidgetStateProperty.all<Color>(
+                                              Colors.white),
                                       elevation: WidgetStatePropertyAll(8),
                                       padding: WidgetStatePropertyAll(
                                           EdgeInsets.all(24)),
@@ -231,10 +242,15 @@ class VehiclesEditState extends State<VehiclesEdit>
                                   },
                                   child: Text('Send Vehicles File')),
                             ),
-                      csvFile == null ? gapH8 : SizedBox(height: 64,),
+                      csvFile == null
+                          ? gapH8
+                          : SizedBox(
+                              height: 64,
+                            ),
                       TextFormField(
                         controller: registrationController,
                         keyboardType: TextInputType.name,
+                        style: myTextStyleMediumLargeWithSize(context, 20),
                         decoration: InputDecoration(
                           label: Text('Registration'),
                           hintText: 'Registration',
@@ -320,12 +336,12 @@ class VehiclesEditState extends State<VehiclesEdit>
                           hintText: 'Enter Owner Name',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Owner Name';
-                          }
-                          return null;
-                        },
+                        // validator: (value) {
+                        //   if (value == null || value.isEmpty) {
+                        //     return 'Please enter Owner Name';
+                        //   }
+                        //   return null;
+                        // },
                       ),
                       gapH8,
                       TextFormField(
@@ -336,12 +352,12 @@ class VehiclesEditState extends State<VehiclesEdit>
                           hintText: 'Enter Owner Cellphone',
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Owner Cellphone';
-                          }
-                          return null;
-                        },
+                        // validator: (value) {
+                        //   if (value == null || value.isEmpty) {
+                        //     return 'Please enter Owner Cellphone';
+                        //   }
+                        //   return null;
+                        // },
                       ),
                       gapH8,
                       gapH32,
@@ -365,11 +381,20 @@ class VehiclesEditState extends State<VehiclesEdit>
                                   },
                                   child: Padding(
                                       padding: EdgeInsets.all(20),
-                                      child: Text('Submit'))),
+                                      child: Text(
+                                        'Submit',
+                                        style: myTextStyleMediumLargeWithSize(
+                                            context, 20),
+                                      ))),
                             ),
-                      result == null? gapW32: SizedBox(height: 32, child: Center(
-                        child: Text('$result'),
-                      ),)
+                      result == null
+                          ? gapW32
+                          : SizedBox(
+                              height: 32,
+                              child: Center(
+                                child: Text('$result'),
+                              ),
+                            )
                     ],
                   )),
             ),
@@ -395,10 +420,8 @@ class VehiclesEditState extends State<VehiclesEdit>
               ],
             ),
           )
-
         ],
       )),
     );
   }
 }
-

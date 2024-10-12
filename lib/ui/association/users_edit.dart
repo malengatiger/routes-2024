@@ -41,15 +41,15 @@ class UsersEditState extends State<UsersEdit>
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController firstNameController =
-      TextEditingController(text: 'John');
+      TextEditingController();
   TextEditingController lastNameController =
-      TextEditingController(text: 'Balls');
+      TextEditingController();
   TextEditingController emailController =
-      TextEditingController(text: 'user1@association.com');
+      TextEditingController();
   TextEditingController cellphoneController =
-      TextEditingController(text: '+27729890001');
+      TextEditingController();
   TextEditingController passwordController =
-      TextEditingController(text: 'pass123');
+      TextEditingController();
 
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
@@ -75,7 +75,11 @@ class UsersEditState extends State<UsersEdit>
 
   Widget getDropDown() {
     var drop = DropdownButton<String>(
-      hint: Text('Select Staff Type'),
+      hint: Row(mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('  Select Staff Type'),
+        ],
+      ),
       items: [
         DropdownMenuItem<String>(
           value: Constants.ASSOCIATION_OFFICIAL,
@@ -131,11 +135,12 @@ class UsersEditState extends State<UsersEdit>
           userId: '${DateTime.now().millisecondsSinceEpoch}',
           associationId: widget.association.associationId!,
           associationName: widget.association.associationName!,
-          countryId: country!.countryId,
+          countryId: widget.association.countryId,
           firstName: firstNameController.text,
           lastName: lastNameController.text,
           email: emailController.text,
           cellphone: cellphoneController.text,
+          password: passwordController.text,
           userType: userType);
 
       try {
@@ -238,8 +243,8 @@ class UsersEditState extends State<UsersEdit>
                                 // backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // Change button color
                                 // foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                                 elevation: WidgetStatePropertyAll(8),
-                                padding: WidgetStatePropertyAll(
-                                    EdgeInsets.all(16)),
+                                padding:
+                                    WidgetStatePropertyAll(EdgeInsets.all(16)),
                                 textStyle: WidgetStatePropertyAll(
                                     myTextStyleMediumLargeWithColor(
                                         context, Colors.pink, 16))),
@@ -278,7 +283,7 @@ class UsersEditState extends State<UsersEdit>
                       csvFile == null
                           ? gapH8
                           : SizedBox(
-                              height: 64,
+                              height: 28,
                             ),
                       gapH8,
                       TextFormField(
@@ -333,13 +338,13 @@ class UsersEditState extends State<UsersEdit>
                         controller: cellphoneController,
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
-                          label: Text('Owner Cellphone'),
-                          hintText: 'Enter Owner Cellphone',
+                          label: Text('Cellphone'),
+                          hintText: 'Enter Cellphone',
                           border: OutlineInputBorder(),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter Owner Cellphone';
+                            return 'Please enter Cellphone';
                           }
                           return null;
                         },
@@ -363,6 +368,17 @@ class UsersEditState extends State<UsersEdit>
                       gapH8,
                       getDropDown(),
                       gapH32,
+                      userType == null
+                          ? gapW8
+                          : SizedBox(height: 64,
+                            child: Center(
+                              child: Text(
+                                  '$userType',
+                                  style:
+                                      myTextStyleMediumLargeWithSize(context, 20),
+                                ),
+                            ),
+                          ),
                       busy
                           ? SizedBox(
                               width: 24,
@@ -390,25 +406,25 @@ class UsersEditState extends State<UsersEdit>
             ),
           ),
           Positioned(
-              right: 24,
-              top: 24,
-              child: Row(
-                children: [
-                  Text('Staff Members'),
-                  gapW32,
-                  bd.Badge(
-                    badgeContent: Text(
-                      '${users.length}',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    badgeStyle: bd.BadgeStyle(
-                      badgeColor: Colors.green.shade800,
-                      elevation: 12,
-                      padding: EdgeInsets.all(16),
-                    ),
+            right: 24,
+            top: 24,
+            child: Row(
+              children: [
+                Text('Staff Members'),
+                gapW32,
+                bd.Badge(
+                  badgeContent: Text(
+                    '${users.length}',
+                    style: TextStyle(color: Colors.white),
                   ),
-                ],
-              ),
+                  badgeStyle: bd.BadgeStyle(
+                    badgeColor: Colors.green.shade800,
+                    elevation: 12,
+                    padding: EdgeInsets.all(16),
+                  ),
+                ),
+              ],
+            ),
           )
         ],
       )),
