@@ -367,7 +367,9 @@ class VehiclesEditState extends State<VehiclesEdit>
                                       padding: EdgeInsets.all(20),
                                       child: Text('Submit'))),
                             ),
-                      result == null? gapW32: Text('$result!')
+                      result == null? gapW32: SizedBox(height: 32, child: Center(
+                        child: Text('$result'),
+                      ),)
                     ],
                   )),
             ),

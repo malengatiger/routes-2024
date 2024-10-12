@@ -44,40 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAu_HffCDir26M7i7Oh6rWDaro-HXmVbaY',
-    appId: '1:167113439249:web:81a80a8fefb89bfc39d9b0',
-    messagingSenderId: '167113439249',
-    projectId: 'kasie2024',
-    authDomain: 'kasie2024.firebaseapp.com',
-    storageBucket: 'kasie2024.appspot.com',
-    measurementId: 'G-W3SG479DHL',
+    apiKey: 'AIzaSyDcAXlT6hoou41oEgIbjRTCagAJzBTsZIM',
+    appId: '1:854189510560:web:4e6e9f73ae347af536dec5',
+    messagingSenderId: '854189510560',
+    projectId: 'kasie-transie-3',
+    authDomain: 'kasie-transie-3.firebaseapp.com',
+    storageBucket: 'kasie-transie-3.appspot.com',
+    measurementId: 'G-BQW5ZWEKB4',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDea0gLkBgTYw0ktxJNF6VrgXeoYztT8as',
-    appId: '1:167113439249:android:70c62906d62d24a639d9b0',
-    messagingSenderId: '167113439249',
-    projectId: 'kasie2024',
-    storageBucket: 'kasie2024.appspot.com',
+    apiKey: 'AIzaSyB3finIgPi481q3-GaEDjOLcoPbs664gTs',
+    appId: '1:854189510560:android:e32b4e800f7ea0e036dec5',
+    messagingSenderId: '854189510560',
+    projectId: 'kasie-transie-3',
+    storageBucket: 'kasie-transie-3.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCtsSEYj6QgmlQRWuCVAwjirPYChXj0Srs',
-    appId: '1:167113439249:ios:879ab2b596f19a4439d9b0',
-    messagingSenderId: '167113439249',
-    projectId: 'kasie2024',
-    storageBucket: 'kasie2024.appspot.com',
-    iosClientId: '167113439249-g5olf7grsp94je5q8lua9jl6aiqevkct.apps.googleusercontent.com',
+    apiKey: 'AIzaSyCBCW2jYebHUN609zOFxgTnm0JWP-1Y40s',
+    appId: '1:854189510560:ios:a9ffeac3b25f452836dec5',
+    messagingSenderId: '854189510560',
+    projectId: 'kasie-transie-3',
+    storageBucket: 'kasie-transie-3.appspot.com',
+    iosClientId: '854189510560-5gs4ds1u1e4ej73m3ss1uack8hsegkcd.apps.googleusercontent.com',
     iosBundleId: 'com.boha.routes2024',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCtsSEYj6QgmlQRWuCVAwjirPYChXj0Srs',
-    appId: '1:167113439249:ios:4211b4650a988f4e39d9b0',
-    messagingSenderId: '167113439249',
-    projectId: 'kasie2024',
-    storageBucket: 'kasie2024.appspot.com',
-    iosClientId: '167113439249-ta4m70r1cdcfe05eb34pl7pujv03e8s0.apps.googleusercontent.com',
+    apiKey: 'AIzaSyCBCW2jYebHUN609zOFxgTnm0JWP-1Y40s',
+    appId: '1:854189510560:ios:a9968a2684e9ca1a36dec5',
+    messagingSenderId: '854189510560',
+    projectId: 'kasie-transie-3',
+    storageBucket: 'kasie-transie-3.appspot.com',
+    iosClientId: '854189510560-jcfgioe7t1ei9ma7mspoeem3s8eld68a.apps.googleusercontent.com',
     iosBundleId: 'com.boha.routes2024.RunnerTests',
   );
 }
