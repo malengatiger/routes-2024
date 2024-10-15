@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:kasie_transie_library/bloc/cloud_storage_bloc.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/data/constants.dart';
@@ -8,6 +9,9 @@ import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:badges/badges.dart' as bd;
+import 'package:kasie_transie_library/widgets/timer_widget.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:universal_io/io.dart';
 
 class UsersEdit extends StatefulWidget {
   const UsersEdit({super.key, required this.association, this.user});
@@ -40,32 +44,34 @@ class UsersEditState extends State<UsersEdit>
 
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController firstNameController =
-      TextEditingController();
-  TextEditingController lastNameController =
-      TextEditingController();
-  TextEditingController emailController =
-      TextEditingController();
-  TextEditingController cellphoneController =
-      TextEditingController();
-  TextEditingController passwordController =
-      TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController cellphoneController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
 
   bool busy = false;
   Prefs prefs = GetIt.instance<Prefs>();
-  User? user;
+  User? selectedUser;
 
   void _setup() async {
+    country = prefs.getCountry();
+
     if (widget.user != null) {
       lastNameController.text = widget.user!.lastName!;
       firstNameController.text = widget.user!.firstName!;
       emailController.text = widget.user!.email!;
       cellphoneController.text = widget.user!.cellphone!;
-      country = prefs.getCountry();
-      user = widget.user;
+      setState(() {});
+    }
+    if (selectedUser != null) {
+      lastNameController.text = selectedUser!.lastName!;
+      firstNameController.text = selectedUser!.firstName!;
+      emailController.text = selectedUser!.email!;
+      cellphoneController.text = selectedUser!.cellphone!;
       setState(() {});
     }
   }
@@ -75,7 +81,8 @@ class UsersEditState extends State<UsersEdit>
 
   Widget getDropDown() {
     var drop = DropdownButton<String>(
-      hint: Row(mainAxisAlignment: MainAxisAlignment.center,
+      hint: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('  Select Staff Type'),
         ],
@@ -131,7 +138,7 @@ class UsersEditState extends State<UsersEdit>
       busy = true;
     });
     if (widget.user == null) {
-      user = User(
+      selectedUser = User(
           userId: '${DateTime.now().millisecondsSinceEpoch}',
           associationId: widget.association.associationId!,
           associationName: widget.association.associationName!,
@@ -144,7 +151,7 @@ class UsersEditState extends State<UsersEdit>
           userType: userType);
 
       try {
-        var res = await dataApiDog.addUser(user!);
+        var res = await dataApiDog.addUser(selectedUser!);
         pp('$mm user: $res');
         _getUsers();
         if (mounted) {
@@ -168,9 +175,76 @@ class UsersEditState extends State<UsersEdit>
   }
 
   PlatformFile? csvFile;
+  PlatformFile? thumbFile;
+
+  PlatformFile? userFile;
+  CloudStorageBloc storage = GetIt.instance<CloudStorageBloc>();
+
+  _pickProfilePicture(User user) async {
+    FilePickerResult? result = await FilePicker.platform
+        .pickFiles(type: FileType.media, dialogTitle: 'Staff Profile Picture');
+
+    if (result != null) {
+      userFile = result.files.first;
+      pp('$mm _pickProfilePicture: userFile picked: ${userFile?.bytes!.length} bytes');
+      _showUploadDialog(user);
+    } else {
+      pp('$mm Error: File bytes are null');
+      if (mounted) {
+        showErrorToast(message: 'The file is not cool', context: context);
+      }
+    }
+  }
+
+  _showUploadDialog(User user) async {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text('Upload Profile Picture'),
+            content: Text('Confirm the profile picture upload'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _startProfileUpload(user);
+                  },
+                  child: Text('Upload File')),
+            ],
+          );
+        });
+  }
+
+  _startProfileUpload(User user) async {
+    pp('$mm ..................... _startProfileUpload ...');
+    setState(() {
+      busy = true;
+    });
+    try {
+      // thumbFile = await getPhotoThumbnail(file: userFile!);
+      await dataApiDog.importUserProfile(
+          file: userFile!, thumb: userFile!, userId: user.userId!);
+      _getUsers();
+    } catch (e, s) {
+      pp('$e $s');
+      if (mounted) {
+        showErrorToast(message: '$e', context: context);
+      }
+    }
+    pp('$mm profile picture uploaded: ${userFile!.bytes?.length} bytes');
+    setState(() {
+      busy = false;
+    });
+  }
 
   void _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform
+        .pickFiles(type: FileType.any, dialogTitle: 'Staff Data File');
 
     if (result != null) {
       csvFile = result.files.first;
@@ -214,6 +288,16 @@ class UsersEditState extends State<UsersEdit>
     });
   }
 
+  int? userIndex;
+  bool _showTools = false;
+
+  _showToolbar(int index) {
+    setState(() {
+      userIndex = index;
+      _showTools = !_showTools;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -221,188 +305,272 @@ class UsersEditState extends State<UsersEdit>
           child: Stack(
         children: [
           Center(
-            child: SizedBox(
-              width: 480,
-              child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      gapH32,
-                      gapH32,
-                      Text(
-                        'Pick the Staff Members CSV File',
-                        style: myTextStyleMediumLarge(context, 20),
-                      ),
-                      gapH16,
-                      SizedBox(
-                        width: 300,
-                        child: ElevatedButton(
-                            style: ButtonStyle(
-                                // backgroundColor: WidgetStatePropertyAll(
-                                //     Colors.pink.shade800),
-                                // backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // Change button color
-                                // foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                elevation: WidgetStatePropertyAll(8),
-                                padding:
-                                    WidgetStatePropertyAll(EdgeInsets.all(16)),
-                                textStyle: WidgetStatePropertyAll(
-                                    myTextStyleMediumLargeWithColor(
-                                        context, Colors.pink, 16))),
-                            onPressed: () {
-                              _pickFile();
-                            },
-                            child: Text('Get File')),
-                      ),
-                      gapH32,
-                      csvFile == null
-                          ? gapH32
-                          : SizedBox(
-                              width: 400,
-                              child: ElevatedButton(
-                                  style: ButtonStyle(
-                                      // backgroundColor: WidgetStatePropertyAll(
-                                      //     Colors.blue.shade800),
-                                      backgroundColor:
-                                          WidgetStateProperty.all<Color>(
-                                              Colors.blue),
-                                      // Change button color
-                                      foregroundColor:
-                                          WidgetStateProperty.all<Color>(
-                                              Colors.white),
-                                      elevation: WidgetStatePropertyAll(8),
-                                      padding: WidgetStatePropertyAll(
-                                          EdgeInsets.all(24)),
-                                      textStyle: WidgetStatePropertyAll(
-                                          myTextStyleMediumLargeWithColor(
-                                              context, Colors.blue, 18))),
-                                  onPressed: () {
-                                    _sendFile();
-                                  },
-                                  child: Text('Send Users File')),
-                            ),
-                      csvFile == null
-                          ? gapH8
-                          : SizedBox(
-                              height: 28,
-                            ),
-                      gapH8,
-                      TextFormField(
-                        controller: firstNameController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          label: Text('First Name'),
-                          hintText: 'Enter First Name',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter First Name';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: lastNameController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          label: Text('Last Name'),
-                          hintText: 'Enter Last Name',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Last Name';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          label: Text('Email Address'),
-                          hintText: 'Enter Email',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Email Address';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: cellphoneController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          label: Text('Cellphone'),
-                          hintText: 'Enter Cellphone',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Cellphone';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: passwordController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          label: Text('Password'),
-                          hintText: 'Enter Password',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Password';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      getDropDown(),
-                      gapH32,
-                      userType == null
-                          ? gapW8
-                          : SizedBox(height: 64,
-                            child: Center(
-                              child: Text(
-                                  '$userType',
-                                  style:
-                                      myTextStyleMediumLargeWithSize(context, 20),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 480,
+                  child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          gapH32,
+                          gapH32,
+                          Text(
+                            'Pick the Staff Members CSV File',
+                            style: myTextStyleMediumLarge(context, 20),
+                          ),
+                          gapH16,
+                          SizedBox(
+                            width: 300,
+                            child: ElevatedButton(
+                                style: ButtonStyle(
+                                    // backgroundColor: WidgetStatePropertyAll(
+                                    //     Colors.pink.shade800),
+                                    // backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // Change button color
+                                    // foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                                    elevation: WidgetStatePropertyAll(8),
+                                    padding: WidgetStatePropertyAll(
+                                        EdgeInsets.all(16)),
+                                    textStyle: WidgetStatePropertyAll(
+                                        myTextStyleMediumLargeWithColor(
+                                            context, Colors.pink, 16))),
+                                onPressed: () {
+                                  _pickFile();
+                                },
+                                child: Text('Get File')),
+                          ),
+                          gapH32,
+                          csvFile == null
+                              ? gapH32
+                              : SizedBox(
+                                  width: 400,
+                                  child: ElevatedButton(
+                                      style: ButtonStyle(
+                                          // backgroundColor: WidgetStatePropertyAll(
+                                          //     Colors.blue.shade800),
+                                          backgroundColor:
+                                              WidgetStateProperty.all<Color>(
+                                                  Colors.blue),
+                                          // Change button color
+                                          foregroundColor:
+                                              WidgetStateProperty.all<Color>(
+                                                  Colors.white),
+                                          elevation: WidgetStatePropertyAll(8),
+                                          padding: WidgetStatePropertyAll(
+                                              EdgeInsets.all(24)),
+                                          textStyle: WidgetStatePropertyAll(
+                                              myTextStyleMediumLargeWithColor(
+                                                  context, Colors.blue, 18))),
+                                      onPressed: () {
+                                        _sendFile();
+                                      },
+                                      child: Text('Send Users File')),
                                 ),
+                          csvFile == null
+                              ? gapH8
+                              : SizedBox(
+                                  height: 28,
+                                ),
+                          gapH8,
+                          TextFormField(
+                            controller: firstNameController,
+                            keyboardType: TextInputType.name,
+                            decoration: InputDecoration(
+                              label: Text('First Name'),
+                              hintText: 'Enter First Name',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter First Name';
+                              }
+                              return null;
+                            },
+                          ),
+                          gapH8,
+                          TextFormField(
+                            controller: lastNameController,
+                            keyboardType: TextInputType.name,
+                            decoration: InputDecoration(
+                              label: Text('Last Name'),
+                              hintText: 'Enter Last Name',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Last Name';
+                              }
+                              return null;
+                            },
+                          ),
+                          gapH8,
+                          TextFormField(
+                            controller: emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              label: Text('Email Address'),
+                              hintText: 'Enter Email',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Email Address';
+                              }
+                              return null;
+                            },
+                          ),
+                          gapH8,
+                          TextFormField(
+                            controller: cellphoneController,
+                            keyboardType: TextInputType.phone,
+                            decoration: InputDecoration(
+                              label: Text('Cellphone'),
+                              hintText: 'Enter Cellphone',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Cellphone';
+                              }
+                              return null;
+                            },
+                          ),
+                          gapH8,
+                          TextFormField(
+                            controller: passwordController,
+                            keyboardType: TextInputType.name,
+                            decoration: InputDecoration(
+                              label: Text('Password'),
+                              hintText: 'Enter Password',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Password';
+                              }
+                              return null;
+                            },
+                          ),
+                          gapH8,
+                          getDropDown(),
+                          gapH32,
+                          userType == null
+                              ? gapW8
+                              : SizedBox(
+                                  height: 64,
+                                  child: Center(
+                                    child: Text(
+                                      '$userType',
+                                      style: myTextStyleMediumLargeWithSize(
+                                          context, 20),
+                                    ),
+                                  ),
+                                ),
+                          busy
+                              ? SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 8,
+                                    backgroundColor: Colors.pink,
+                                  ),
+                                )
+                              : SizedBox(
+                                  width: 400,
+                                  child: ElevatedButton(
+                                      style: ButtonStyle(
+                                        elevation: WidgetStatePropertyAll(8),
+                                      ),
+                                      onPressed: () {
+                                        _onSubmit();
+                                      },
+                                      child: Padding(
+                                          padding: EdgeInsets.all(20),
+                                          child: Text('Submit'))),
+                                ),
+                        ],
+                      )),
+                ),
+                gapH32,
+                Expanded(
+                  child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 5),
+                      itemCount: users.length,
+                      itemBuilder: (_, index) {
+                        var user = users[index];
+                        return GestureDetector(
+                          onTap: () {
+                            selectedUser = user;
+                            _setup();
+                          },
+                          child: Card(
+                            elevation: 8,
+                            child: SizedBox(height:200,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      _showToolbar(index);
+                                    },
+                                    child: UserProfile(user: user,),
+                                  ),
+                                  gapH8,
+                                  Text(
+                                    '${user.firstName} ${user.lastName}',
+                                    style: myTextStyle(
+                                        weight: FontWeight.w900, fontSize: 20),
+                                  ),
+                                  gapH16,
+                                  Text(
+                                    '${user.userType}',
+                                    style: myTextStyle(
+                                        weight: FontWeight.w200, fontSize: 14),
+                                  ),
+                                  if (_showTools && userIndex == index)
+                                    SizedBox(
+                                      height: 64,
+                                      child: Card(
+                                        elevation: 12,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 16.0, horizontal: 16.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              IconButton(
+                                                  onPressed: () {
+                                                    pp('$mm ... get and upload profile picture');
+                                                    _pickProfilePicture(user);
+                                                  },
+                                                  icon: Icon(
+                                                      Icons.camera_alt_outlined,
+                                                      color: Colors.pink)),
+                                              IconButton(
+                                                  onPressed: () {},
+                                                  icon: Icon(
+                                                    Icons.edit,
+                                                    color: Colors.teal,
+                                                  )),
+                                              IconButton(
+                                                  onPressed: () {},
+                                                  icon: Icon(Icons.email,
+                                                      color: Colors.blue)),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
-                      busy
-                          ? SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 8,
-                                backgroundColor: Colors.pink,
-                              ),
-                            )
-                          : SizedBox(
-                              width: 400,
-                              child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    elevation: WidgetStatePropertyAll(8),
-                                  ),
-                                  onPressed: () {
-                                    _onSubmit();
-                                  },
-                                  child: Padding(
-                                      padding: EdgeInsets.all(20),
-                                      child: Text('Submit'))),
-                            ),
-                    ],
-                  )),
+                        );
+                      }),
+                )
+              ],
             ),
           ),
           Positioned(
@@ -425,9 +593,43 @@ class UsersEditState extends State<UsersEdit>
                 ),
               ],
             ),
-          )
+          ),
+          busy
+              ? Positioned(
+                  child: Center(
+                      child: TimerWidget(
+                  title: 'Uploading file ...',
+                  isSmallSize: true,
+                )))
+              : gapW32,
         ],
       )),
+    );
+  }
+}
+
+class UserProfile extends StatelessWidget {
+  const UserProfile({super.key, required this.user});
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    if (user.profileUrl == null) {
+      return SizedBox(width:100, height: 100,
+        child: Image.asset(
+          'assets/avatar1.png',
+          height: 64,
+          width: 64,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+    return SizedBox(width:100, height: 100,
+      child: CircleAvatar(
+        backgroundImage: NetworkImage(user.profileUrl!),
+        radius: 100,
+      )
     );
   }
 }

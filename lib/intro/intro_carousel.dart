@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/intro/intro_page_one.dart';
@@ -42,15 +41,7 @@ class BigCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var initialPage = Random().nextInt(9);
-    var options= CarouselOptions(
-      enlargeCenterPage: true,
-      autoPlay: true,
-      pauseAutoPlayOnTouch: true,
-      initialPage: initialPage,
-    );
-    // return Column(children: [
-    //   Expanded(child: CarouselSlider(items: items, options: options)),
-    // ],);
+
     return PageView(children: items, onPageChanged: (p){
       onPageChanged(p);
     },);

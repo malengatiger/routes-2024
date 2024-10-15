@@ -330,7 +330,7 @@ class RouteEditorState extends ConsumerState<RouteEditor>
       countryId: country!.countryId,
       isActive: true,
       countryName: country!.name,
-      userUrl: user!.thumbnailUrl,
+      userUrl: user!.profileUrl,
       userName: user!.name,
       name: _nameController.value.text,
     );

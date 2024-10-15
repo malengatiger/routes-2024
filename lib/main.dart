@@ -95,7 +95,7 @@ class KasieTransieApp extends ConsumerWidget {
               debugShowCheckedModeBanner: false,
               title: 'KasieTransie',
               theme: ThemeData(
-                colorScheme: MaterialTheme.lightScheme(),
+                colorScheme: MaterialTheme.darkScheme(),
                 useMaterial3: true,
                 primaryColor: Colors.teal,
                 primaryColorDark: Colors.teal.shade900,
