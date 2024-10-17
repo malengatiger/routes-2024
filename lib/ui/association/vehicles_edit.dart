@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
+import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:badges/badges.dart' as bd;
+import 'package:routes_2024/ui/association/vehicle_list_widget.dart';
 
 class VehiclesEdit extends StatefulWidget {
   const VehiclesEdit({super.key, required this.association, this.vehicle});
@@ -39,8 +41,7 @@ class VehiclesEditState extends State<VehiclesEdit>
 
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController registrationController =
-      TextEditingController();
+  TextEditingController registrationController = TextEditingController();
   TextEditingController makeController = TextEditingController(text: 'Toyota');
   TextEditingController modelController =
       TextEditingController(text: 'Quantum');
@@ -58,6 +59,8 @@ class VehiclesEditState extends State<VehiclesEdit>
   bool busy = false;
   Prefs prefs = GetIt.instance<Prefs>();
   Vehicle? vehicle;
+  List<VehiclePhoto> vehiclePhotos = [];
+  List<VehicleVideo> vehicleVideos = [];
 
   void _setup() async {
     if (widget.vehicle != null) {
@@ -65,11 +68,21 @@ class VehiclesEditState extends State<VehiclesEdit>
       modelController.text = widget.vehicle!.model!;
       makeController.text = widget.vehicle!.make!;
       yearController.text = widget.vehicle!.year!;
-      capacityController.text = widget.vehicle!.passengerCapacity! as String;
-      ownerNameController.text = widget.vehicle!.ownerName!;
-      cellphoneController.text = widget.vehicle!.ownerCellphone!;
+      capacityController.text = '${widget.vehicle!.passengerCapacity}';
+      ownerNameController.text = widget.vehicle!.ownerName ?? '';
+      cellphoneController.text = widget.vehicle!.ownerCellphone ?? '';
       country = prefs.getCountry();
-      vehicle = widget.vehicle;
+      setState(() {});
+    }
+    if (vehicle != null) {
+      registrationController.text = vehicle!.vehicleReg!;
+      modelController.text = vehicle!.model!;
+      makeController.text = vehicle!.make!;
+      yearController.text = vehicle!.year!;
+      capacityController.text = '${vehicle!.passengerCapacity!}';
+      ownerNameController.text = vehicle!.ownerName ?? '';
+      cellphoneController.text = vehicle!.ownerCellphone ?? '';
+      country = prefs.getCountry();
       setState(() {});
     }
   }
@@ -79,7 +92,7 @@ class VehiclesEditState extends State<VehiclesEdit>
 
   void _getCars() async {
     cars =
-        await listApiDog.getCarsFromBackend(widget.association.associationId!);
+        await listApiDog.getAssociationCars(widget.association.associationId!, false);
     setState(() {});
   }
 
@@ -94,19 +107,18 @@ class VehiclesEditState extends State<VehiclesEdit>
     });
     if (widget.vehicle == null) {
       vehicle = Vehicle(
-        vehicleId: '${DateTime.now().millisecondsSinceEpoch}',
-        associationId: widget.association.associationId!,
-        associationName: widget.association.associationName,
-        vehicleReg: registrationController.text,
-        countryId: widget.association.countryId,
-        created: DateTime.now().toUtc().toIso8601String(),
-        make: makeController.text,
-        model: modelController.text,
-        passengerCapacity: int.parse(capacityController.text),
-        year: yearController.text,
-        ownerName: ownerNameController.text,
-        ownerCellphone: cellphoneController.text
-      );
+          vehicleId: '${DateTime.now().millisecondsSinceEpoch}',
+          associationId: widget.association.associationId!,
+          associationName: widget.association.associationName,
+          vehicleReg: registrationController.text,
+          countryId: widget.association.countryId,
+          created: DateTime.now().toUtc().toIso8601String(),
+          make: makeController.text,
+          model: modelController.text,
+          passengerCapacity: int.parse(capacityController.text),
+          year: yearController.text,
+          ownerName: ownerNameController.text,
+          ownerCellphone: cellphoneController.text);
 
       try {
         var res = await dataApiDog.addVehicle(vehicle!);
@@ -130,9 +142,9 @@ class VehiclesEditState extends State<VehiclesEdit>
     });
   }
 
-  PlatformFile? csvFile;
+  PlatformFile? csvFile, vehiclePictureFile;
 
-  void _pickFile() async {
+  void _pickVehicleFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
@@ -180,229 +192,259 @@ class VehiclesEditState extends State<VehiclesEdit>
     });
   }
 
+  bool _showEditor = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
           child: Stack(
         children: [
-          Center(
-            child: SizedBox(
-              width: 500,
-              child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      gapH32,
-                      gapH32,
-                      Text(
-                        'Pick the Vehicles CSV File',
-                        style: myTextStyleMediumLarge(context, 20),
-                      ),
-                      gapH16,
-                      SizedBox(
-                        width: 300,
-                        child: ElevatedButton(
-                            style: ButtonStyle(
-                                elevation: WidgetStatePropertyAll(8),
-                                padding:
-                                    WidgetStatePropertyAll(EdgeInsets.all(16)),
-                                textStyle: WidgetStatePropertyAll(
-                                    myTextStyleMediumLargeWithColor(
-                                        context, Colors.pink, 16))),
-                            onPressed: () {
-                              _pickFile();
-                            },
-                            child: Text('Get File')),
-                      ),
-                      gapH32,
-                      csvFile == null
-                          ? gapH32
-                          : SizedBox(
-                              width: 400,
-                              child: ElevatedButton(
-                                  style: ButtonStyle(
-                                      // backgroundColor: WidgetStatePropertyAll(
-                                      //     Colors.blue.shade800),
-                                      backgroundColor:
-                                          WidgetStateProperty.all<Color>(
-                                              Colors.blue),
-                                      // Change button color
-                                      foregroundColor:
-                                          WidgetStateProperty.all<Color>(
-                                              Colors.white),
-                                      elevation: WidgetStatePropertyAll(8),
-                                      padding: WidgetStatePropertyAll(
-                                          EdgeInsets.all(24)),
-                                      textStyle: WidgetStatePropertyAll(
-                                          myTextStyleMediumLargeWithColor(
-                                              context, Colors.blue, 18))),
-                                  onPressed: () {
-                                    _sendFile();
-                                  },
-                                  child: Text('Send Vehicles File')),
-                            ),
-                      csvFile == null
-                          ? gapH8
-                          : SizedBox(
-                              height: 64,
-                            ),
-                      TextFormField(
-                        controller: registrationController,
-                        keyboardType: TextInputType.name,
-                        style: myTextStyleMediumLargeWithSize(context, 20),
-                        decoration: InputDecoration(
-                          label: Text('Registration'),
-                          hintText: 'Registration',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Registration';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: makeController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          label: Text('Make'),
-                          hintText: 'Enter Vehicle Make',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Vehicle Make';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: modelController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          label: Text('Model'),
-                          hintText: 'Enter Model',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Model';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: yearController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          label: Text('Year'),
-                          hintText: 'Enter Year',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Vehicle Year';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: capacityController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          label: Text('Passenger Capacity'),
-                          hintText: 'Enter Passenger Capacity',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Passenger Capacity';
-                          }
-                          return null;
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: ownerNameController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          label: Text('Owner Name'),
-                          hintText: 'Enter Owner Name',
-                          border: OutlineInputBorder(),
-                        ),
-                        // validator: (value) {
-                        //   if (value == null || value.isEmpty) {
-                        //     return 'Please enter Owner Name';
-                        //   }
-                        //   return null;
-                        // },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: cellphoneController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          label: Text('Owner Cellphone'),
-                          hintText: 'Enter Owner Cellphone',
-                          border: OutlineInputBorder(),
-                        ),
-                        // validator: (value) {
-                        //   if (value == null || value.isEmpty) {
-                        //     return 'Please enter Owner Cellphone';
-                        //   }
-                        //   return null;
-                        // },
-                      ),
-                      gapH8,
-                      gapH32,
-                      busy
-                          ? SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 8,
-                                backgroundColor: Colors.pink,
-                              ),
-                            )
-                          : SizedBox(
-                              width: 400,
-                              child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    elevation: WidgetStatePropertyAll(8),
+          Column(
+            children: [
+              _showEditor
+                  ? Center(
+                      child: SizedBox(
+                        width: 500,
+                        child: Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                gapH32,
+                                gapH32,
+                                Text(
+                                  'Pick the Vehicles CSV File',
+                                  style: myTextStyleMediumLarge(context, 20),
+                                ),
+                                gapH16,
+                                SizedBox(
+                                  width: 300,
+                                  child: ElevatedButton(
+                                      style: ButtonStyle(
+                                          elevation: WidgetStatePropertyAll(8),
+                                          padding: WidgetStatePropertyAll(
+                                              EdgeInsets.all(16)),
+                                          textStyle: WidgetStatePropertyAll(
+                                              myTextStyleMediumLargeWithColor(
+                                                  context, Colors.pink, 16))),
+                                      onPressed: () {
+                                        _pickVehicleFile();
+                                      },
+                                      child: Text('Get File')),
+                                ),
+                                gapH32,
+                                csvFile == null
+                                    ? gapH32
+                                    : SizedBox(
+                                        width: 400,
+                                        child: ElevatedButton(
+                                            style: ButtonStyle(
+                                                // backgroundColor: WidgetStatePropertyAll(
+                                                //     Colors.blue.shade800),
+                                                backgroundColor:
+                                                    WidgetStateProperty.all<
+                                                        Color>(Colors.blue),
+                                                // Change button color
+                                                foregroundColor:
+                                                    WidgetStateProperty.all<
+                                                        Color>(Colors.white),
+                                                elevation:
+                                                    WidgetStatePropertyAll(8),
+                                                padding: WidgetStatePropertyAll(
+                                                    EdgeInsets.all(24)),
+                                                textStyle: WidgetStatePropertyAll(
+                                                    myTextStyleMediumLargeWithColor(
+                                                        context,
+                                                        Colors.blue,
+                                                        18))),
+                                            onPressed: () {
+                                              _sendFile();
+                                            },
+                                            child: Text('Send Vehicles File')),
+                                      ),
+                                csvFile == null
+                                    ? gapH8
+                                    : SizedBox(
+                                        height: 64,
+                                      ),
+                                TextFormField(
+                                  controller: registrationController,
+                                  keyboardType: TextInputType.name,
+                                  style: myTextStyleMediumLargeWithSize(
+                                      context, 20),
+                                  decoration: InputDecoration(
+                                    label: Text('Registration'),
+                                    hintText: 'Registration',
+                                    border: OutlineInputBorder(),
                                   ),
-                                  onPressed: () {
-                                    _onSubmit();
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter Registration';
+                                    }
+                                    return null;
                                   },
-                                  child: Padding(
-                                      padding: EdgeInsets.all(20),
-                                      child: Text(
-                                        'Submit',
-                                        style: myTextStyleMediumLargeWithSize(
-                                            context, 20),
-                                      ))),
-                            ),
-                      result == null
-                          ? gapW32
-                          : SizedBox(
-                              height: 32,
-                              child: Center(
-                                child: Text('$result'),
-                              ),
-                            )
-                    ],
-                  )),
-            ),
+                                ),
+                                gapH8,
+                                TextFormField(
+                                  controller: makeController,
+                                  keyboardType: TextInputType.name,
+                                  decoration: InputDecoration(
+                                    label: Text('Make'),
+                                    hintText: 'Enter Vehicle Make',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter Vehicle Make';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                gapH8,
+                                TextFormField(
+                                  controller: modelController,
+                                  keyboardType: TextInputType.name,
+                                  decoration: InputDecoration(
+                                    label: Text('Model'),
+                                    hintText: 'Enter Model',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter Model';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                gapH8,
+                                TextFormField(
+                                  controller: yearController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: InputDecoration(
+                                    label: Text('Year'),
+                                    hintText: 'Enter Year',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter Vehicle Year';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                gapH8,
+                                TextFormField(
+                                  controller: capacityController,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(
+                                    label: Text('Passenger Capacity'),
+                                    hintText: 'Enter Passenger Capacity',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter Passenger Capacity';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                gapH8,
+                                TextFormField(
+                                  controller: ownerNameController,
+                                  keyboardType: TextInputType.name,
+                                  decoration: InputDecoration(
+                                    label: Text('Owner Name'),
+                                    hintText: 'Enter Owner Name',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  // validator: (value) {
+                                  //   if (value == null || value.isEmpty) {
+                                  //     return 'Please enter Owner Name';
+                                  //   }
+                                  //   return null;
+                                  // },
+                                ),
+                                gapH8,
+                                TextFormField(
+                                  controller: cellphoneController,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(
+                                    label: Text('Owner Cellphone'),
+                                    hintText: 'Enter Owner Cellphone',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  // validator: (value) {
+                                  //   if (value == null || value.isEmpty) {
+                                  //     return 'Please enter Owner Cellphone';
+                                  //   }
+                                  //   return null;
+                                  // },
+                                ),
+                                gapH8,
+                                gapH32,
+                                busy
+                                    ? SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 8,
+                                          backgroundColor: Colors.pink,
+                                        ),
+                                      )
+                                    : SizedBox(
+                                        width: 400,
+                                        child: ElevatedButton(
+                                            style: ButtonStyle(
+                                              elevation:
+                                                  WidgetStatePropertyAll(8),
+                                            ),
+                                            onPressed: () {
+                                              _onSubmit();
+                                            },
+                                            child: Padding(
+                                                padding: EdgeInsets.all(20),
+                                                child: Text(
+                                                  'Submit',
+                                                  style:
+                                                      myTextStyleMediumLargeWithSize(
+                                                          context, 20),
+                                                ))),
+                                      ),
+                                result == null
+                                    ? gapW32
+                                    : SizedBox(
+                                        height: 32,
+                                        child: Center(
+                                          child: Text('$result'),
+                                        ),
+                                      )
+                              ],
+                            )),
+                      ),
+                    )
+                  : gapH32,
+              gapH32,
+              Expanded(
+                  child: VehicleListWidget(
+                vehicles: cars,
+                onVehiclePicked: (car, photos, videos) {
+                  pp('$mm car picked: ${car.toJson()}');
+                  pp('$mm car photos: ${photos.length}');
+                  vehicle = car;
+                  _setup();
+                  setState(() {
+                    vehiclePhotos = photos;
+                    vehicleVideos = videos;
+                  });
+                },
+              ))
+            ],
           ),
           Positioned(
             right: 24,
             top: 24,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text('Vehicles'),
                 gapW32,
@@ -417,6 +459,22 @@ class VehiclesEditState extends State<VehiclesEdit>
                     padding: EdgeInsets.all(16),
                   ),
                 ),
+                gapW32,
+                _showEditor
+                    ? IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _showEditor = false;
+                          });
+                        },
+                        icon: Icon(Icons.close))
+                    : IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _showEditor = true;
+                          });
+                        },
+                        icon: Icon(Icons.edit)),
               ],
             ),
           )

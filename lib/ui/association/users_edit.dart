@@ -514,7 +514,7 @@ class UsersEditState extends State<UsersEdit>
                                     onTap: () {
                                       _showToolbar(index);
                                     },
-                                    child: UserProfile(user: user,),
+                                    child: UserProfilePicture(user: user,),
                                   ),
                                   gapH8,
                                   Text(
@@ -608,8 +608,8 @@ class UsersEditState extends State<UsersEdit>
   }
 }
 
-class UserProfile extends StatelessWidget {
-  const UserProfile({super.key, required this.user});
+class UserProfilePicture extends StatelessWidget {
+  const UserProfilePicture({super.key, required this.user});
 
   final User user;
 

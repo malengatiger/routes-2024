@@ -138,7 +138,9 @@ class KasieIntroState extends State<KasieIntro>
     if (user != null) {
       if (user.associationId == 'ADMIN') {
         if (mounted) {
-          showOKToast(message: 'Sign in good, Boss!', context: context);
+          showOKToast(message: 'Sign in good, Boss!',
+              duration: Duration(seconds: 2),
+              context: context);
         NavigationUtils.navigateTo(
               context: context,
               widget: const AssociationList(),
@@ -146,7 +148,9 @@ class KasieIntroState extends State<KasieIntro>
         }
       } else {
         if (mounted) {
-          showOKToast(message: 'Sign in good, Boss!', context: context);
+          showOKToast(message: 'Sign in good, Boss!',
+              duration: Duration(seconds: 2),
+              context: context);
           NavigationUtils.navigateTo(
               context: context,
               widget:
