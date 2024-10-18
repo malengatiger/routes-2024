@@ -26,10 +26,10 @@ class AssociationMainState extends State<AssociationMain>
     _controller = AnimationController(vsync: this);
     super.initState();
     if (widget.association == null) {
-      currentWidget = AssociationEdit();
+      currentWidget = AssociationEdit(onClose: (){},);
     } else {
       currentWidget = AssociationEdit(
-        association: widget.association,
+        association: widget.association, onClose: (){},
       );
     }
   }
@@ -170,7 +170,7 @@ class KasieNavigation extends StatelessWidget {
             },
             child: ListTile(
               leading: Icon(Icons.people, size: 48, color: Theme.of(context).primaryColor),
-              title: Text('Manage Staff'),
+              title: Text('Staff'),
             ),
           ),
           gapH32,
@@ -180,7 +180,37 @@ class KasieNavigation extends StatelessWidget {
             },
             child: ListTile(
               leading: Icon(Icons.car_crash_rounded, size: 48, color: Theme.of(context).primaryColor,),
-              title: Text('Manage Vehicles'),
+              title: Text('Vehicles'),
+            ),
+          ),
+          gapH32,
+          GestureDetector(
+            onTap: () {
+              onTapped(2);
+            },
+            child: ListTile(
+              leading: Icon(Icons.airplane_ticket, size: 48, color: Theme.of(context).primaryColor,),
+              title: Text('Commuter Tickets'),
+            ),
+          ),
+          gapH32,
+          GestureDetector(
+            onTap: () {
+              onTapped(3);
+            },
+            child: ListTile(
+              leading: Icon(Icons.roundabout_right, size: 48, color: Theme.of(context).primaryColor,),
+              title: Text('Routes'),
+            ),
+          ),
+          gapH32,
+          GestureDetector(
+            onTap: () {
+              onTapped(3);
+            },
+            child: ListTile(
+              leading: Icon(Icons.folder_copy_rounded, size: 48,),
+              title: Text('Example upload Files'),
             ),
           ),
           gapH32,

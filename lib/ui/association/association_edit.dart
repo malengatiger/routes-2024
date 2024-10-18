@@ -7,9 +7,10 @@ import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/widgets/country_selection.dart';
 
 class AssociationEdit extends StatefulWidget {
-  const AssociationEdit({super.key, this.association});
+  const AssociationEdit({super.key, this.association, required this.onClose});
 
   final Association? association;
+  final Function onClose;
 
   @override
   AssociationEditState createState() => AssociationEditState();
@@ -50,6 +51,7 @@ class AssociationEditState extends State<AssociationEdit>
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   bool busy = false;
   Prefs prefs = GetIt.instance<Prefs>();
+
   void _setup() async {
     if (widget.association != null) {
       nameController.text = widget.association!.associationName!;
@@ -114,153 +116,158 @@ class AssociationEditState extends State<AssociationEdit>
 
   Country? country;
   Association? association;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Association',
-          style: myTextStyleMediumLarge(context, 24),
-        ),
-      ),
-      body: SafeArea(
-          child: Stack(
-        children: [
-          Center(
-            child: SizedBox(
-              width: 480,
-              child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      gapH32,
-                      gapH32,
-                      Text(
-                        'Select the country',
-                        style: myTextStyleMediumLarge(context, 20),
-                      ),
-                      gapH16,
-                      CountryChooser(
-                          onSelected: (c) {
-                            pp('$mm ... country: ${c.toJson()}');
-                            setState(() {
-                              country = c;
-                            });
-                          },
-                          hint: 'Select Country',
-                          refreshCountries: false),
-                      gapH32,
-                      country == null
-                          ? gapH32
-                          : Text(
-                              country!.name!,
-                              style: myTextStyleMediumLarge(context, 28),
-                            ),
-                      country == null ? gapH8 : gapH32,
-                      TextFormField(
-                        controller: nameController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          label: Text('Association Name'),
-                          hintText: 'Enter Association Name',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Association Name';
-                          }
+    return Stack(
+      children: [
+        Center(
+          child: SizedBox(
+            width: 400,
+            child: Column(
+              children: [
+                Row(mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          widget.onClose();
                         },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: adminFirstNameController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          label: Text('Administrator Name'),
-                          hintText: 'Enter Administrator Name',
-                          border: OutlineInputBorder(),
+                        icon: Icon(Icons.close)),
+                  ],
+                ),
+                Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        gapH32,
+                        gapH32,
+                        Text(
+                          'Select the country',
+                          style: myTextStyleMediumLarge(context, 20),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Administrator Name';
-                          }
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: adminLastNameController,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          label: Text('Administrator Surname'),
-                          hintText: 'Enter Administrator Surname',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Administrator Surname';
-                          }
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          label: Text('Administrator Email'),
-                          hintText: 'Enter Administrator Email',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Administrator Email';
-                          }
-                        },
-                      ),
-                      gapH8,
-                      TextFormField(
-                        controller: cellphoneController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          label: Text('Administrator Cellphone'),
-                          hintText: 'Enter Administrator Cellphone',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter Administrator Cellphone';
-                          }
-                        },
-                      ),
-                      gapH32,
-                      gapH32,
-                      busy
-                          ? SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 8,
-                                backgroundColor: Colors.pink,
+                        gapH16,
+                        CountryChooser(
+                            onSelected: (c) {
+                              pp('$mm ... country: ${c.toJson()}');
+                              setState(() {
+                                country = c;
+                              });
+                            },
+                            hint: 'Select Country',
+                            refreshCountries: false),
+                        gapH32,
+                        country == null
+                            ? gapH32
+                            : Text(
+                                country!.name!,
+                                style: myTextStyleMediumLarge(context, 28),
                               ),
-                            )
-                          : SizedBox(
-                              width: 400,
-                              child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    elevation: WidgetStatePropertyAll(8),
-                                  ),
-                                  onPressed: () {
-                                    _onSubmit();
-                                  },
-                                  child: Padding(
-                                      padding: EdgeInsets.all(20),
-                                      child: Text('Submit'))),
-                            ),
-                    ],
-                  )),
+                        country == null ? gapH8 : gapH32,
+                        TextFormField(
+                          controller: nameController,
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            label: Text('Association Name'),
+                            hintText: 'Enter Association Name',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter Association Name';
+                            }
+                          },
+                        ),
+                        gapH32,
+                        TextFormField(
+                          controller: adminFirstNameController,
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            label: Text('Administrator Name'),
+                            hintText: 'Enter Administrator Name',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter Administrator Name';
+                            }
+                          },
+                        ),
+                        gapH32,
+                        TextFormField(
+                          controller: adminLastNameController,
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            label: Text('Administrator Surname'),
+                            hintText: 'Enter Administrator Surname',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter Administrator Surname';
+                            }
+                          },
+                        ),
+                        gapH32,
+                        TextFormField(
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            label: Text('Administrator Email'),
+                            hintText: 'Enter Administrator Email',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter Administrator Email';
+                            }
+                          },
+                        ),
+                        gapH32,
+                        TextFormField(
+                          controller: cellphoneController,
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            label: Text('Administrator Cellphone'),
+                            hintText: 'Enter Administrator Cellphone',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter Administrator Cellphone';
+                            }
+                          },
+                        ),
+                        gapH32,
+                        gapH32,
+                        busy
+                            ? SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 8,
+                                  backgroundColor: Colors.pink,
+                                ),
+                              )
+                            : SizedBox(
+                                width: 400,
+                                child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      elevation: WidgetStatePropertyAll(8),
+                                    ),
+                                    onPressed: () {
+                                      _onSubmit();
+                                    },
+                                    child: Padding(
+                                        padding: EdgeInsets.all(20),
+                                        child: Text('Submit'))),
+                              ),
+                      ],
+                    )),
+              ],
             ),
-          )
-        ],
-      )),
+          ),
+        )
+      ],
     );
   }
 }

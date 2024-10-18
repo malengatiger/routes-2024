@@ -290,6 +290,7 @@ class UsersEditState extends State<UsersEdit>
 
   int? userIndex;
   bool _showTools = false;
+  bool _showEditor = false;
 
   _showToolbar(int index) {
     setState(() {
@@ -307,190 +308,197 @@ class UsersEditState extends State<UsersEdit>
           Center(
             child: Column(
               children: [
-                SizedBox(
-                  width: 480,
-                  child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          gapH32,
-                          gapH32,
-                          Text(
-                            'Pick the Staff Members CSV File',
-                            style: myTextStyleMediumLarge(context, 20),
-                          ),
-                          gapH16,
-                          SizedBox(
-                            width: 300,
-                            child: ElevatedButton(
-                                style: ButtonStyle(
-                                    // backgroundColor: WidgetStatePropertyAll(
-                                    //     Colors.pink.shade800),
-                                    // backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // Change button color
-                                    // foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                    elevation: WidgetStatePropertyAll(8),
-                                    padding: WidgetStatePropertyAll(
-                                        EdgeInsets.all(16)),
-                                    textStyle: WidgetStatePropertyAll(
-                                        myTextStyleMediumLargeWithColor(
-                                            context, Colors.pink, 16))),
-                                onPressed: () {
-                                  _pickFile();
-                                },
-                                child: Text('Get File')),
-                          ),
-                          gapH32,
-                          csvFile == null
-                              ? gapH32
-                              : SizedBox(
-                                  width: 400,
+                _showEditor
+                    ? SizedBox(
+                        width: 480,
+                        child: Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                gapH32,
+                                gapH32,
+                                Text(
+                                  'Pick the Staff Members CSV File',
+                                  style: myTextStyleMediumLarge(context, 20),
+                                ),
+                                gapH16,
+                                SizedBox(
+                                  width: 300,
                                   child: ElevatedButton(
                                       style: ButtonStyle(
                                           // backgroundColor: WidgetStatePropertyAll(
-                                          //     Colors.blue.shade800),
-                                          backgroundColor:
-                                              WidgetStateProperty.all<Color>(
-                                                  Colors.blue),
-                                          // Change button color
-                                          foregroundColor:
-                                              WidgetStateProperty.all<Color>(
-                                                  Colors.white),
+                                          //     Colors.pink.shade800),
+                                          // backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // Change button color
+                                          // foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                                           elevation: WidgetStatePropertyAll(8),
                                           padding: WidgetStatePropertyAll(
-                                              EdgeInsets.all(24)),
+                                              EdgeInsets.all(16)),
                                           textStyle: WidgetStatePropertyAll(
                                               myTextStyleMediumLargeWithColor(
-                                                  context, Colors.blue, 18))),
+                                                  context, Colors.pink, 16))),
                                       onPressed: () {
-                                        _sendFile();
+                                        _pickFile();
                                       },
-                                      child: Text('Send Users File')),
+                                      child: Text('Get File')),
                                 ),
-                          csvFile == null
-                              ? gapH8
-                              : SizedBox(
-                                  height: 28,
-                                ),
-                          gapH8,
-                          TextFormField(
-                            controller: firstNameController,
-                            keyboardType: TextInputType.name,
-                            decoration: InputDecoration(
-                              label: Text('First Name'),
-                              hintText: 'Enter First Name',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter First Name';
-                              }
-                              return null;
-                            },
-                          ),
-                          gapH8,
-                          TextFormField(
-                            controller: lastNameController,
-                            keyboardType: TextInputType.name,
-                            decoration: InputDecoration(
-                              label: Text('Last Name'),
-                              hintText: 'Enter Last Name',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter Last Name';
-                              }
-                              return null;
-                            },
-                          ),
-                          gapH8,
-                          TextFormField(
-                            controller: emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              label: Text('Email Address'),
-                              hintText: 'Enter Email',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter Email Address';
-                              }
-                              return null;
-                            },
-                          ),
-                          gapH8,
-                          TextFormField(
-                            controller: cellphoneController,
-                            keyboardType: TextInputType.phone,
-                            decoration: InputDecoration(
-                              label: Text('Cellphone'),
-                              hintText: 'Enter Cellphone',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter Cellphone';
-                              }
-                              return null;
-                            },
-                          ),
-                          gapH8,
-                          TextFormField(
-                            controller: passwordController,
-                            keyboardType: TextInputType.name,
-                            decoration: InputDecoration(
-                              label: Text('Password'),
-                              hintText: 'Enter Password',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter Password';
-                              }
-                              return null;
-                            },
-                          ),
-                          gapH8,
-                          getDropDown(),
-                          gapH32,
-                          userType == null
-                              ? gapW8
-                              : SizedBox(
-                                  height: 64,
-                                  child: Center(
-                                    child: Text(
-                                      '$userType',
-                                      style: myTextStyleMediumLargeWithSize(
-                                          context, 20),
-                                    ),
-                                  ),
-                                ),
-                          busy
-                              ? SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 8,
-                                    backgroundColor: Colors.pink,
-                                  ),
-                                )
-                              : SizedBox(
-                                  width: 400,
-                                  child: ElevatedButton(
-                                      style: ButtonStyle(
-                                        elevation: WidgetStatePropertyAll(8),
+                                gapH32,
+                                csvFile == null
+                                    ? gapH32
+                                    : SizedBox(
+                                        width: 400,
+                                        child: ElevatedButton(
+                                            style: ButtonStyle(
+                                                // backgroundColor: WidgetStatePropertyAll(
+                                                //     Colors.blue.shade800),
+                                                backgroundColor:
+                                                    WidgetStateProperty.all<
+                                                        Color>(Colors.blue),
+                                                // Change button color
+                                                foregroundColor:
+                                                    WidgetStateProperty.all<
+                                                        Color>(Colors.white),
+                                                elevation:
+                                                    WidgetStatePropertyAll(8),
+                                                padding: WidgetStatePropertyAll(
+                                                    EdgeInsets.all(24)),
+                                                textStyle: WidgetStatePropertyAll(
+                                                    myTextStyleMediumLargeWithColor(
+                                                        context,
+                                                        Colors.blue,
+                                                        18))),
+                                            onPressed: () {
+                                              _sendFile();
+                                            },
+                                            child: Text('Send Users File')),
                                       ),
-                                      onPressed: () {
-                                        _onSubmit();
-                                      },
-                                      child: Padding(
-                                          padding: EdgeInsets.all(20),
-                                          child: Text('Submit'))),
+                                csvFile == null
+                                    ? gapH8
+                                    : SizedBox(
+                                        height: 28,
+                                      ),
+                                gapH32,
+                                TextFormField(
+                                  controller: firstNameController,
+                                  keyboardType: TextInputType.name,
+                                  decoration: InputDecoration(
+                                    label: Text('First Name'),
+                                    hintText: 'Enter First Name',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter First Name';
+                                    }
+                                    return null;
+                                  },
                                 ),
-                        ],
-                      )),
-                ),
+                                gapH32,
+                                TextFormField(
+                                  controller: lastNameController,
+                                  keyboardType: TextInputType.name,
+                                  decoration: InputDecoration(
+                                    label: Text('Last Name'),
+                                    hintText: 'Enter Last Name',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter Last Name';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                gapH32,
+                                TextFormField(
+                                  controller: emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: InputDecoration(
+                                    label: Text('Email Address'),
+                                    hintText: 'Enter Email',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter Email Address';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                gapH32,
+                                TextFormField(
+                                  controller: cellphoneController,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(
+                                    label: Text('Cellphone'),
+                                    hintText: 'Enter Cellphone',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter Cellphone';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                gapH32,
+                                TextFormField(
+                                  controller: passwordController,
+                                  keyboardType: TextInputType.name,
+                                  decoration: InputDecoration(
+                                    label: Text('Password'),
+                                    hintText: 'Enter Password',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter Password';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                gapH32,
+                                getDropDown(),
+                                gapH32,
+                                userType == null
+                                    ? gapW8
+                                    : SizedBox(
+                                        height: 64,
+                                        child: Center(
+                                          child: Text(
+                                            '$userType',
+                                            style:
+                                                myTextStyleMediumLargeWithSize(
+                                                    context, 20),
+                                          ),
+                                        ),
+                                      ),
+                                busy
+                                    ? SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 8,
+                                          backgroundColor: Colors.pink,
+                                        ),
+                                      )
+                                    : SizedBox(
+                                        width: 400,
+                                        child: ElevatedButton(
+                                            style: ButtonStyle(
+                                              elevation:
+                                                  WidgetStatePropertyAll(8),
+                                            ),
+                                            onPressed: () {
+                                              _onSubmit();
+                                            },
+                                            child: Padding(
+                                                padding: EdgeInsets.all(20),
+                                                child: Text('Submit'))),
+                                      ),
+                              ],
+                            )),
+                      )
+                    : gapH32,
                 gapH32,
                 Expanded(
                   child: GridView.builder(
@@ -506,7 +514,8 @@ class UsersEditState extends State<UsersEdit>
                           },
                           child: Card(
                             elevation: 8,
-                            child: SizedBox(height:200,
+                            child: SizedBox(
+                              height: 200,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -514,7 +523,9 @@ class UsersEditState extends State<UsersEdit>
                                     onTap: () {
                                       _showToolbar(index);
                                     },
-                                    child: UserProfilePicture(user: user,),
+                                    child: UserProfilePicture(
+                                      user: user,
+                                    ),
                                   ),
                                   gapH8,
                                   Text(
@@ -591,6 +602,23 @@ class UsersEditState extends State<UsersEdit>
                     padding: EdgeInsets.all(16),
                   ),
                 ),
+                gapW32,
+                gapW32,
+                _showEditor
+                    ? IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _showEditor = true;
+                          });
+                        },
+                        icon: Icon(Icons.edit))
+                    : IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _showEditor = false;
+                          });
+                        },
+                        icon: Icon(Icons.close))
               ],
             ),
           ),
@@ -616,7 +644,9 @@ class UserProfilePicture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (user.profileUrl == null) {
-      return SizedBox(width:100, height: 100,
+      return SizedBox(
+        width: 100,
+        height: 100,
         child: Image.asset(
           'assets/avatar1.png',
           height: 64,
@@ -625,12 +655,13 @@ class UserProfilePicture extends StatelessWidget {
         ),
       );
     }
-    return SizedBox(width:100, height: 100,
-      child: CircleAvatar(
-        backgroundImage: NetworkImage(user.profileUrl!),
-        radius: 100,
-      )
-    );
+    return SizedBox(
+        width: 100,
+        height: 100,
+        child: CircleAvatar(
+          backgroundImage: NetworkImage(user.profileUrl!),
+          radius: 100,
+        ));
   }
 }
 

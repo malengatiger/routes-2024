@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
-import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
@@ -30,7 +29,7 @@ class VehiclesEditState extends State<VehiclesEdit>
     _controller = AnimationController(vsync: this);
     super.initState();
     _setup();
-    _getCars();
+    _getCars(false);
   }
 
   @override
@@ -90,10 +89,23 @@ class VehiclesEditState extends State<VehiclesEdit>
   List<Vehicle> cars = [];
   String? result;
 
-  void _getCars() async {
-    cars =
-        await listApiDog.getAssociationCars(widget.association.associationId!, false);
-    setState(() {});
+  void _getCars(bool refresh) async {
+    setState(() {
+      busy = true;
+    });
+    try {
+      cars = await listApiDog.getAssociationCars(
+          widget.association.associationId!, refresh);
+      cars.sort((a, b) => a.vehicleReg!.compareTo(b.vehicleReg!));
+    } catch (e, s) {
+      pp('$e $s');
+      if (mounted) {
+        showErrorToast(message: '$e', context: context);
+      }
+    }
+    setState(() {
+      busy = false;
+    });
   }
 
   _onSubmit() async {
@@ -122,7 +134,7 @@ class VehiclesEditState extends State<VehiclesEdit>
 
       try {
         var res = await dataApiDog.addVehicle(vehicle!);
-        _getCars();
+        cars.insert(0, res);
         if (mounted) {
           showOKToast(
               message: 'Vehicle registered on KasieTransie', context: context);
@@ -164,6 +176,9 @@ class VehiclesEditState extends State<VehiclesEdit>
   Country? country;
   Association? association;
 
+  AddCarsResponse? addCarsResponse;
+  bool _showErrors = false;
+
   _sendFile() async {
     pp('$mm  send the Vehicle File ...');
     setState(() {
@@ -171,12 +186,19 @@ class VehiclesEditState extends State<VehiclesEdit>
     });
 
     try {
-      var addCarsResponse = await dataApiDog.importVehiclesFromCSV(
+      addCarsResponse = await dataApiDog.importVehiclesFromCSV(
           csvFile!, widget.association.associationId!);
-      _getCars();
+      if (addCarsResponse != null) {
+        for (var car in addCarsResponse!.cars) {
+          cars.insert(0, car);
+        }
+        if (addCarsResponse!.errors.isNotEmpty) {
+          _showErrors = true;
+        }
+      }
       if (mounted) {
         var msg =
-            '🌿 Vehicles added: ${addCarsResponse!.cars.length} errors: ${addCarsResponse.errors.length}';
+            '🌿 Vehicles uploaded successfully: ${addCarsResponse!.cars.length}, errors encountered: ${addCarsResponse!.errors.length}';
         result = msg;
         showOKToast(message: msg, context: context);
       }
@@ -192,7 +214,7 @@ class VehiclesEditState extends State<VehiclesEdit>
     });
   }
 
-  bool _showEditor = true;
+  bool _showEditor = false;
 
   @override
   Widget build(BuildContext context) {
@@ -284,7 +306,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH8,
+                                gapH32,
                                 TextFormField(
                                   controller: makeController,
                                   keyboardType: TextInputType.name,
@@ -300,7 +322,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH8,
+                                gapH32,
                                 TextFormField(
                                   controller: modelController,
                                   keyboardType: TextInputType.name,
@@ -316,7 +338,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH8,
+                                gapH32,
                                 TextFormField(
                                   controller: yearController,
                                   keyboardType: TextInputType.emailAddress,
@@ -332,7 +354,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH8,
+                                gapH32,
                                 TextFormField(
                                   controller: capacityController,
                                   keyboardType: TextInputType.phone,
@@ -348,7 +370,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH8,
+                                gapH32,
                                 TextFormField(
                                   controller: ownerNameController,
                                   keyboardType: TextInputType.name,
@@ -364,7 +386,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                   //   return null;
                                   // },
                                 ),
-                                gapH8,
+                                gapH32,
                                 TextFormField(
                                   controller: cellphoneController,
                                   keyboardType: TextInputType.phone,
@@ -424,6 +446,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                     )
                   : gapH32,
               gapH32,
+              _showEditor ? gapH4 : gapH32,
               Expanded(
                   child: VehicleListWidget(
                 vehicles: cars,
@@ -446,22 +469,33 @@ class VehiclesEditState extends State<VehiclesEdit>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text('Vehicles'),
+                Text(
+                  'Vehicles',
+                  style: myTextStyle(fontSize: 18, weight: FontWeight.w900),
+                ),
                 gapW32,
-                bd.Badge(
-                  badgeContent: Text(
-                    '${cars.length}',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  badgeStyle: bd.BadgeStyle(
-                    badgeColor: Colors.blue.shade800,
-                    elevation: 12,
-                    padding: EdgeInsets.all(16),
+                GestureDetector(
+                  onTap: () {
+                    pp('$mm ... refresh cars ...');
+                    _getCars(true);
+                  },
+                  child: bd.Badge(
+                    badgeContent: Text(
+                      '${cars.length}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    badgeStyle: bd.BadgeStyle(
+                      badgeColor: Colors.blue.shade800,
+                      elevation: 8,
+                      padding: EdgeInsets.all(16),
+                    ),
                   ),
                 ),
                 gapW32,
+                gapW32,
                 _showEditor
                     ? IconButton(
+                        tooltip: 'Close Vehicle Editor',
                         onPressed: () {
                           setState(() {
                             _showEditor = false;
@@ -469,6 +503,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                         },
                         icon: Icon(Icons.close))
                     : IconButton(
+                        tooltip: 'Open Vehicle Editor',
                         onPressed: () {
                           setState(() {
                             _showEditor = true;
@@ -477,9 +512,82 @@ class VehiclesEditState extends State<VehiclesEdit>
                         icon: Icon(Icons.edit)),
               ],
             ),
-          )
+          ),
+          _showErrors
+              ? Positioned(
+                  child: Center(
+                  child: CarErrors(cars: cars, onClose: (){
+                    setState(() {
+                      _showErrors = false;
+                    });
+                  },),
+                ))
+              : gapW32,
         ],
       )),
+    );
+  }
+}
+
+class CarErrors extends StatelessWidget {
+  const CarErrors({super.key, required this.cars, required this.onClose});
+
+  final List<Vehicle> cars;
+  final Function onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        gapH32,
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Upload Errors',
+              style: myTextStyle(fontSize: 24, weight: FontWeight.w900),
+            ),
+            IconButton(onPressed: (){
+              onClose();
+            }, icon: Icon(Icons.close)),
+          ],
+        ),
+        gapH32,
+        GridView.builder(
+            gridDelegate:
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+            itemCount: cars.length,
+            itemBuilder: (_, index) {
+              var car = cars[index];
+              return Card(
+                elevation: 8,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        '${car.vehicleReg}',
+                        style: myTextStyle(
+                            color: Colors.amber.shade900, fontSize: 20),
+                      ),
+                      Text(
+                        '${car.make}',
+                        style: myTextStyle(fontSize: 10),
+                      ),
+                      Text(
+                        '${car.model}',
+                        style: myTextStyle(fontSize: 10),
+                      ),
+                      Text(
+                        '${car.year}',
+                        style:
+                            myTextStyle(fontSize: 12, weight: FontWeight.w900),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+      ],
     );
   }
 }

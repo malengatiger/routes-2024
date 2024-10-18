@@ -10,8 +10,10 @@ import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:routes_2024/ui/association/association_edit.dart';
 import 'package:routes_2024/ui/association/association_main.dart';
 import 'package:routes_2024/ui/route_data_widget.dart';
+import 'package:badges/badges.dart' as bd;
 
 class AssociationList extends StatefulWidget {
   const AssociationList({super.key});
@@ -23,9 +25,10 @@ class AssociationList extends StatefulWidget {
 class AssociationListState extends State<AssociationList>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  static const mm = '😡😡😡 AssociationList 😡';
+  static const mm = '😡😡😡AssociationList 😡';
   ListApiDog api = GetIt.instance<ListApiDog>();
   List<Association> associations = [];
+  Association? association;
   bool busy = false;
 
   @override
@@ -35,44 +38,14 @@ class AssociationListState extends State<AssociationList>
     _getAssociations(false);
   }
 
-  _navigateToRoutes(Association ass) async {}
   _navigateToData(Association ass) async {
+    prefs.saveAssociation(ass);
     NavigationUtils.navigateTo(
         context: context,
         widget: AssociationMain(
           association: ass,
         ),
         transitionType: PageTransitionType.leftToRight);
-  }
-
-  List<FocusedMenuItem> _getMenuItems(Association ass, BuildContext context) {
-    //prefs.saveRoute(route);
-    List<FocusedMenuItem> list = [];
-
-    list.add(FocusedMenuItem(
-        title: Text('Manage Routes', style: myTextStyleMediumBlack(context)),
-        // backgroundColor: Theme.of(context).primaryColor,
-        trailingIcon: Icon(
-          Icons.roundabout_right,
-          color: Theme.of(context).primaryColor,
-        ),
-        onPressed: () {
-          _navigateToRoutesDash(ass);
-        }));
-    //
-    list.add(FocusedMenuItem(
-        title: Text('Manage Staff and Vehicles',
-            style: myTextStyleMediumBlack(context)),
-        // backgroundColor: Theme.of(context).primaryColor,
-        trailingIcon: Icon(
-          Icons.car_crash_rounded,
-          color: Theme.of(context).primaryColor,
-        ),
-        onPressed: () {
-          _navigateToData(ass);
-        }));
-
-    return list;
   }
 
   @override
@@ -124,6 +97,19 @@ class AssociationListState extends State<AssociationList>
           ),
           actions: [
             IconButton(
+                tooltip: 'Add new Taxi Association/Organisation',
+                onPressed: () {
+                  setState(() {
+                    _showEditor = true;
+                  });
+                },
+                icon: Icon(
+                  Icons.add,
+                  color: Theme.of(context).primaryColor,
+                  size: 48,
+                )),
+            IconButton(
+                tooltip: 'Refresh the list of associations/organization',
                 onPressed: () {
                   _getAssociations(true);
                 },
@@ -152,57 +138,74 @@ class AssociationListState extends State<AssociationList>
                     ));
               },
             ),
+            _showEditor
+                ? Positioned(
+                    child: Center(
+                    child: Card(
+                      elevation: 8,
+                      child: SizedBox(
+                        width: 600,
+                        height: 800,
+                        child: AssociationEdit(
+                          association: association,
+                          onClose: () {
+                            setState(() {
+                              _showEditor = false;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ))
+                : gapW32,
           ],
         ),
       ),
     );
   }
 
+  bool _showEditor = false;
+
   Widget getWidget() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 48, horizontal: 24),
-      child: ListView.builder(
-          itemCount: associations.length,
-          itemBuilder: (_, index) {
-            var ass = associations[index];
-            return GestureDetector(
-                onTap: () {
-                  _navigateToRoutesDash(ass);
-                },
-                child: Card(
-                    elevation: 8,
-                    child: ListTile(
-                        title: Text(
-                          ass.associationName!,
-                          style: myTextStyleMediumLarge(context, 20),
-                        ),
-                        subtitle: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  ass.countryName ?? 'NOT AVAILABLE',
-                                  style: myTextStyleSmall(context),
-                                ),
-                              ],
-                            ),
-                            gapH8,
-                            Row(mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                TextButton(onPressed: (){
-                                  _navigateToRoutesDash(ass);
-                                }, child: Text('Manage Routes')),
-                                gapW32,
-                                TextButton(onPressed: (){
-                                  _navigateToData(ass);
-                                }, child: Text('Manage Data')),
-                              ],
-                            )
-                          ],
-                        ),
-                        leading: Icon(Icons.car_crash_rounded,
-                            color: Theme.of(context).primaryColor))));
-          }),
+      child: bd.Badge(
+        badgeContent: Text('${associations.length}'),
+        badgeStyle: bd.BadgeStyle(
+          badgeColor: Theme.of(context).primaryColor,
+          elevation: 8,
+          padding: EdgeInsets.all(20.0),
+        ),
+        child: ListView.builder(
+            itemCount: associations.length,
+            itemBuilder: (_, index) {
+              var ass = associations[index];
+              return GestureDetector(
+                  onTap: () {
+                    association = ass;
+                    _navigateToData(ass);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                        elevation: 8,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ListTile(
+                              title: Text(
+                                ass.associationName!,
+                                style: myTextStyleMediumLarge(context, 20),
+                              ),
+                              subtitle: Text(
+                                ass.countryName ?? 'NOT AVAILABLE',
+                                style: myTextStyleSmall(context),
+                              ),
+                              leading: Icon(Icons.car_crash_rounded,
+                                  color: Theme.of(context).primaryColor)),
+                        )),
+                  ));
+            }),
+      ),
     );
   }
 }

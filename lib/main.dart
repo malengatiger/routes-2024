@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/bloc/register_services.dart';
 import 'package:kasie_transie_library/bloc/theme_bloc.dart';
 import 'package:kasie_transie_library/data/color_and_locale.dart';
@@ -44,6 +45,8 @@ main() async {
   }
   try {
     await RegisterServices.register();
+    ListApiDog listApiDog = GetIt.instance<ListApiDog>();
+    listApiDog.getAllPhotosAndVideos();
     themeBloc = GetIt.instance<ThemeBloc>();
   } catch (e) {
     pp(e);

@@ -10,6 +10,7 @@ import 'package:kasie_transie_library/utils/device_location_bloc.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:badges/badges.dart' as bd;
+import 'package:routes_2024/ui/association/vehicle_photos.dart';
 
 class VehicleListWidget extends StatefulWidget {
   const VehicleListWidget(
@@ -126,9 +127,9 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
     });
     pp('$mm get vehicle photos ...');
     try {
-      photos = await listApiDog.getVehiclePhotos(car.vehicleId!, true);
+      photos = await listApiDog.getVehiclePhotos(car, false);
       photos.sort((a, b) => b.created!.compareTo(a.created!));
-      videos = await listApiDog.getVehicleVideos(car.vehicleId!, true);
+      videos = await listApiDog.getVehicleVideos(car, false);
       videos.sort((a, b) => b.created!.compareTo(a.created!));
       car.photos = photos;
       car.videos = videos;
@@ -145,29 +146,15 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
     });
   }
 
-  _showConfirmDialog(Vehicle car) {
-    showDialog(
-        context: context,
-        builder: (ctx) {
-          return AlertDialog(
-            title: Text('Confirmation'),
-            content: Text(
-                'Do you want to fetch any existing photos and videos of ${car.vehicleReg}'),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Cancel')),
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _getCarMedia(car);
-                  },
-                  child: Text('Get Media')),
-            ],
-          );
-        });
+  bool isGallery = false;
+  Vehicle? selectedCar;
+
+  _showCarPhotos(Vehicle car) {
+    pp('$mm _showCarPhotos: setting selected car and state ...');
+    selectedCar = car;
+    setState(() {
+      isGallery = true;
+    });
   }
 
   _takeVehiclePicture(Vehicle vehicle) async {
@@ -192,6 +179,7 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
               if (car.photos != null && car.photos!.isNotEmpty) {
                 photos = car.photos!.length;
               }
+              var (col, s) = getRandomColor();
               return GestureDetector(
                 onTap: () {
                   _showActions = true;
@@ -205,15 +193,27 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       bd.Badge(
-                          badgeContent: photos == 0? gapH4: Text('$photos',
-                            style: myTextStyle(color: Colors.white, fontSize: 10),),
-                          badgeStyle: photos == 0? bd.BadgeStyle(
-                            badgeColor: Colors.transparent
-                          ): bd.BadgeStyle(
-                            badgeColor: Colors.red, padding: EdgeInsets.all(8.0),
-                          ),
-                          child: VehicleProfilePicture(
-                            car: car,
+                          badgeContent: photos == 0
+                              ? gapH4
+                              : Text(
+                                  '$photos',
+                                  style: myTextStyle(
+                                      color: Colors.white, fontSize: 10),
+                                ),
+                          badgeStyle: photos == 0
+                              ? bd.BadgeStyle(badgeColor: Colors.transparent)
+                              : bd.BadgeStyle(
+                                  badgeColor: col,
+                                  padding: EdgeInsets.all(8.0),
+                                ),
+                          child: GestureDetector(
+                            onTap: () {
+                              pp('$mm car profile picture tapped: ${car.vehicleReg}');
+                              _showCarPhotos(car);
+                            },
+                            child: VehicleProfilePicture(
+                              car: car,
+                            ),
                           )),
                       gapH16,
                       Text(
@@ -238,14 +238,16 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                               kIsWeb? gapH4: IconButton(
-                                    onPressed: () {
-                                      _takeVehiclePicture(car);
-                                    },
-                                    icon: Icon(
-                                      Icons.camera_alt_outlined,
-                                      color: Colors.green,
-                                    )),
+                                kIsWeb
+                                    ? gapH4
+                                    : IconButton(
+                                        onPressed: () {
+                                          _takeVehiclePicture(car);
+                                        },
+                                        icon: Icon(
+                                          Icons.camera_alt_outlined,
+                                          color: Colors.green,
+                                        )),
                                 IconButton(
                                     onPressed: () {
                                       _sendVehicleEmail(car);
@@ -262,6 +264,14 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
                                       Icons.folder,
                                       color: Colors.pink,
                                     )),
+                                IconButton(
+                                    onPressed: () {
+                                      _showCarPhotos(car);
+                                    },
+                                    icon: Icon(
+                                      Icons.list,
+                                      color: Colors.amber,
+                                    )),
                               ],
                             ),
                           ),
@@ -276,6 +286,25 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
                 child: Center(
                 child: TimerWidget(
                     title: 'Uploading vehicle photo', isSmallSize: true),
+              ))
+            : gapW32,
+        isGallery
+            ? Positioned(
+                child: Center(
+                child: SizedBox(
+                  width: 1200,
+                  child: VehiclePhotos(
+                    vehicle: selectedCar!,
+                    onPhotoPicked: (p) {
+                      pp('$mm onPhotoPicked');
+                    },
+                    onClose: () {
+                      setState(() {
+                        isGallery = false;
+                      });
+                    },
+                  ),
+                ),
               ))
             : gapW32,
       ],
