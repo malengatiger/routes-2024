@@ -16,47 +16,82 @@ class VehiclePhotos extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    pp('vehiclePhotos build .... photos car: ${vehicle.photos!.length}');
+    pp('vehiclePhotos build .... photos photo: ${vehicle.photos!.length}');
+    var height = MediaQuery.sizeOf(context).height;
+
     return SizedBox(
-      height: 1200,
+      height: height / 1.2,
       child: Column(
         children: [
-          Row(
-            children: [
-              IconButton(
-                  onPressed: () {
-                    onClose();
-                  },
-                  icon: Icon(Icons.close))
-            ],
+          Container(
+            color: Colors.black54,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                    tooltip: 'Close Vehicle Photos',
+                    onPressed: () {
+                      onClose();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Theme.of(context).primaryColor,
+                    ))
+              ],
+            ),
           ),
           gapH32,
           Expanded(
-            child: Card(
-              elevation: 12,
-              color: Theme.of(context).primaryColor,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2),
-                    itemCount: vehicle.photos!.length,
-                    itemBuilder: (_, index) {
-                      var car = vehicle.photos![index];
-                      return GestureDetector(
-                        onTap: () {
-                          onPhotoPicked(car);
-                        },
-                        child: Card(
-                          elevation: 8,
-                          child: CachedNetworkImage(
-                            imageUrl: car.url!, fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    }),
-              ),
-            ),
+            child: vehicle.photos!.length == 1
+                ? Card(
+                    elevation: 8,
+                    child: CachedNetworkImage(
+                      imageUrl: vehicle.photos![0].url!,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Card(
+                    elevation: 12,
+                    color: Colors.black54,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2),
+                          itemCount: vehicle.photos!.length,
+                          itemBuilder: (_, index) {
+                            var photo = vehicle.photos![index];
+                            var df = getFormattedDateLong(photo.created!);
+                            return GestureDetector(
+                              onTap: () {
+                                onPhotoPicked(photo);
+                              },
+                              child: Card(
+                                elevation: 8,
+                                child: Column(
+                                  children: [
+                                    gapH8,
+                                    Text(
+                                      '${photo.vehicleReg} - $df',
+                                      style: myTextStyle(
+                                          fontSize: 12,
+                                          weight: FontWeight.w900),
+                                    ),
+                                    gapH8,
+                                    Expanded(
+                                      child: CachedNetworkImage(
+                                        imageUrl: photo.url!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+                    ),
+                  ),
           ),
         ],
       ),

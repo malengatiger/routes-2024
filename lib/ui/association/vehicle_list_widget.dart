@@ -14,11 +14,11 @@ import 'package:routes_2024/ui/association/vehicle_photos.dart';
 
 class VehicleListWidget extends StatefulWidget {
   const VehicleListWidget(
-      {super.key, required this.vehicles, required this.onVehiclePicked});
+      {super.key, required this.vehicles, required this.onVehiclePicked, required this.onEditVehicle});
 
   final List<Vehicle> vehicles;
-  final Function(Vehicle, List<VehiclePhoto>, List<VehicleVideo>)
-      onVehiclePicked;
+  final Function(Vehicle) onVehiclePicked;
+  final Function onEditVehicle;
 
   @override
   State<VehicleListWidget> createState() => _VehicleListWidgetState();
@@ -167,6 +167,7 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.sizeOf(context).width;
     return Stack(
       children: [
         GridView.builder(
@@ -184,6 +185,7 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
                 onTap: () {
                   _showActions = true;
                   _showIndex = index;
+                  widget.onVehiclePicked(car);
                   _getCarMedia(car);
                 },
                 child: Card(
@@ -244,11 +246,13 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
                                         onPressed: () {
                                           _takeVehiclePicture(car);
                                         },
+                                        tooltip: 'Take photo of vehicle',
                                         icon: Icon(
                                           Icons.camera_alt_outlined,
                                           color: Colors.green,
                                         )),
                                 IconButton(
+                                    tooltip: 'Send email to Owner',
                                     onPressed: () {
                                       _sendVehicleEmail(car);
                                     },
@@ -260,17 +264,30 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
                                     onPressed: () {
                                       _pickVehiclePictureFile(car);
                                     },
+                                    tooltip: 'Pick vehicle image file',
                                     icon: Icon(
-                                      Icons.folder,
+                                      Icons.upload,
                                       color: Colors.pink,
                                     )),
                                 IconButton(
+                                    tooltip: 'Show all vehicle photos',
                                     onPressed: () {
                                       _showCarPhotos(car);
                                     },
                                     icon: Icon(
                                       Icons.list,
                                       color: Colors.amber,
+                                    )),
+                                IconButton(
+                                    onPressed: () {
+                                     setState(() {
+                                       widget.onEditVehicle();
+                                     });
+                                    },
+                                    tooltip: 'Edit the vehicle details',
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: Colors.indigo,
                                     )),
                               ],
                             ),
@@ -292,7 +309,7 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
             ? Positioned(
                 child: Center(
                 child: SizedBox(
-                  width: 1200,
+                  width: width / 2,
                   child: VehiclePhotos(
                     vehicle: selectedCar!,
                     onPhotoPicked: (p) {

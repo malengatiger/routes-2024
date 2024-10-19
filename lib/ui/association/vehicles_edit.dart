@@ -7,13 +7,13 @@ import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:badges/badges.dart' as bd;
+import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:routes_2024/ui/association/vehicle_list_widget.dart';
 
 class VehiclesEdit extends StatefulWidget {
-  const VehiclesEdit({super.key, required this.association, this.vehicle});
+  const VehiclesEdit({super.key, required this.association});
 
   final Association association;
-  final Vehicle? vehicle;
 
   @override
   VehiclesEditState createState() => VehiclesEditState();
@@ -28,7 +28,6 @@ class VehiclesEditState extends State<VehiclesEdit>
   void initState() {
     _controller = AnimationController(vsync: this);
     super.initState();
-    _setup();
     _getCars(false);
   }
 
@@ -41,16 +40,13 @@ class VehiclesEditState extends State<VehiclesEdit>
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController registrationController = TextEditingController();
-  TextEditingController makeController = TextEditingController(text: 'Toyota');
-  TextEditingController modelController =
-      TextEditingController(text: 'Quantum');
-  TextEditingController yearController = TextEditingController(text: '2024');
-  TextEditingController capacityController = TextEditingController(text: '16');
+  TextEditingController makeController = TextEditingController();
+  TextEditingController modelController = TextEditingController();
+  TextEditingController yearController = TextEditingController();
+  TextEditingController capacityController = TextEditingController();
 
-  TextEditingController ownerNameController =
-      TextEditingController(text: 'John Mathebula');
-  TextEditingController cellphoneController =
-      TextEditingController(text: '+27724457766');
+  TextEditingController ownerNameController = TextEditingController();
+  TextEditingController cellphoneController = TextEditingController();
 
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
@@ -61,29 +57,17 @@ class VehiclesEditState extends State<VehiclesEdit>
   List<VehiclePhoto> vehiclePhotos = [];
   List<VehicleVideo> vehicleVideos = [];
 
-  void _setup() async {
-    if (widget.vehicle != null) {
-      registrationController.text = widget.vehicle!.vehicleReg!;
-      modelController.text = widget.vehicle!.model!;
-      makeController.text = widget.vehicle!.make!;
-      yearController.text = widget.vehicle!.year!;
-      capacityController.text = '${widget.vehicle!.passengerCapacity}';
-      ownerNameController.text = widget.vehicle!.ownerName ?? '';
-      cellphoneController.text = widget.vehicle!.ownerCellphone ?? '';
-      country = prefs.getCountry();
-      setState(() {});
-    }
-    if (vehicle != null) {
-      registrationController.text = vehicle!.vehicleReg!;
-      modelController.text = vehicle!.model!;
-      makeController.text = vehicle!.make!;
-      yearController.text = vehicle!.year!;
-      capacityController.text = '${vehicle!.passengerCapacity!}';
-      ownerNameController.text = vehicle!.ownerName ?? '';
-      cellphoneController.text = vehicle!.ownerCellphone ?? '';
-      country = prefs.getCountry();
-      setState(() {});
-    }
+  void _setup(Vehicle vehicle) async {
+    pp('$mm ... setUp ... vehicle: $vehicle');
+    registrationController.text = vehicle!.vehicleReg!;
+    modelController.text = vehicle!.model!;
+    makeController.text = vehicle!.make!;
+    yearController.text = vehicle!.year!;
+    capacityController.text = '${vehicle!.passengerCapacity!}';
+    ownerNameController.text = vehicle!.ownerName ?? '';
+    cellphoneController.text = vehicle!.ownerCellphone ?? '';
+    country = prefs.getCountry();
+    setState(() {});
   }
 
   List<Vehicle> cars = [];
@@ -117,7 +101,14 @@ class VehiclesEditState extends State<VehiclesEdit>
     setState(() {
       busy = true;
     });
-    if (widget.vehicle == null) {
+    if (vehicle != null) {
+      vehicle!.vehicleReg = registrationController.text;
+      vehicle!.make = makeController.text;
+      vehicle!.model = modelController.text;
+      vehicle!.ownerCellphone = cellphoneController.text;
+      vehicle!.ownerName = ownerNameController.text;
+      vehicle!.year = yearController.text;
+    } else {
       vehicle = Vehicle(
           vehicleId: '${DateTime.now().millisecondsSinceEpoch}',
           associationId: widget.association.associationId!,
@@ -131,24 +122,23 @@ class VehiclesEditState extends State<VehiclesEdit>
           year: yearController.text,
           ownerName: ownerNameController.text,
           ownerCellphone: cellphoneController.text);
-
-      try {
-        var res = await dataApiDog.addVehicle(vehicle!);
-        cars.insert(0, res);
-        if (mounted) {
-          showOKToast(
-              message: 'Vehicle registered on KasieTransie', context: context);
-        }
-      } catch (e, s) {
-        pp('$e $s');
-        if (mounted) {
-          showErrorToast(message: '$e', context: context);
-        }
-      }
-    } else {
-      //TODO - update the Vehicle
-      pp('$mm  update the Vehicle ...');
     }
+    try {
+      var res = await dataApiDog.addVehicle(vehicle!);
+      cars.insert(0, res);
+      if (mounted) {
+        showOKToast(
+            message:
+                'Vehicle registered on KasieTransie: ${vehicle!.vehicleReg}',
+            context: context);
+      }
+    } catch (e, s) {
+      pp('$e $s');
+      if (mounted) {
+        showErrorToast(message: '$e', context: context);
+      }
+    }
+
     setState(() {
       busy = false;
     });
@@ -178,9 +168,10 @@ class VehiclesEditState extends State<VehiclesEdit>
 
   AddCarsResponse? addCarsResponse;
   bool _showErrors = false;
+  List<Vehicle> errorCars = [];
 
   _sendFile() async {
-    pp('$mm  send the Vehicle File ...');
+    pp('\n\n$mm ..... send the Vehicle File to upload ...');
     setState(() {
       busy = true;
     });
@@ -194,13 +185,21 @@ class VehiclesEditState extends State<VehiclesEdit>
         }
         if (addCarsResponse!.errors.isNotEmpty) {
           _showErrors = true;
+          errorCars = addCarsResponse!.errors;
         }
       }
       if (mounted) {
-        var msg =
-            '🌿 Vehicles uploaded successfully: ${addCarsResponse!.cars.length}, errors encountered: ${addCarsResponse!.errors.length}';
-        result = msg;
-        showOKToast(message: msg, context: context);
+        if (addCarsResponse!.errors.isNotEmpty) {
+          showErrorToast(
+              message: 'Upload encountered ${addCarsResponse!.errors.length} errors',
+              context: context);
+        } else {
+          var msg =
+              '🌿 Vehicles uploaded OK: ${addCarsResponse!.cars
+              .length}';
+          result = msg;
+          showOKToast(message: msg, context: context);
+        }
       }
     } catch (e, s) {
       pp('$e $s');
@@ -450,14 +449,14 @@ class VehiclesEditState extends State<VehiclesEdit>
               Expanded(
                   child: VehicleListWidget(
                 vehicles: cars,
-                onVehiclePicked: (car, photos, videos) {
-                  pp('$mm car picked: ${car.toJson()}');
-                  pp('$mm car photos: ${photos.length}');
+                onVehiclePicked: (car) {
+                  pp('$mm .... car picked: ${car.toJson()}');
                   vehicle = car;
-                  _setup();
+                  _setup(car);
+                },
+                onEditVehicle: () {
                   setState(() {
-                    vehiclePhotos = photos;
-                    vehicleVideos = videos;
+                    _showEditor = true;
                   });
                 },
               ))
@@ -516,12 +515,27 @@ class VehiclesEditState extends State<VehiclesEdit>
           _showErrors
               ? Positioned(
                   child: Center(
-                  child: CarErrors(cars: cars, onClose: (){
-                    setState(() {
-                      _showErrors = false;
-                    });
-                  },),
+                  child: Container(
+                    color: Colors.red,
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: CarErrors(
+                        cars: errorCars,
+                        onClose: () {
+                          setState(() {
+                            _showErrors = false;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
                 ))
+              : gapW32,
+          busy
+              ? Positioned(
+                  child: Center(
+                      child: TimerWidget(
+                          title: 'Uploading vehicle file', isSmallSize: true)))
               : gapW32,
         ],
       )),
@@ -537,57 +551,85 @@ class CarErrors extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        gapH32,
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Upload Errors',
-              style: myTextStyle(fontSize: 24, weight: FontWeight.w900),
-            ),
-            IconButton(onPressed: (){
-              onClose();
-            }, icon: Icon(Icons.close)),
-          ],
-        ),
-        gapH32,
-        GridView.builder(
-            gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-            itemCount: cars.length,
-            itemBuilder: (_, index) {
-              var car = cars[index];
-              return Card(
+    var height = MediaQuery.sizeOf(context).height;
+    var width = MediaQuery.sizeOf(context).width;
+
+    return SizedBox(
+      height: height / 2,
+      width: width / 2,
+      child: Column(
+        children: [
+          gapH32,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              gapW32,
+              Text(
+                'Vehicle Upload Errors',
+                style: myTextStyle(fontSize: 20, weight: FontWeight.w900),
+              ),
+              IconButton(
+                  onPressed: () {
+                    onClose();
+                  },
+                  icon: Icon(Icons.close)),
+            ],
+          ),
+          gapH32,
+          Text(
+              'The vehicles listed below were not created. They may have been created previously'),
+          gapH32,
+          Expanded(
+            child: SizedBox(
+              height: (height / 2) - 100,
+              child: Card(
                 elevation: 8,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        '${car.vehicleReg}',
-                        style: myTextStyle(
-                            color: Colors.amber.shade900, fontSize: 20),
-                      ),
-                      Text(
-                        '${car.make}',
-                        style: myTextStyle(fontSize: 10),
-                      ),
-                      Text(
-                        '${car.model}',
-                        style: myTextStyle(fontSize: 10),
-                      ),
-                      Text(
-                        '${car.year}',
-                        style:
-                            myTextStyle(fontSize: 12, weight: FontWeight.w900),
-                      ),
-                    ],
-                  ),
+                  child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 6),
+                      itemCount: cars.length,
+                      itemBuilder: (_, index) {
+                        var car = cars[index];
+                        return Card(
+                          elevation: 8,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${car.vehicleReg}',
+                                  style: myTextStyle(
+                                      color: Colors.amber.shade900,
+                                      fontSize: 16),
+                                ),
+                                Text(
+                                  '${car.make}',
+                                  style: myTextStyle(fontSize: 10),
+                                ),
+                                Text(
+                                  '${car.model}',
+                                  style: myTextStyle(fontSize: 10),
+                                ),
+                                Text(
+                                  '${car.year}',
+                                  style: myTextStyle(
+                                      fontSize: 12, weight: FontWeight.w900),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
                 ),
-              );
-            }),
-      ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
