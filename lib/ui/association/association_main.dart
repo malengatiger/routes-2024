@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
+import 'package:kasie_transie_library/utils/navigator_utils.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/association_edit.dart';
 import 'package:routes_2024/ui/association/routes_edit.dart';
 import 'package:routes_2024/ui/association/users_edit.dart';
 import 'package:routes_2024/ui/association/vehicles_edit.dart';
+
+import '../route_data_widget.dart';
+import '../route_list.dart';
 
 class AssociationMain extends StatefulWidget {
   const AssociationMain({super.key, this.association});
@@ -26,10 +31,13 @@ class AssociationMainState extends State<AssociationMain>
     _controller = AnimationController(vsync: this);
     super.initState();
     if (widget.association == null) {
-      currentWidget = AssociationEdit(onClose: (){},);
+      currentWidget = AssociationEdit(
+        onClose: () {},
+      );
     } else {
       currentWidget = AssociationEdit(
-        association: widget.association, onClose: (){},
+        association: widget.association,
+        onClose: () {},
       );
     }
   }
@@ -49,7 +57,9 @@ class AssociationMainState extends State<AssociationMain>
     switch (index) {
       case 0:
         if (widget.association != null) {
-          currentWidget = UsersEdit(association: widget.association!,);
+          currentWidget = UsersEdit(
+            association: widget.association!,
+          );
         }
         break;
       case 1:
@@ -62,7 +72,12 @@ class AssociationMainState extends State<AssociationMain>
       case 2:
         currentWidget = RoutesEdit();
         break;
-
+      case 3:
+        _navigateToRoutes();
+        break;
+      case 4:
+        currentWidget = RoutesEdit();
+        break;
       default:
         currentWidget = Container(
           color: Colors.red,
@@ -75,6 +90,26 @@ class AssociationMainState extends State<AssociationMain>
     setState(() {});
   }
 
+  _navigateToRoutes() async {
+    NavigationUtils.navigateTo(context: context,
+        widget: RouteDataWidget( widget.association!), transitionType: PageTransitionType.leftToRight);
+    // NavigationUtils.navigateTo(
+    //     context: context,
+    //     widget: RouteListWidget(
+    //       navigateToMapViewer: (route) {},
+    //       navigateToLandmarks: (route) {},
+    //       navigateToCreatorMap: (route) {},
+    //       onSendRouteUpdateMessage: (route) {},
+    //       onCalculateDistances: (route) {},
+    //       showRouteDetails: (route) {},
+    //       onCreateNewRoute: () {
+    //         pp('$mm create new route');
+    //       },
+    //       association: widget.association!,
+    //     ),
+    //     transitionType: PageTransitionType.leftToRight);
+  }
+
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
@@ -84,7 +119,10 @@ class AssociationMainState extends State<AssociationMain>
             widget.association == null
                 ? 'Association Data Manager'
                 : widget.association!.associationName!,
-            style: myTextStyleMediumLargeWithSize(context, 24),
+            style: myTextStyle(
+                fontSize: 24,
+                weight: FontWeight.w900,
+                color: Theme.of(context).primaryColor),
           ),
         ),
         body: SafeArea(
@@ -163,13 +201,13 @@ class KasieNavigation extends StatelessWidget {
           gapH32,
           gapH32,
           gapH32,
-
           GestureDetector(
             onTap: () {
               onTapped(0);
             },
             child: ListTile(
-              leading: Icon(Icons.people, size: 48, color: Theme.of(context).primaryColor),
+              leading: Icon(Icons.people,
+                  size: 48, color: Theme.of(context).primaryColor),
               title: Text('Staff'),
             ),
           ),
@@ -179,7 +217,11 @@ class KasieNavigation extends StatelessWidget {
               onTapped(1);
             },
             child: ListTile(
-              leading: Icon(Icons.car_crash_rounded, size: 48, color: Theme.of(context).primaryColor,),
+              leading: Icon(
+                Icons.car_crash_rounded,
+                size: 48,
+                color: Theme.of(context).primaryColor,
+              ),
               title: Text('Vehicles'),
             ),
           ),
@@ -189,7 +231,11 @@ class KasieNavigation extends StatelessWidget {
               onTapped(2);
             },
             child: ListTile(
-              leading: Icon(Icons.airplane_ticket, size: 48, color: Theme.of(context).primaryColor,),
+              leading: Icon(
+                Icons.airplane_ticket,
+                size: 48,
+                color: Theme.of(context).primaryColor,
+              ),
               title: Text('Commuter Tickets'),
             ),
           ),
@@ -199,22 +245,28 @@ class KasieNavigation extends StatelessWidget {
               onTapped(3);
             },
             child: ListTile(
-              leading: Icon(Icons.roundabout_right, size: 48, color: Theme.of(context).primaryColor,),
+              leading: Icon(
+                Icons.roundabout_right,
+                size: 48,
+                color: Theme.of(context).primaryColor,
+              ),
               title: Text('Routes'),
             ),
           ),
           gapH32,
           GestureDetector(
             onTap: () {
-              onTapped(3);
+              onTapped(4);
             },
             child: ListTile(
-              leading: Icon(Icons.folder_copy_rounded, size: 48,),
+              leading: Icon(
+                Icons.folder_copy_rounded,
+                size: 48,
+              ),
               title: Text('Example upload Files'),
             ),
           ),
           gapH32,
-
         ],
       ),
     );

@@ -18,12 +18,12 @@ import 'package:routes_2024/ui/association/association_main.dart';
 import 'firebase_options.dart';
 import 'intro/kasie_intro.dart';
 import 'intro/splash_page.dart';
+
 late FirebaseApp firebaseApp;
 fb.User? fbAuthedUser;
 const mx = '🔵🔵🔵🔵 🍅 KasieTransie RouteBuilder : main  🍅 🔵🔵';
 late ColorAndLocale colorAndLocale;
-Future<void>
-main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   pp('\n\n$mx DefaultFirebaseOptions.currentPlatform: '
       '\n\n${DefaultFirebaseOptions.currentPlatform.toString()}\n\n');
@@ -70,13 +70,14 @@ main() async {
 temporarySignOut(Prefs prefs) async {
   //TODO: REMOVE after test ....
   prefs.removeUser();
- await  fb.FirebaseAuth.instance.signOut();
+  await fb.FirebaseAuth.instance.signOut();
   pp('\n\n$mx  😈 👿cached User and Firebase creds cleaned up for testing. 🌶 REMOVE when done! 🌶 \n\n');
-
 }
+
 int themeIndex = 0;
 lib.User? me;
 late ThemeBloc themeBloc;
+
 class KasieTransieApp extends ConsumerWidget {
   const KasieTransieApp({super.key});
 

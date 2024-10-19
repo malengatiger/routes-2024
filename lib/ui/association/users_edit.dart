@@ -71,7 +71,7 @@ class UsersEditState extends State<UsersEdit>
       lastNameController.text = selectedUser!.lastName!;
       firstNameController.text = selectedUser!.firstName!;
       emailController.text = selectedUser!.email!;
-      cellphoneController.text = selectedUser!.cellphone!;
+      cellphoneController.text = selectedUser!.cellphone?? '';
       setState(() {});
     }
   }
@@ -290,7 +290,7 @@ class UsersEditState extends State<UsersEdit>
 
   int? userIndex;
   bool _showTools = false;
-  bool _showEditor = false;
+  bool _showEditor = true;
 
   _showToolbar(int index) {
     setState(() {
@@ -499,11 +499,12 @@ class UsersEditState extends State<UsersEdit>
                             )),
                       )
                     : gapH32,
+                _showEditor? gapH8: gapH32,
                 gapH32,
                 Expanded(
                   child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 5),
+                          crossAxisCount: 6),
                       itemCount: users.length,
                       itemBuilder: (_, index) {
                         var user = users[index];
@@ -515,7 +516,7 @@ class UsersEditState extends State<UsersEdit>
                           child: Card(
                             elevation: 8,
                             child: SizedBox(
-                              height: 200,
+                              height: 280,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -531,22 +532,22 @@ class UsersEditState extends State<UsersEdit>
                                   Text(
                                     '${user.firstName} ${user.lastName}',
                                     style: myTextStyle(
-                                        weight: FontWeight.w900, fontSize: 20),
+                                        weight: FontWeight.w900, fontSize: 16),
                                   ),
-                                  gapH16,
+                                  gapH4,
                                   Text(
                                     '${user.userType}',
                                     style: myTextStyle(
-                                        weight: FontWeight.w200, fontSize: 14),
+                                        weight: FontWeight.w200, fontSize: 10),
                                   ),
                                   if (_showTools && userIndex == index)
                                     SizedBox(
-                                      height: 64,
+                                      height: 36,
                                       child: Card(
                                         elevation: 12,
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              vertical: 16.0, horizontal: 16.0),
+                                              vertical: 4.0, horizontal: 4.0),
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -589,7 +590,7 @@ class UsersEditState extends State<UsersEdit>
             top: 24,
             child: Row(
               children: [
-                Text('Staff Members'),
+                Text('Staff Members', style: myTextStyle(weight: FontWeight.w900, fontSize: 20),),
                 gapW32,
                 bd.Badge(
                   badgeContent: Text(
@@ -608,17 +609,17 @@ class UsersEditState extends State<UsersEdit>
                     ? IconButton(
                         onPressed: () {
                           setState(() {
-                            _showEditor = true;
-                          });
-                        },
-                        icon: Icon(Icons.edit))
-                    : IconButton(
-                        onPressed: () {
-                          setState(() {
                             _showEditor = false;
                           });
                         },
                         icon: Icon(Icons.close))
+                    : IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _showEditor = true;
+                          });
+                        },
+                        icon: Icon(Icons.edit))
               ],
             ),
           ),

@@ -409,7 +409,6 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          leading: const SizedBox(),
           centerTitle: centerTitle,
           title: Text(
             'Taxi Route Builder',
