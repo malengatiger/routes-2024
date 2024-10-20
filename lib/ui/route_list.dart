@@ -46,74 +46,9 @@ class _RouteListWidgetState extends State<RouteListWidget> {
 
   static const mm = '🎽🎽🎽 RouteListWidget 🎽';
 
-  List<FocusedMenuItem> _getMenuItems(lib.Route route, BuildContext context) {
-    //prefs.saveRoute(route);
-    List<FocusedMenuItem> list = [];
-
-    list.add(FocusedMenuItem(
-        title: Text('Display Route Details',
-            style: myTextStyleMediumBlack(context)),
-        // backgroundColor: Theme.of(context).primaryColor,
-        trailingIcon: Icon(
-          Icons.map,
-          color: Theme.of(context).primaryColor,
-        ),
-        onPressed: () {
-          prefs.saveRoute(route);
-          widget.showRouteDetails(route);
-        }));
-    //
-    list.add(FocusedMenuItem(
-        title: Text('View Route Map', style: myTextStyleMediumBlack(context)),
-        // backgroundColor: Theme.of(context).primaryColor,
-        trailingIcon: Icon(
-          Icons.map,
-          color: Theme.of(context).primaryColor,
-        ),
-        onPressed: () {
-          prefs.saveRoute(route);
-          widget.navigateToMapViewer(route);
-        }));
-    //
-    list.add(FocusedMenuItem(
-        title: Text('Route Landmarks', style: myTextStyleMediumBlack(context)),
-        trailingIcon: Icon(
-          Icons.water_damage_outlined,
-          color: Theme.of(context).primaryColor,
-        ),
-        onPressed: () {
-          prefs.saveRoute(route);
-          widget.navigateToLandmarks(route);
-        }));
-    //
-    list.add(FocusedMenuItem(
-        title: Text('Update Route', style: myTextStyleMediumBlack(context)),
-        // backgroundColor: Theme.of(context).primaryColor,
-        trailingIcon: Icon(
-          Icons.edit,
-          color: Theme.of(context).primaryColor,
-        ),
-        onPressed: () {
-          prefs.saveRoute(route);
-          widget.navigateToCreatorMap(route);
-        }));
-
-    list.add(FocusedMenuItem(
-        title: Text('Send Route Update Message',
-            style: myTextStyleMediumBlack(context)),
-        // backgroundColor: Theme.of(context).primaryColor,
-        trailingIcon: Icon(
-          Icons.send,
-          color: Theme.of(context).primaryColor,
-        ),
-        onPressed: () {
-          prefs.saveRoute(route);
-          widget.onSendRouteUpdateMessage(route);
-        }));
-    return list;
-  }
 
   List<lib.Route> mRoutes = [];
+
   @override
   void initState() {
     super.initState();
@@ -189,47 +124,146 @@ class _RouteListWidgetState extends State<RouteListWidget> {
                               var elevation = 6.0;
                               final rt = mRoutes.elementAt(index);
 
-                              return FocusedMenuHolder(
-                                menuOffset: 24,
-                                duration: const Duration(milliseconds: 300),
-                                menuItems: _getMenuItems(rt, context),
-                                animateMenuItems: true,
-                                openWithTap: true,
-                                onPressed: () {
-                                  pp('💛️️ tapped FocusedMenuHolder ...');
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 48.0, vertical: 1.0),
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 48.0, vertical: 1.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (_showIndex == index) {
+                                      setState(() {
+                                        _showIndex = null;
+                                        _showActions = false;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        _showActions = true;
+                                        _showIndex = index;
+                                      });
+                                    }
+                                  },
                                   child: Card(
                                     shape: getRoundedBorder(radius: 16),
                                     elevation: elevation,
-                                    child: ListTile(
-                                      leading: Container(
-                                        height: 24,
-                                        width: 24,
-                                        color: getColor(rt.color!),
-                                        child: Center(
-                                          child: Text(
-                                            '${index + 1}',
-                                            style:
-                                                myTextStyleMediumLargeWithColor(
-                                                    context,
-                                                    rt.color == 'white'
-                                                        ? Colors.black
-                                                        : Colors.white,
-                                                    14),
+                                    child: Column(
+                                      children: [
+                                        ListTile(
+                                          leading: Container(
+                                            height: 24,
+                                            width: 24,
+                                            color: getColor(rt.color!),
+                                            child: Center(
+                                              child: Text(
+                                                '${index + 1}',
+                                                style:
+                                                    myTextStyleMediumLargeWithColor(
+                                                        context,
+                                                        rt.color == 'white'
+                                                            ? Colors.black
+                                                            : Colors.white,
+                                                        14),
+                                              ),
+                                            ),
+                                          ),
+                                          title: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Text(
+                                              '${rt.name}',
+                                              style: myTextStyleMediumLarge(
+                                                  context, 16),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      title: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Text(
-                                          '${rt.name}',
-                                          style: myTextStyleMediumLarge(
-                                              context, 16),
-                                        ),
-                                      ),
+                                        _showActions && _showIndex == index
+                                            ? gapH16
+                                            : gapH32,
+                                        if (_showActions && _showIndex == index)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 16.0,
+                                                right: 16,
+                                                top: 8,
+                                                bottom: 8),
+                                            child: Card(
+                                              elevation: 12,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    IconButton(
+                                                        tooltip:
+                                                            'Display Route Information',
+                                                        onPressed: () {
+                                                          prefs.saveRoute(rt);
+                                                          widget
+                                                              .showRouteDetails(
+                                                                  rt);
+                                                        },
+                                                        icon: Icon(Icons.book,
+                                                            color: Colors.amber
+                                                                .shade700)),
+                                                    IconButton(
+                                                        tooltip:
+                                                            'Show Route Map',
+                                                        onPressed: () {
+                                                          prefs.saveRoute(rt);
+                                                          widget
+                                                              .navigateToMapViewer(
+                                                                  rt);
+                                                        },
+                                                        icon: Icon(Icons.map,
+                                                            color:
+                                                                Colors.green)),
+                                                    IconButton(
+                                                        tooltip:
+                                                            'Update Route Landmarks',
+                                                        onPressed: () {
+                                                          prefs.saveRoute(rt);
+                                                          widget
+                                                              .navigateToLandmarks(
+                                                                  rt);
+                                                        },
+                                                        icon: Icon(
+                                                            Icons
+                                                                .back_hand_sharp,
+                                                            color:
+                                                                Colors.indigo)),
+                                                    IconButton(
+                                                        tooltip:
+                                                            'Update Route Mapping',
+                                                        onPressed: () {
+                                                          prefs.saveRoute(rt);
+                                                          widget
+                                                              .navigateToCreatorMap(
+                                                                  rt);
+                                                        },
+                                                        icon: Icon(
+                                                            Icons
+                                                                .roundabout_right,
+                                                            color: Colors.red)),
+                                                    IconButton(
+                                                        tooltip:
+                                                            'Send System Route Update Message',
+                                                        onPressed: () {
+                                                          prefs.saveRoute(rt);
+                                                          widget
+                                                              .onSendRouteUpdateMessage(
+                                                                  rt);
+                                                        },
+                                                        icon: Icon(Icons.send,
+                                                            color:
+                                                                Colors.blue)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        if (_showActions && _showIndex == index)
+                                          gapH32
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -244,4 +278,7 @@ class _RouteListWidgetState extends State<RouteListWidget> {
       ),
     );
   }
+
+  bool _showActions = false;
+  int? _showIndex;
 }
