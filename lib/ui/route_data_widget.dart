@@ -10,6 +10,7 @@ import 'package:kasie_transie_library/data/color_and_locale.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/data/route_bag.dart';
+import 'package:kasie_transie_library/data/route_data.dart';
 import 'package:kasie_transie_library/l10n/translation_handler.dart';
 import 'package:kasie_transie_library/maps/city_creator_map.dart';
 import 'package:kasie_transie_library/maps/landmark_creator_map.dart';
@@ -46,7 +47,7 @@ class RouteDataWidget extends ConsumerStatefulWidget {
 class RouteDataState extends ConsumerState<RouteDataWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  static const mm = '😡😡😡😡 RouteBuilder Dashboard: 💪 ';
+  static const mm = '😡😡😡😡 RouteDataWidget: 💪 ';
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
   Prefs prefs = GetIt.instance<Prefs>();
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
@@ -154,20 +155,21 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
       busy = true;
     });
     try {
-      pp('\n\n ... will call zipHandler ...\n');
+      pp('\n\n ... will call listApiDog ...\n');
+      // var routeData = await listApiDog.getAssociationRouteData(
+      //     widget.association.associationId!);
       var routeData = await zipHandler.getRoutes(
           associationId: widget.association.associationId!);
-      var c = await semCache.getCities();
-      if (c.isEmpty) {
-        var cities = await zipHandler.getCities(user!.countryId!, false);
-        pp('$mm ...  dashboard; country cities found by zipHandler: ${cities.length} ...\n\n');
-      }
-      await _populate(routeData);
+        _populate(routeData);
+
     } catch (e, stack) {
-      pp('$mm ERROR $e : $stack');
+      pp('$mm ERROR getting route data $e : $stack');
       if (mounted) {
-        showSnackBar(
-            padding: 16, message: 'Error getting data', context: context);
+        showErrorToast(
+            duration: Duration(seconds: 10),
+            padding: 16,
+            message: '$e',
+            context: context);
       }
     }
     //
@@ -176,14 +178,21 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
     });
   }
 
-  Future<void> _populate(RouteData routeData) async {
-    routes = routeData.routes;
-    routeLandmarks = routeData.landmarks;
-    routes.sort((a, b) => a.name!.compareTo(b.name!));
-    routeLandmarksTotal = routeData.landmarks.length;
-    routeCitiesTotal = routeData.cities.length;
+   _populate(AssociationRouteData routeData)  {
+    for (var t in routeData.routeDataList) {
+      routes.add(t.route!);
+    }
+    for (var t in routeData.routeDataList) {
+      routeLandmarks.addAll(t.landmarks);
+    }
+    for (var t in routeData.routeDataList) {
+      routeCitiesTotal += t.cities.length;
+    }
+    for (var t in routeData.routeDataList) {
+      routePointsTotal += t.routePoints.length;
+    }
+    routeLandmarksTotal = routeLandmarks.length;
     routesTotal = routes.length;
-    routePointsTotal = routeData.routePoints.length;
     routes.sort((a, b) => a.name!.compareTo(b.name!));
 
     pp('\n\n$mm Association Route Data');
@@ -326,8 +335,7 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
       NavigationUtils.navigateTo(
           context: context,
           widget: RouteMapViewer(
-            routeId: route.routeId!,
-            associationId: route.associationId!,
+            route: route,
             onRouteUpdated: () {
               pp('\n\n$mm onRouteUpdated ... do something Boss!');
               // _refresh(true);
@@ -380,18 +388,23 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
   void _navigateToCityCreator() {
     NavigationUtils.navigateTo(
         context: context,
-        widget:  CityCreatorMap(onCityAdded: (c ) {
-          pp('$mm ... city added: ${c.name}');
-        },),
+        widget: CityCreatorMap(
+          onCityAdded: (c) {
+            pp('$mm ... city added: ${c.name}');
+          },
+        ),
         transitionType: PageTransitionType.leftToRight);
   }
 
   _onCreateNewRoute() async {
     NavigationUtils.navigateTo(
         context: context,
-        widget: RouteEditor(association: widget.association, onRouteAdded: (r ) {
-          _getData();
-        },),
+        widget: RouteEditor(
+          association: widget.association,
+          onRouteAdded: (r) {
+            _getData();
+          },
+        ),
         transitionType: PageTransitionType.leftToRight);
   }
 
@@ -665,9 +678,11 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
                       pp('$mm navigate to city creator map .......');
                       NavigationUtils.navigateTo(
                           context: context,
-                          widget: CityCreatorMap(onCityAdded: (c ) {
-                            pp('$mm ... city added: ${c.name}');
-                          },),
+                          widget: CityCreatorMap(
+                            onCityAdded: (c) {
+                              pp('$mm ... city added: ${c.name}');
+                            },
+                          ),
                           transitionType: PageTransitionType.leftToRight);
                     },
                   ),
@@ -684,9 +699,10 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
                       NavigationUtils.navigateTo(
                           context: context,
                           widget: RouteEditor(
-                            association: widget.association, onRouteAdded: (r ) {
+                            association: widget.association,
+                            onRouteAdded: (r) {
                               _getData();
-                          },
+                            },
                           ),
                           transitionType: PageTransitionType.leftToRight);
                     },
@@ -731,7 +747,6 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
       ),
     );
   }
-
 }
 
 class DashContent extends StatelessWidget {
@@ -782,8 +797,7 @@ class DashContent extends StatelessWidget {
               ),
               Text(
                 association.associationName!,
-                style: myTextStyleMediumLarge(
-                    context, 24),
+                style: myTextStyleMediumLarge(context, 24),
               ),
               const SizedBox(
                 height: 32,

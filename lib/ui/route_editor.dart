@@ -44,6 +44,7 @@ class RouteEditorState extends ConsumerState<RouteEditor>
   lib.Country? country;
   List<lib.Route> routes = [];
   final DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
+  DeviceLocationBloc locationBloc = GetIt.instance<DeviceLocationBloc>();
   final Prefs prefs = GetIt.instance<Prefs>();
   String colorString = 'black';
   Color color = Colors.black;
@@ -145,7 +146,7 @@ class RouteEditorState extends ConsumerState<RouteEditor>
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
 
   _getRoutes() async {
-    routes = await semCache.getRoutes(widget.association.associationId!);
+    routes = await semCache.getRoutes(associationId: widget.association.associationId!);
   }
 
   Future _getUser() async {

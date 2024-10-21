@@ -117,7 +117,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
       if (selectedRoute != null) {
         selectedRouteId = selectedRoute!.routeId!;
       }
-      routes = await semCache.getRoutes(user!.associationId!);
+      routes = await semCache.getRoutes(associationId: user!.associationId!);
       routes.sort((a,b) => a.name!.compareTo(b.name!));
     } catch (e) {
       pp(e);
@@ -169,8 +169,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
       NavigationUtils.navigateTo(
           context: context,
           widget: RouteMapViewer(
-            routeId: route.routeId!,
-            associationId: route.associationId!,
+            route: route,
             onRouteUpdated: () {
               pp('\n\n$mm onRouteUpdated ... do something Boss!');
               _refresh(true);
@@ -261,7 +260,7 @@ class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
       user = prefs.getUser();
       var routesIsolate = GetIt.instance<SemCache>();
       if (user != null) {
-        routes = await routesIsolate.getRoutes(user!.associationId!);
+        routes = await routesIsolate.getRoutes(associationId:user!.associationId!);
       }
     } catch (e, stackTrace) {
       pp(stackTrace);
