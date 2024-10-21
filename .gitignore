@@ -28,3 +28,5 @@ doc/api/
 
 lib/firebase_options.dart
 web/index.html
+.firebase/
+/.firebase/

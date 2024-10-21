@@ -93,21 +93,7 @@ class AssociationMainState extends State<AssociationMain>
   _navigateToRoutes() async {
     NavigationUtils.navigateTo(context: context,
         widget: RouteDataWidget( widget.association!), transitionType: PageTransitionType.leftToRight);
-    // NavigationUtils.navigateTo(
-    //     context: context,
-    //     widget: RouteListWidget(
-    //       navigateToMapViewer: (route) {},
-    //       navigateToLandmarks: (route) {},
-    //       navigateToCreatorMap: (route) {},
-    //       onSendRouteUpdateMessage: (route) {},
-    //       onCalculateDistances: (route) {},
-    //       showRouteDetails: (route) {},
-    //       onCreateNewRoute: () {
-    //         pp('$mm create new route');
-    //       },
-    //       association: widget.association!,
-    //     ),
-    //     transitionType: PageTransitionType.leftToRight);
+
   }
 
   @override

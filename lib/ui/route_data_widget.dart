@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
@@ -22,6 +23,7 @@ import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/utils/route_distance_calculator.dart';
+import 'package:kasie_transie_library/utils/route_update_listener.dart';
 import 'package:kasie_transie_library/utils/zip_handler.dart';
 import 'package:kasie_transie_library/widgets/dash_widgets/generic.dart';
 import 'package:kasie_transie_library/widgets/language_and_color_chooser.dart';
@@ -54,6 +56,9 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
   ZipHandler zipHandler = GetIt.instance<ZipHandler>();
   SemCache semCache = GetIt.instance<SemCache>();
 
+  RouteUpdateListener routeUpdateListener =
+      GetIt.instance<RouteUpdateListener>();
+  late StreamSubscription<lib.Route> _routeUpdateListenerSubscription;
   RouteDistanceCalculator routeDistanceCalculator =
       GetIt.instance<RouteDistanceCalculator>();
   lib.User? user;
@@ -131,6 +136,17 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
       pp('$mm fcmBloc.routeUpdateRequestStream delivered: ${event.routeName}');
       _noteRouteUpdate(event);
     });
+
+    _routeUpdateListenerSubscription =
+        routeUpdateListener.routeUpdateStream.listen((route) {
+      pp('$mm routeUpdateListener.routeUpdateStream delivered: ${route.toJson()}');
+      _handleRouteRefresh(route);
+    });
+  }
+
+  void _handleRouteRefresh(lib.Route route) async {
+    pp('$mm This route was updated somewhere: ${route.name}');
+    _getData();
   }
 
   void _noteRouteUpdate(lib.RouteUpdateRequest request) async {
@@ -155,13 +171,9 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
       busy = true;
     });
     try {
-      pp('\n\n ... will call listApiDog ...\n');
-      // var routeData = await listApiDog.getAssociationRouteData(
-      //     widget.association.associationId!);
-      var routeData = await zipHandler.getRoutes(
-          associationId: widget.association.associationId!);
-        _populate(routeData);
-
+      AssociationRouteData? routeData = await listApiDog
+            .getAssociationRouteData(widget.association.associationId!);
+      _populate(routeData!);
     } catch (e, stack) {
       pp('$mm ERROR getting route data $e : $stack');
       if (mounted) {
@@ -178,10 +190,16 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
     });
   }
 
-   _populate(AssociationRouteData routeData)  {
+  _populate(AssociationRouteData routeData) {
+    routes.clear();
+    routeLandmarks.clear();
+    routeCitiesTotal = 0;
+    routePointsTotal = 0;
+
     for (var t in routeData.routeDataList) {
       routes.add(t.route!);
     }
+
     for (var t in routeData.routeDataList) {
       routeLandmarks.addAll(t.landmarks);
     }
@@ -634,115 +652,6 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
                   ))
                 : gapH16,
           ],
-        ),
-        drawer: SizedBox(
-          width: 400,
-          child: Drawer(
-            child: Card(
-              elevation: 8,
-              child: ListView(
-                children: [
-                  DrawerHeader(
-                      decoration: const BoxDecoration(
-                          color: Colors.black12,
-                          image: DecorationImage(
-                              image: AssetImage('assets/gio.png'),
-                              scale: 0.1,
-                              opacity: 0.1)),
-                      child: SizedBox(
-                          height: 60,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(routesText,
-                                  style: myTextStyleMediumLargeWithColor(
-                                      context, Colors.grey, 32)),
-                              const SizedBox(
-                                height: 48,
-                              )
-                            ],
-                          ))),
-                  const SizedBox(
-                    height: 64,
-                  ),
-                  ListTile(
-                    title: const Text('Add Place/Town/City'),
-                    leading: Icon(
-                      Icons.account_balance,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    subtitle: Text(
-                        'Create a new place that wil be used in your routes',
-                        style: myTextStyleSmall(context)),
-                    onTap: () {
-                      pp('$mm navigate to city creator map .......');
-                      NavigationUtils.navigateTo(
-                          context: context,
-                          widget: CityCreatorMap(
-                            onCityAdded: (c) {
-                              pp('$mm ... city added: ${c.name}');
-                            },
-                          ),
-                          transitionType: PageTransitionType.leftToRight);
-                    },
-                  ),
-                  const SizedBox(
-                    height: 32,
-                  ),
-                  ListTile(
-                    title: const Text('Add New Route'),
-                    leading: Icon(Icons.directions_bus,
-                        color: Theme.of(context).primaryColor),
-                    subtitle: Text('Create a new route',
-                        style: myTextStyleSmall(context)),
-                    onTap: () {
-                      NavigationUtils.navigateTo(
-                          context: context,
-                          widget: RouteEditor(
-                            association: widget.association,
-                            onRouteAdded: (r) {
-                              _getData();
-                            },
-                          ),
-                          transitionType: PageTransitionType.leftToRight);
-                    },
-                  ),
-                  const SizedBox(
-                    height: 32,
-                  ),
-                  ListTile(
-                    title: const Text('Calculate Route Distances'),
-                    leading: Icon(Icons.calculate,
-                        color: Theme.of(context).primaryColor),
-                    subtitle: Text(
-                      'Calculate distances between landmarks in the route',
-                      style: myTextStyleSmall(context),
-                    ),
-                    onTap: () {
-                      pp('$mm starting distance calculation ...');
-                      routeDistanceCalculator
-                          .calculateAssociationRouteDistances();
-                    },
-                  ),
-                  const SizedBox(
-                    height: 32,
-                  ),
-                  ListTile(
-                    title: const Text('Refresh Route Data'),
-                    leading: Icon(Icons.refresh,
-                        color: Theme.of(context).primaryColor),
-                    subtitle: Text(
-                      'Fetch refreshed route data from the Mother Ship',
-                      style: myTextStyleSmall(context),
-                    ),
-                    onTap: () {
-                      _getData();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
         ),
       ),
     );
