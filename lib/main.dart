@@ -12,6 +12,7 @@ import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/theme.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
+import 'package:kasie_transie_library/widgets/scanners/qrcode_generator.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:get_it/get_it.dart';
 import 'package:routes_2024/ui/association/association_main.dart';
@@ -99,11 +100,11 @@ class KasieTransieApp extends ConsumerWidget {
               debugShowCheckedModeBanner: false,
               title: 'KasieTransie',
               theme: ThemeData(
-                colorScheme: MaterialTheme.darkScheme(),
+                colorScheme: MaterialTheme.lightScheme(),
                 useMaterial3: true,
-                primaryColor: Colors.teal,
-                primaryColorDark: Colors.teal.shade900,
-                primaryColorLight: Colors.teal.shade300,
+                primaryColor: Colors.indigo,
+                primaryColorDark: Colors.indigo.shade900,
+                primaryColorLight: Colors.indigo.shade300,
               ),
 
               // theme: themeBloc.getTheme(themeIndex).darkTheme,

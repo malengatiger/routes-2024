@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -7,6 +9,7 @@ import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:badges/badges.dart' as bd;
+import 'package:kasie_transie_library/widgets/scanners/gen_code.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:routes_2024/ui/association/vehicle_list_widget.dart';
 
@@ -59,13 +62,13 @@ class VehiclesEditState extends State<VehiclesEdit>
 
   void _setup(Vehicle vehicle) async {
     pp('$mm ... setUp ... vehicle: $vehicle');
-    registrationController.text = vehicle!.vehicleReg!;
-    modelController.text = vehicle!.model!;
-    makeController.text = vehicle!.make!;
-    yearController.text = vehicle!.year!;
-    capacityController.text = '${vehicle!.passengerCapacity!}';
-    ownerNameController.text = vehicle!.ownerName ?? '';
-    cellphoneController.text = vehicle!.ownerCellphone ?? '';
+    registrationController.text = vehicle.vehicleReg!;
+    modelController.text = vehicle.model!;
+    makeController.text = vehicle.make!;
+    yearController.text = vehicle.year!;
+    capacityController.text = '${vehicle.passengerCapacity!}';
+    ownerNameController.text = vehicle.ownerName ?? '';
+    cellphoneController.text = vehicle.ownerCellphone ?? '';
     country = prefs.getCountry();
     setState(() {});
   }
@@ -124,6 +127,10 @@ class VehiclesEditState extends State<VehiclesEdit>
           ownerCellphone: cellphoneController.text);
     }
     try {
+      var bytes = await generateQrCode(vehicle!.toJson());
+      var url = await dataApiDog.uploadQRCodeFile(imageBytes: bytes,
+          associationId: widget.association.associationId!);
+      vehicle!.qrCodeUrl = url;
       var res = await dataApiDog.addVehicle(vehicle!);
       cars.insert(0, res);
       if (mounted) {
@@ -146,19 +153,26 @@ class VehiclesEditState extends State<VehiclesEdit>
 
   PlatformFile? csvFile, vehiclePictureFile;
 
+
+// ... other imports ...
+
+  String? csvString;
   void _pickVehicleFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
-      csvFile = result.files.first; // Assign PlatformFile directly
+      csvFile = result.files.first;
       pp('$mm csvFile exists: ${csvFile?.bytes!.length} bytes');
+
+      // Read the CSV file as a string
+      csvString = utf8.decode(csvFile!.bytes!);
+
       setState(() {});
     } else {
-      // Handle file picking on mobile/desktop (using path)
-      // Handle case where bytes are null
-      pp('$mm Error: File bytes are null');
+      // Handle file picking cancellation
+      pp('$mm Error: File picking cancelled');
       if (mounted) {
-        showErrorToast(message: 'The file is not cool', context: context);
+        showErrorToast(message: 'File picking cancelled', context: context);
       }
     }
   }
@@ -166,41 +180,60 @@ class VehiclesEditState extends State<VehiclesEdit>
   Country? country;
   Association? association;
 
-  AddCarsResponse? addCarsResponse;
+  AddCarsResponse addCarsResponse = AddCarsResponse([], []);
   bool _showErrors = false;
+  bool _showSubmit = true;
   List<Vehicle> errorCars = [];
 
   _sendFile() async {
     pp('\n\n$mm ..... send the Vehicle File to upload ...');
     setState(() {
-      busy = true;
+      _showSubmit = false;
     });
-
+    addCarsResponse = AddCarsResponse([], []);
     try {
-      addCarsResponse = await dataApiDog.importVehiclesFromCSV(
-          csvFile!, widget.association.associationId!);
-      if (addCarsResponse != null) {
-        for (var car in addCarsResponse!.cars) {
-          cars.insert(0, car);
-        }
-        if (addCarsResponse!.errors.isNotEmpty) {
-          _showErrors = true;
-          errorCars = addCarsResponse!.errors;
+      var cars = getVehiclesFromCsv(
+          csv: csvString!, countryId: widget.association.countryId!,
+          associationId: widget.association.associationId!,
+          associationName: widget.association.associationName!);
+
+      for (var car in cars) {
+        registrationController.text = car.vehicleReg!;
+        makeController.text = car.make!;
+        modelController.text = car.model!;
+        yearController.text = car.year!;
+        ownerNameController.text = car.ownerName!;
+        setState(() {
+
+        });
+        try {
+          var bytes = await generateQrCode(car.toJson());
+          var url = await dataApiDog.uploadQRCodeFile(imageBytes: bytes,
+                      associationId: widget.association.associationId!);
+          car.qrCodeUrl = url;
+          var res = await dataApiDog.addVehicle(car);
+          addCarsResponse.cars.add(res);
+        } catch (e,s) {
+          pp('$e\n$e');
+          addCarsResponse.errors.add(car);
         }
       }
+      pp('$mm  cars registered: 🍎 ${addCarsResponse.cars.length}');
+      pp('$mm  cars fucked up: 🍎 ${addCarsResponse.errors.length}');
       if (mounted) {
-        if (addCarsResponse!.errors.isNotEmpty) {
+        if (addCarsResponse.errors.isNotEmpty) {
           showErrorToast(
-              message: 'Upload encountered ${addCarsResponse!.errors.length} errors',
+              message: 'Upload encountered ${addCarsResponse.errors.length} errors',
               context: context);
         } else {
           var msg =
-              '🌿 Vehicles uploaded OK: ${addCarsResponse!.cars
+              '🌿 Vehicles uploaded OK: ${addCarsResponse.cars
               .length}';
           result = msg;
           showOKToast(message: msg, context: context);
         }
       }
+      _getCars(true);
     } catch (e, s) {
       pp('$e $s');
       result = '$e';
@@ -210,6 +243,7 @@ class VehiclesEditState extends State<VehiclesEdit>
     }
     setState(() {
       busy = false;
+      _showSubmit = true;
     });
   }
 
@@ -412,7 +446,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                           backgroundColor: Colors.pink,
                                         ),
                                       )
-                                    : SizedBox(
+                                    : _showSubmit? SizedBox(
                                         width: 400,
                                         child: ElevatedButton(
                                             style: ButtonStyle(
@@ -430,7 +464,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                                       myTextStyleMediumLargeWithSize(
                                                           context, 20),
                                                 ))),
-                                      ),
+                                      ): gapH32,
                                 result == null
                                     ? gapW32
                                     : SizedBox(

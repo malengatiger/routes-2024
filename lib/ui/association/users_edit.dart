@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -9,6 +11,7 @@ import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:badges/badges.dart' as bd;
+import 'package:kasie_transie_library/widgets/scanners/gen_code.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:universal_io/io.dart';
@@ -151,6 +154,10 @@ class UsersEditState extends State<UsersEdit>
           userType: userType);
 
       try {
+        var bytes = await generateQrCode(selectedUser!.toJson());
+        var url = await dataApiDog.uploadQRCodeFile(imageBytes: bytes,
+            associationId: widget.association.associationId!);
+        selectedUser!.qrCodeUrl = url;
         var res = await dataApiDog.addUser(selectedUser!);
         pp('$mm user: $res');
         _getUsers();
@@ -241,6 +248,7 @@ class UsersEditState extends State<UsersEdit>
       busy = false;
     });
   }
+  String? csvString;
 
   void _pickFile() async {
     FilePickerResult? result = await FilePicker.platform
@@ -249,6 +257,7 @@ class UsersEditState extends State<UsersEdit>
     if (result != null) {
       csvFile = result.files.first;
       pp('$mm csvFile exists: ${csvFile?.bytes!.length} bytes');
+      csvString = utf8.decode(csvFile!.bytes!);
       setState(() {});
     } else {
       pp('$mm Error: File bytes are null');
@@ -261,20 +270,50 @@ class UsersEditState extends State<UsersEdit>
   Country? country;
   Association? association;
 
+  AddUsersResponse addUsersResponse = AddUsersResponse([], []);
   _sendFile() async {
     pp('$mm  send the User File ...');
     setState(() {
       busy = true;
     });
-
+    addUsersResponse = AddUsersResponse([], []);
     try {
-      var result = await dataApiDog.importUsersFromCSV(
-          csvFile!, widget.association.associationId!);
+      var users = getUsersFromCsv(
+          csv: csvString!, countryId: widget.association.countryId!,
+          associationId: widget.association.associationId!,
+          associationName: widget.association.associationName!);
+
+      pp('$mm  send the Users found in File ... 🍎 ${users.length}');
+
+      for (var user in users) {
+        try {
+          var bytes = await generateQrCode(user.toJson());
+          var url = await dataApiDog.uploadQRCodeFile(imageBytes: bytes,
+              associationId: widget.association.associationId!);
+          user.qrCodeUrl = url;
+          var res = await dataApiDog.addUser(user);
+          addUsersResponse.users.add(res);
+        } catch (e,s) {
+          pp('$e\n$e');
+          addUsersResponse.errors.add(user);
+        }
+      }
+      pp('$mm  users registered: 🍎 ${addUsersResponse.users.length}');
+      pp('$mm  users fucked up: 🍎 ${addUsersResponse.errors.length}');
+
       _getUsers();
       if (mounted) {
-        var msg =
-            '🌿 Users added: ${result!.users.length} errors: ${result.errors.length}';
-        showOKToast(message: msg, context: context);
+        if (addUsersResponse.errors.isNotEmpty) {
+          showErrorToast(
+              message: 'Upload encountered ${addUsersResponse.errors.length} errors',
+              context: context);
+        } else {
+          var msg =
+              '🌿 Vehicles uploaded OK: ${addUsersResponse.users
+              .length}';
+
+          showOKToast(message: msg, context: context);
+        }
       }
     } catch (e, s) {
       pp('$e $s');

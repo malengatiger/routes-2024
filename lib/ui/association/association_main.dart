@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
+import 'package:kasie_transie_library/widgets/scanners/qrcode_generator.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/association_edit.dart';
@@ -78,6 +79,7 @@ class AssociationMainState extends State<AssociationMain>
       case 4:
         currentWidget = RoutesEdit();
         break;
+
       default:
         currentWidget = Container(
           color: Colors.red,
@@ -253,6 +255,7 @@ class KasieNavigation extends StatelessWidget {
             ),
           ),
           gapH32,
+
         ],
       ),
     );

@@ -10,6 +10,7 @@ import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
+import 'package:kasie_transie_library/widgets/scanners/qrcode_generator.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/intro/intro_carousel.dart';
@@ -161,7 +162,7 @@ class KasieIntroState extends State<KasieIntro>
     }
   }
 
-  void _onPageChanged(int value) {}
+
 
   @override
   void dispose() {
