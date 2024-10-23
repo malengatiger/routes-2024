@@ -218,6 +218,13 @@ class VehiclesEditState extends State<VehiclesEdit>
           addCarsResponse.errors.add(car);
         }
       }
+      registrationController.text = '';
+      makeController.text = '';
+      modelController.text = '';
+      cellphoneController.text = '';
+      yearController.text = '';
+      ownerNameController.text = '';
+
       pp('$mm  cars registered: 🍎 ${addCarsResponse.cars.length}');
       pp('$mm  cars fucked up: 🍎 ${addCarsResponse.errors.length}');
       if (mounted) {

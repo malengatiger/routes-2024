@@ -74,7 +74,7 @@ class UsersEditState extends State<UsersEdit>
       lastNameController.text = selectedUser!.lastName!;
       firstNameController.text = selectedUser!.firstName!;
       emailController.text = selectedUser!.email!;
-      cellphoneController.text = selectedUser!.cellphone?? '';
+      cellphoneController.text = selectedUser!.cellphone ?? '';
       setState(() {});
     }
   }
@@ -155,7 +155,8 @@ class UsersEditState extends State<UsersEdit>
 
       try {
         var bytes = await generateQrCode(selectedUser!.toJson());
-        var url = await dataApiDog.uploadQRCodeFile(imageBytes: bytes,
+        var url = await dataApiDog.uploadQRCodeFile(
+            imageBytes: bytes,
             associationId: widget.association.associationId!);
         selectedUser!.qrCodeUrl = url;
         var res = await dataApiDog.addUser(selectedUser!);
@@ -248,6 +249,7 @@ class UsersEditState extends State<UsersEdit>
       busy = false;
     });
   }
+
   String? csvString;
 
   void _pickFile() async {
@@ -271,33 +273,49 @@ class UsersEditState extends State<UsersEdit>
   Association? association;
 
   AddUsersResponse addUsersResponse = AddUsersResponse([], []);
+
   _sendFile() async {
-    pp('$mm  send the User File ...');
     setState(() {
       busy = true;
     });
     addUsersResponse = AddUsersResponse([], []);
     try {
       var users = getUsersFromCsv(
-          csv: csvString!, countryId: widget.association.countryId!,
+          csv: csvString!,
+          countryId: widget.association.countryId!,
           associationId: widget.association.associationId!,
           associationName: widget.association.associationName!);
 
-      pp('$mm  send the Users found in File ... 🍎 ${users.length}');
+      pp('$mm  upload the Users found in File ... 🍎 ${users.length} 🍎');
 
       for (var user in users) {
+        setState(() {
+          firstNameController.text = user.firstName!;
+          lastNameController.text = user.lastName!;
+          emailController.text = user.email!;
+          cellphoneController.text = user.cellphone!;
+          passwordController.text = user.password ?? 'pass123';
+        });
         try {
           var bytes = await generateQrCode(user.toJson());
-          var url = await dataApiDog.uploadQRCodeFile(imageBytes: bytes,
+          var url = await dataApiDog.uploadQRCodeFile(
+              imageBytes: bytes,
               associationId: widget.association.associationId!);
           user.qrCodeUrl = url;
           var res = await dataApiDog.addUser(user);
           addUsersResponse.users.add(res);
-        } catch (e,s) {
+        } catch (e, s) {
           pp('$e\n$e');
           addUsersResponse.errors.add(user);
         }
       }
+
+      firstNameController.text = '';
+      lastNameController.text = '';
+      emailController.text = '';
+      cellphoneController.text = '';
+      passwordController.text = '';
+
       pp('$mm  users registered: 🍎 ${addUsersResponse.users.length}');
       pp('$mm  users fucked up: 🍎 ${addUsersResponse.errors.length}');
 
@@ -305,12 +323,11 @@ class UsersEditState extends State<UsersEdit>
       if (mounted) {
         if (addUsersResponse.errors.isNotEmpty) {
           showErrorToast(
-              message: 'Upload encountered ${addUsersResponse.errors.length} errors',
+              message:
+                  'Upload encountered ${addUsersResponse.errors.length} errors',
               context: context);
         } else {
-          var msg =
-              '🌿 Vehicles uploaded OK: ${addUsersResponse.users
-              .length}';
+          var msg = '🌿 Vehicles uploaded OK: ${addUsersResponse.users.length}';
 
           showOKToast(message: msg, context: context);
         }
@@ -538,7 +555,7 @@ class UsersEditState extends State<UsersEdit>
                             )),
                       )
                     : gapH32,
-                _showEditor? gapH8: gapH32,
+                _showEditor ? gapH8 : gapH32,
                 gapH32,
                 Expanded(
                   child: GridView.builder(
@@ -629,7 +646,10 @@ class UsersEditState extends State<UsersEdit>
             top: 24,
             child: Row(
               children: [
-                Text('Staff Members', style: myTextStyle(weight: FontWeight.w900, fontSize: 20),),
+                Text(
+                  'Staff Members',
+                  style: myTextStyle(weight: FontWeight.w900, fontSize: 20),
+                ),
                 gapW32,
                 bd.Badge(
                   badgeContent: Text(
