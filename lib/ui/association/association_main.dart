@@ -7,6 +7,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/association_edit.dart';
 import 'package:routes_2024/ui/association/routes_edit.dart';
+import 'package:routes_2024/ui/association/ticket_maker.dart';
 import 'package:routes_2024/ui/association/users_edit.dart';
 import 'package:routes_2024/ui/association/vehicles_edit.dart';
 
@@ -79,6 +80,13 @@ class AssociationMainState extends State<AssociationMain>
       case 4:
         currentWidget = RoutesEdit();
         break;
+      case 5:
+
+        NavigationUtils.navigateTo(
+            context: context,
+            widget: TicketMaker(association: widget.association!),
+            transitionType: PageTransitionType.leftToRight);
+        break;
 
       default:
         currentWidget = Container(
@@ -93,9 +101,10 @@ class AssociationMainState extends State<AssociationMain>
   }
 
   _navigateToRoutes() async {
-    NavigationUtils.navigateTo(context: context,
-        widget: RouteDataWidget( widget.association!), transitionType: PageTransitionType.leftToRight);
-
+    NavigationUtils.navigateTo(
+        context: context,
+        widget: RouteDataWidget(widget.association!),
+        transitionType: PageTransitionType.leftToRight);
   }
 
   @override
@@ -255,7 +264,19 @@ class KasieNavigation extends StatelessWidget {
             ),
           ),
           gapH32,
-
+          GestureDetector(
+            onTap: () {
+              onTapped(5);
+            },
+            child: ListTile(
+              leading: Icon(
+                Icons.airplane_ticket,
+                size: 48,
+              ),
+              title: Text('Ticket Maker'),
+            ),
+          ),
+          gapH32,
         ],
       ),
     );
