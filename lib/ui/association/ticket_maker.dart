@@ -249,34 +249,44 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
                         if (_showTicketRoutes &&
                             _showTicketRoutesIndex == index)
                           SizedBox(
-                            height: 300,
+                            height: _getHeight(ticket),
                             width: 400,
                             child: Card(
                               elevation: 8,
-                              child: Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: ListView.builder(
-                                    itemCount: ticket.ticketRoutes!.length,
-                                    itemBuilder: (_, index) {
-                                      var tr = ticket.ticketRoutes![index];
-                                      return Row(
-                                        children: [
-                                          SizedBox(width: 24,
-                                            child: Text(
-                                              '$index',
-                                              style: myTextStyle(
-                                                  weight: FontWeight.w900,
-                                                  color: Colors.blue),
-                                            ),
-                                          ),
-                                          gapW32,
-                                          Text(
-                                            '${tr.routeName}',
-                                            style: myTextStyle(fontSize: 12),
-                                          ),
-                                        ],
-                                      );
-                                    }),
+                              child: Column(
+                                children: [
+                                  gapH12,
+                                  Text('Ticket is valid on these route(s)', style: myTextStyle(weight: FontWeight.w900),),
+                                  gapH8,
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: ListView.builder(
+                                          itemCount: ticket.ticketRoutes!.length,
+                                          itemBuilder: (_, index) {
+                                            var tr = ticket.ticketRoutes![index];
+                                            return Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 16,
+                                                  child: Text(
+                                                    '${index + 1}',
+                                                    style: myTextStyle(
+                                                        weight: FontWeight.w900,
+                                                        color: Colors.blue),
+                                                  ),
+                                                ),
+                                                gapW32,
+                                                Text(
+                                                  '${tr.routeName}',
+                                                  style: myTextStyle(fontSize: 12),
+                                                ),
+                                              ],
+                                            );
+                                          }),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           )
@@ -286,6 +296,16 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
                 ));
           }),
     );
+  }
+
+  double _getHeight(Ticket ticket) {
+    if (ticket.ticketRoutes!.length < 5.0) {
+      return ticket.ticketRoutes!.length * 48.0;
+    }
+    if (ticket.ticketRoutes!.length < 15.0) {
+      return ticket.ticketRoutes!.length * 40;
+    }
+    return ticket.ticketRoutes!.length * 28;
   }
 }
 
