@@ -185,7 +185,7 @@ class KasieNavigation extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(
-              height: 200,
+              height: 140,
               child: Column(
                 children: [
                   Image.asset(
@@ -199,15 +199,14 @@ class KasieNavigation extends StatelessWidget {
               )),
           gapH32,
           gapH32,
-          gapH32,
           GestureDetector(
             onTap: () {
               onTapped(0);
             },
             child: ListTile(
               leading: Icon(Icons.people,
-                  size: 48, color: Theme.of(context).primaryColor),
-              title: Text('Staff'),
+                  size: 36, color: Theme.of(context).primaryColor),
+              title: Text('Staff', style: myTextStyle(weight: FontWeight.w900, fontSize: 18)),
             ),
           ),
           gapH32,
@@ -218,26 +217,26 @@ class KasieNavigation extends StatelessWidget {
             child: ListTile(
               leading: Icon(
                 Icons.car_crash_rounded,
-                size: 48,
+                size: 36,
                 color: Theme.of(context).primaryColor,
               ),
-              title: Text('Vehicles'),
+              title: Text('Vehicles', style: myTextStyle(weight: FontWeight.w900, fontSize: 18),),
             ),
           ),
-          gapH32,
-          GestureDetector(
-            onTap: () {
-              onTapped(2);
-            },
-            child: ListTile(
-              leading: Icon(
-                Icons.airplane_ticket,
-                size: 48,
-                color: Theme.of(context).primaryColor,
-              ),
-              title: Text('Commuter Tickets'),
-            ),
-          ),
+          // gapH32,
+          // GestureDetector(
+          //   onTap: () {
+          //     onTapped(2);
+          //   },
+          //   child: ListTile(
+          //     leading: Icon(
+          //       Icons.airplane_ticket,
+          //       size: 36,
+          //       color: Theme.of(context).primaryColor,
+          //     ),
+          //     title: Text('Commuter Tickets', style: myTextStyle(weight: FontWeight.w900, fontSize: 18)),
+          //   ),
+          // ),
           gapH32,
           GestureDetector(
             onTap: () {
@@ -246,10 +245,10 @@ class KasieNavigation extends StatelessWidget {
             child: ListTile(
               leading: Icon(
                 Icons.roundabout_right,
-                size: 48,
+                size: 36,
                 color: Theme.of(context).primaryColor,
               ),
-              title: Text('Routes'),
+              title: Text('Routes', style: myTextStyle(weight: FontWeight.w900, fontSize: 18)),
             ),
           ),
 
@@ -261,12 +260,11 @@ class KasieNavigation extends StatelessWidget {
             child: ListTile(
               leading: Icon(
                 Icons.airplane_ticket,
-                size: 48, color: Theme.of(context).primaryColor,
+                size: 36, color: Theme.of(context).primaryColor,
               ),
-              title: Text('Ticket Maker'),
+              title: Text('Ticket Maker', style: myTextStyle(weight: FontWeight.w900, fontSize: 18)),
             ),
           ),
-          gapH32,
           gapH32,
           gapH32,
           GestureDetector(
@@ -276,7 +274,7 @@ class KasieNavigation extends StatelessWidget {
             child: ListTile(
               leading: Icon(
                 Icons.folder_copy_rounded,
-                size: 48,
+                size: 36,
               ),
               title: Text('Example upload Files'),
             ),

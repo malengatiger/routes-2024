@@ -167,7 +167,7 @@ class ExampleFileWidgetState extends State<ExampleFileWidget>
               ),
               gapH32,
               SizedBox(
-                height: 480,
+                height: 320,
                 child: ListView.builder(
                   itemCount: persons.length,
                   itemBuilder: (_, index) {
@@ -190,7 +190,7 @@ class ExampleFileWidgetState extends State<ExampleFileWidget>
                             child: Text(
                               '${p.firstName}',
                               style: myTextStyle(
-                                  fontSize: 14,
+                                  fontSize: 10,
                                   weight: index == 0
                                       ? FontWeight.w900
                                       : FontWeight.w500),
@@ -200,23 +200,23 @@ class ExampleFileWidgetState extends State<ExampleFileWidget>
                             child: Text(
                               '${p.lastName}',
                               style: myTextStyle(
-                                  fontSize: 14,
+                                  fontSize: 10,
                                   weight: index == 0
                                       ? FontWeight.w900
                                       : FontWeight.w500),
                             )),
                         SizedBox(
-                            width: 172,
+                            width: 186,
                             child: Text(
                               '${p.email}',
                               style: myTextStyle(
-                                  fontSize: 12,
+                                  fontSize: 10,
                                   weight: index == 0
                                       ? FontWeight.w900
                                       : FontWeight.w500),
                             )),
                         SizedBox(
-                            width: 148,
+                            width: 120,
                             child: Text(
                               '${p.cellphone}',
                               style: myTextStyle(
@@ -258,7 +258,7 @@ class ExampleFileWidgetState extends State<ExampleFileWidget>
                             child: Text(
                               '${p.ownerName}',
                               style: myTextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   weight: index == 0
                                       ? FontWeight.w900
                                       : FontWeight.w500),
@@ -268,7 +268,7 @@ class ExampleFileWidgetState extends State<ExampleFileWidget>
                             child: Text(
                               '${p.vehicleReg}',
                               style: myTextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   weight: index == 0
                                       ? FontWeight.w900
                                       : FontWeight.w500),
@@ -278,7 +278,7 @@ class ExampleFileWidgetState extends State<ExampleFileWidget>
                             child: Text(
                               '${p.model}',
                               style: myTextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   weight: index == 0
                                       ? FontWeight.w900
                                       : FontWeight.w500),
@@ -288,7 +288,7 @@ class ExampleFileWidgetState extends State<ExampleFileWidget>
                             child: Text(
                               '${p.make}',
                               style: myTextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   weight: index == 0
                                       ? FontWeight.w900
                                       : FontWeight.w500),
@@ -298,7 +298,7 @@ class ExampleFileWidgetState extends State<ExampleFileWidget>
                             child: Text(
                               '${p.year}',
                               style: myTextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   weight: index == 0
                                       ? FontWeight.w900
                                       : FontWeight.w500),

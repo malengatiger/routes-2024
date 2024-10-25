@@ -119,10 +119,22 @@ class UsersEditState extends State<UsersEdit>
   }
 
   void _getUsers() async {
-    users = await listApiDog.getAssociationUsers(
-        widget.association.associationId!, true);
-    pp('$mm association users found: ${users.length}');
-    setState(() {});
+    setState(() {
+      busy = true;
+    });
+    try {
+      users = await listApiDog.getAssociationUsers(
+              widget.association.associationId!, true);
+      pp('$mm association users found: ${users.length}');
+    } catch (e,s) {
+      pp('$e $s');
+      if (mounted) {
+        showErrorToast(message: '$e', context: context);
+      }
+    }
+    setState(() {
+      busy = false;
+    });
   }
 
   _onSubmit() async {
@@ -347,7 +359,7 @@ class UsersEditState extends State<UsersEdit>
 
   int? userIndex;
   bool _showTools = false;
-  bool _showEditor = true;
+  bool _showEditor = false;
 
   _showToolbar(int index) {
     setState(() {
@@ -375,7 +387,7 @@ class UsersEditState extends State<UsersEdit>
                                 gapH32,
                                 gapH32,
                                 Text(
-                                  'Pick the Staff Members CSV File',
+                                  'Pick the Staff Members File',
                                   style: myTextStyleMediumLarge(context, 20),
                                 ),
                                 gapH16,
@@ -398,9 +410,9 @@ class UsersEditState extends State<UsersEdit>
                                       },
                                       child: Text('Get File')),
                                 ),
-                                gapH32,
+                                gapH16,
                                 csvFile == null
-                                    ? gapH32
+                                    ? gapH4
                                     : SizedBox(
                                         width: 400,
                                         child: ElevatedButton(
@@ -430,10 +442,8 @@ class UsersEditState extends State<UsersEdit>
                                       ),
                                 csvFile == null
                                     ? gapH8
-                                    : SizedBox(
-                                        height: 28,
-                                      ),
-                                gapH32,
+                                    : gapH16,
+                                gapH16,
                                 TextFormField(
                                   controller: firstNameController,
                                   keyboardType: TextInputType.name,
@@ -449,7 +459,7 @@ class UsersEditState extends State<UsersEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: lastNameController,
                                   keyboardType: TextInputType.name,
@@ -465,7 +475,7 @@ class UsersEditState extends State<UsersEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: emailController,
                                   keyboardType: TextInputType.emailAddress,
@@ -481,7 +491,7 @@ class UsersEditState extends State<UsersEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: cellphoneController,
                                   keyboardType: TextInputType.phone,
@@ -497,7 +507,7 @@ class UsersEditState extends State<UsersEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: passwordController,
                                   keyboardType: TextInputType.name,
@@ -513,7 +523,7 @@ class UsersEditState extends State<UsersEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 getDropDown(),
                                 gapH32,
                                 userType == null
@@ -544,13 +554,14 @@ class UsersEditState extends State<UsersEdit>
                                             style: ButtonStyle(
                                               elevation:
                                                   WidgetStatePropertyAll(8),
+                                              backgroundColor: WidgetStatePropertyAll(Theme.of(context).primaryColor),
                                             ),
                                             onPressed: () {
                                               _onSubmit();
                                             },
                                             child: Padding(
                                                 padding: EdgeInsets.all(20),
-                                                child: Text('Submit'))),
+                                                child: Text('Submit', style: myTextStyle(color: Colors.white)))),
                                       ),
                               ],
                             )),
@@ -559,52 +570,54 @@ class UsersEditState extends State<UsersEdit>
                 _showEditor ? gapH8 : gapH32,
                 gapH32,
                 Expanded(
-                  child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 6),
-                      itemCount: users.length,
-                      itemBuilder: (_, index) {
-                        var user = users[index];
-                        return GestureDetector(
-                          onTap: () {
-                            selectedUser = user;
-                            _setup();
-                          },
-                          child: Card(
-                            elevation: 8,
-                            child: SizedBox(
-                              height: 280,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      _showToolbar(index);
-                                    },
-                                    child: UserProfilePicture(
-                                      user: user,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: busy? SizedBox(
+                        height: 400, width: 400,
+                        child: TimerWidget(title: 'Loading staff ...', isSmallSize: true)): GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5),
+                        itemCount: users.length,
+                        itemBuilder: (_, index) {
+                          var user = users[index];
+                          return GestureDetector(
+                            onTap: () {
+                              selectedUser = user;
+                              _setup();
+                              _showToolbar(index);
+                            },
+                            child: Card(
+                              elevation: 8,
+                              child: SizedBox(
+                                height: 280,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        _showToolbar(index);
+                                      },
+                                      child: UserProfilePicture(
+                                        user: user,
+                                      ),
                                     ),
-                                  ),
-                                  gapH8,
-                                  Text(
-                                    '${user.firstName} ${user.lastName}',
-                                    style: myTextStyle(
-                                        weight: FontWeight.w900, fontSize: 16),
-                                  ),
-                                  gapH4,
-                                  Text(
-                                    '${user.userType}',
-                                    style: myTextStyle(
-                                        weight: FontWeight.w200, fontSize: 10),
-                                  ),
-                                  if (_showTools && userIndex == index)
-                                    SizedBox(
-                                      height: 36,
-                                      child: Card(
-                                        elevation: 12,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4.0, horizontal: 4.0),
+                                    gapH8,
+                                    Text(
+                                      '${user.firstName} ${user.lastName}',
+                                      style: myTextStyle(
+                                          weight: FontWeight.w900, fontSize: 16),
+                                    ),
+                                    gapH4,
+                                    Text(
+                                      '${user.userType}',
+                                      style: myTextStyle(
+                                          weight: FontWeight.w200, fontSize: 10),
+                                    ),
+                                    if (_showTools && userIndex == index)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+                                        child: Card(
+                                          elevation: 8,
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -631,20 +644,20 @@ class UsersEditState extends State<UsersEdit>
                                           ),
                                         ),
                                       ),
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
+                  ),
                 )
               ],
             ),
           ),
           Positioned(
             right: 24,
-            top: 24,
+            top: 16,
             child: Row(
               children: [
                 Text(
@@ -667,6 +680,7 @@ class UsersEditState extends State<UsersEdit>
                 gapW32,
                 _showEditor
                     ? IconButton(
+                        tooltip: 'Close Editor Form',
                         onPressed: () {
                           setState(() {
                             _showEditor = false;
@@ -674,6 +688,7 @@ class UsersEditState extends State<UsersEdit>
                         },
                         icon: Icon(Icons.close))
                     : IconButton(
+                        tooltip: 'Open Editor Form',
                         onPressed: () {
                           setState(() {
                             _showEditor = true;
@@ -683,14 +698,7 @@ class UsersEditState extends State<UsersEdit>
               ],
             ),
           ),
-          busy
-              ? Positioned(
-                  child: Center(
-                      child: TimerWidget(
-                  title: 'Uploading file ...',
-                  isSmallSize: true,
-                )))
-              : gapW32,
+
         ],
       )),
     );
@@ -706,8 +714,8 @@ class UserProfilePicture extends StatelessWidget {
   Widget build(BuildContext context) {
     if (user.profileUrl == null) {
       return SizedBox(
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         child: Image.asset(
           'assets/avatar1.png',
           height: 64,
@@ -717,11 +725,11 @@ class UserProfilePicture extends StatelessWidget {
       );
     }
     return SizedBox(
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         child: CircleAvatar(
           backgroundImage: NetworkImage(user.profileUrl!),
-          radius: 100,
+          radius: 80,
         ));
   }
 }

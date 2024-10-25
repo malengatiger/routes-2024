@@ -170,11 +170,11 @@ class AssociationListState extends State<AssociationList>
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 48, horizontal: 24),
       child: bd.Badge(
-        badgeContent: Text('${associations.length}'),
+        badgeContent: Text('${associations.length}', style: myTextStyle(color: Colors.white),),
         badgeStyle: bd.BadgeStyle(
           badgeColor: Theme.of(context).primaryColor,
           elevation: 8,
-          padding: EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(16.0),
         ),
         child: ListView.builder(
             itemCount: associations.length,
@@ -190,7 +190,7 @@ class AssociationListState extends State<AssociationList>
                     child: Card(
                         elevation: 8,
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: ListTile(
                               title: Text(
                                 ass.associationName!,
@@ -225,7 +225,7 @@ class AssScaffold extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(width: (width / 2) - 128, child: leftWidget),
+                SizedBox(width: (width / 2) - 160, child: leftWidget),
                 SizedBox(width: (width / 2) - 48, child: rightWidget),
               ],
             )));

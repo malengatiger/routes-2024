@@ -81,7 +81,7 @@ class TicketMakerState extends State<TicketMaker>
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 tickets.isEmpty
                     ? Center(
@@ -152,160 +152,177 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.sizeOf(context).width;
     return SizedBox(
       // height: widget.height,
-      width: 600,
-      child: ListView.builder(
-          itemCount: widget.tickets.length,
-          itemBuilder: (_, index) {
-            var ticket = widget.tickets[index];
-            var mType = '';
-            switch (ticket.ticketType) {
-              case TicketType.oneTrip:
-                mType = 'One Trip';
-                break;
-              case TicketType.daily:
-                mType = 'Daily';
-                break;
-              case TicketType.monthly:
-                mType = 'Monthly';
-                break;
-              case TicketType.weekly:
-                mType = 'Weekly';
-                break;
-              case TicketType.annual:
-                mType = 'Annual';
-                break;
+      width: (width / 3),
+      child: Card(
+        elevation: 8,
+        color: Theme.of(context).primaryColorLight,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: ListView.builder(
+              itemCount: widget.tickets.length,
+              itemBuilder: (_, index) {
+                var ticket = widget.tickets[index];
+                var mType = '';
+                switch (ticket.ticketType) {
+                  case TicketType.oneTrip:
+                    mType = 'One Trip';
+                    break;
+                  case TicketType.daily:
+                    mType = 'Daily';
+                    break;
+                  case TicketType.monthly:
+                    mType = 'Monthly';
+                    break;
+                  case TicketType.weekly:
+                    mType = 'Weekly';
+                    break;
+                  case TicketType.annual:
+                    mType = 'Annual';
+                    break;
 
-              default:
-                mType = 'One Trip';
-            }
-            return GestureDetector(
-                onTap: () {
-                  widget.onTicket(ticket);
-                },
-                child: Card(
-                  elevation: 8,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  default:
+                    mType = 'One Trip';
+                }
+                return GestureDetector(
+                    onTap: () {
+                      widget.onTicket(ticket);
+                    },
+                    child: Card(
+                      elevation: 8,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Column(
                           children: [
-                            Card(
-                              elevation: 8,
-                              color: Colors.yellow.shade100,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Image.network(
-                                  '${ticket.qrCodeUrl}',
-                                  height: 120,
-                                  width: 120,
-                                ),
-                              ),
-                            ),
-                            Column(
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    pp(' routes tapped, should show list ');
-                                    if (_showTicketRoutesIndex == index) {
-                                      setState(() {
-                                        _showTicketRoutes = false;
-                                        _showTicketRoutesIndex = null;
-                                      });
-                                    } else {
-                                      setState(() {
-                                        _showTicketRoutes = true;
-                                        _showTicketRoutesIndex = index;
-                                      });
-                                    }
-                                  },
-                                  child: Card(
-                                    elevation: 8,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: TicketElement(
-                                        label: 'Ticket Routes',
-                                        text: '${ticket.ticketRoutes!.length}',
-                                        textColor: Colors.blue,
-                                        onTap: () {},
-                                      ),
+                                Card(
+                                  elevation: 8,
+                                  color: Colors.yellow.shade50,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Image.network(
+                                      '${ticket.qrCodeUrl}',
+                                      height: 100,
+                                      width: 100,
                                     ),
                                   ),
                                 ),
-                                gapH32,
-                                TicketElement(
-                                  label: 'Ticket Value',
-                                  text: '${ticket.value!}',
-                                  onTap: () {},
-                                ),
-                                TicketElement(
-                                  label: 'Ticket Type',
-                                  text: mType,
-                                  onTap: () {},
-                                ),
-                                TicketElement(
-                                  label: 'Number of Trips',
-                                  text: '${ticket.numberOfTrips!}',
-                                  onTap: () {},
+                                Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        pp(' routes tapped, should show list ');
+                                        if (_showTicketRoutesIndex == index) {
+                                          setState(() {
+                                            _showTicketRoutes = false;
+                                            _showTicketRoutesIndex = null;
+                                          });
+                                        } else {
+                                          setState(() {
+                                            _showTicketRoutes = true;
+                                            _showTicketRoutesIndex = index;
+                                          });
+                                        }
+                                      },
+                                      child: Card(
+                                        elevation: 4,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: TicketElement(
+                                            label: 'Ticket Routes',
+                                            text:
+                                                '${ticket.ticketRoutes!.length}',
+                                            textColor: Colors.blue,
+                                            onTap: () {},
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    gapH32,
+                                    TicketElement(
+                                      label: 'Ticket Value',
+                                      text: '${ticket.value!}',
+                                      onTap: () {},
+                                    ),
+                                    TicketElement(
+                                      label: 'Ticket Type',
+                                      text: mType,
+                                      onTap: () {},
+                                    ),
+                                    TicketElement(
+                                      label: 'Number of Trips',
+                                      text: '${ticket.numberOfTrips!}',
+                                      onTap: () {},
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
+                            if (_showTicketRoutes &&
+                                _showTicketRoutesIndex == index)
+                              SizedBox(
+                                height: _getHeight(ticket),
+                                width: 400,
+                                child: Card(
+                                  elevation: 8,
+                                  child: Column(
+                                    children: [
+                                      gapH12,
+                                      Text(
+                                        'Ticket is valid on these route(s)',
+                                        style:
+                                            myTextStyle(weight: FontWeight.w900),
+                                      ),
+                                      gapH8,
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: ListView.builder(
+                                              itemCount:
+                                                  ticket.ticketRoutes!.length,
+                                              itemBuilder: (_, index) {
+                                                var tr =
+                                                    ticket.ticketRoutes![index];
+                                                return Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: 24,
+                                                      child: Text(
+                                                        '${index + 1}',
+                                                        style: myTextStyle(
+                                                            weight:
+                                                                FontWeight.w900,
+                                                            color: Colors.blue),
+                                                      ),
+                                                    ),
+                                                    gapW32,
+                                                    Flexible(
+                                                      child: Text(
+                                                        '${tr.routeName}',
+                                                        style: myTextStyle(
+                                                            fontSize: 12),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              }),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
                           ],
                         ),
-                        if (_showTicketRoutes &&
-                            _showTicketRoutesIndex == index)
-                          SizedBox(
-                            height: _getHeight(ticket),
-                            width: 400,
-                            child: Card(
-                              elevation: 8,
-                              child: Column(
-                                children: [
-                                  gapH12,
-                                  Text('Ticket is valid on these route(s)', style: myTextStyle(weight: FontWeight.w900),),
-                                  gapH8,
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: ListView.builder(
-                                          itemCount: ticket.ticketRoutes!.length,
-                                          itemBuilder: (_, index) {
-                                            var tr = ticket.ticketRoutes![index];
-                                            return Row(
-                                              children: [
-                                                SizedBox(
-                                                  width: 24,
-                                                  child: Text(
-                                                    '${index + 1}',
-                                                    style: myTextStyle(
-                                                        weight: FontWeight.w900,
-                                                        color: Colors.blue),
-                                                  ),
-                                                ),
-                                                gapW32,
-                                                Flexible(
-                                                  child: Text(
-                                                    '${tr.routeName}',
-                                                    style: myTextStyle(fontSize: 12),
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          }),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                      ],
-                    ),
-                  ),
-                ));
-          }),
+                      ),
+                    ));
+              }),
+        ),
+      ),
     );
   }
 
@@ -349,7 +366,7 @@ class AssociationRouteList extends StatelessWidget {
                   width: 20,
                   color: getColor(route.color!),
                   child: Center(
-                    child: Text('${index + 1}'),
+                    child: Text('${index + 1}', style: myTextStyle(color: Colors.white, fontSize: 10),),
                   ),
                 ),
                 gapW32,
@@ -358,6 +375,7 @@ class AssociationRouteList extends StatelessWidget {
             ),
           ),
         );
+        index++;
       }
       return DropdownButton<lib.Route>(
           hint: Text('Add Route to Ticket'),
@@ -426,7 +444,7 @@ class TicketElement extends StatelessWidget {
             text,
             style: myTextStyle(
                 weight: FontWeight.w900,
-                fontSize: 20,
+                fontSize: 16,
                 color: textColor ?? Colors.black),
           ),
         ],

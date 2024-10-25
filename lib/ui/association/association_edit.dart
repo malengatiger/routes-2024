@@ -123,27 +123,19 @@ class AssociationEditState extends State<AssociationEdit>
       children: [
         Center(
           child: SizedBox(
-            width: 400,
+            width: 480,
             child: Column(
               children: [
-                Row(mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          widget.onClose();
-                        },
-                        icon: Icon(Icons.close)),
-                  ],
-                ),
+
                 Form(
                     key: _formKey,
                     child: Column(
                       children: [
-                        gapH32,
-                        gapH32,
+                        gapH16,
+                        gapH16,
                         Text(
-                          'Select the country',
-                          style: myTextStyleMediumLarge(context, 20),
+                          'Association Details',
+                          style: myTextStyleMediumLarge(context, 28),
                         ),
                         gapH16,
                         CountryChooser(
@@ -153,19 +145,20 @@ class AssociationEditState extends State<AssociationEdit>
                                 country = c;
                               });
                             },
-                            hint: 'Select Country',
+                            hint: '   Select Country',
                             refreshCountries: false),
-                        gapH32,
+                        gapH16,
                         country == null
-                            ? gapH32
+                            ? gapH16
                             : Text(
                                 country!.name!,
-                                style: myTextStyleMediumLarge(context, 28),
+                                style: myTextStyleMediumLarge(context, 36),
                               ),
-                        country == null ? gapH8 : gapH32,
+                        country == null ? gapH8 : gapH16,
                         TextFormField(
                           controller: nameController,
                           keyboardType: TextInputType.name,
+                          style: myTextStyle(fontSize: 20, weight: FontWeight.w900),
                           decoration: InputDecoration(
                             label: Text('Association Name'),
                             hintText: 'Enter Association Name',
@@ -192,7 +185,7 @@ class AssociationEditState extends State<AssociationEdit>
                             }
                           },
                         ),
-                        gapH32,
+                        gapH16,
                         TextFormField(
                           controller: adminLastNameController,
                           keyboardType: TextInputType.name,
@@ -207,7 +200,7 @@ class AssociationEditState extends State<AssociationEdit>
                             }
                           },
                         ),
-                        gapH32,
+                        gapH16,
                         TextFormField(
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -222,7 +215,7 @@ class AssociationEditState extends State<AssociationEdit>
                             }
                           },
                         ),
-                        gapH32,
+                        gapH16,
                         TextFormField(
                           controller: cellphoneController,
                           keyboardType: TextInputType.phone,
@@ -244,7 +237,7 @@ class AssociationEditState extends State<AssociationEdit>
                                 width: 24,
                                 height: 24,
                                 child: CircularProgressIndicator(
-                                  strokeWidth: 8,
+                                  strokeWidth: 4,
                                   backgroundColor: Colors.pink,
                                 ),
                               )
@@ -253,13 +246,14 @@ class AssociationEditState extends State<AssociationEdit>
                                 child: ElevatedButton(
                                     style: ButtonStyle(
                                       elevation: WidgetStatePropertyAll(8),
+                                      backgroundColor: WidgetStatePropertyAll(Theme.of(context).primaryColor)
                                     ),
                                     onPressed: () {
                                       _onSubmit();
                                     },
                                     child: Padding(
                                         padding: EdgeInsets.all(20),
-                                        child: Text('Submit'))),
+                                        child: Text('Submit', style: myTextStyle(color: Colors.white, fontSize: 20),))),
                               ),
                       ],
                     )),

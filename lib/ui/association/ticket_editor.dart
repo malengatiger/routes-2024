@@ -218,12 +218,13 @@ class _TicketEditorState extends State<TicketEditor> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.sizeOf(context).width;
     return Card(
       elevation: 8,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SizedBox(
-          width: 800,
+          width: (width/2),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -232,14 +233,14 @@ class _TicketEditorState extends State<TicketEditor> {
                   'Taxi Ticket Creator',
                   style: myTextStyle(weight: FontWeight.w900, fontSize: 28),
                 ),
-                gapH32,
+                gapH16,
                 _getTicketTypeDropDown(),
-                gapH32,
+                gapH16,
                 Text(
                   ticketType,
                   style: myTextStyle(weight: FontWeight.w900, fontSize: 32),
                 ),
-                gapH32,
+                gapH16,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -270,23 +271,12 @@ class _TicketEditorState extends State<TicketEditor> {
                         isDropDown: true),
                   ],
                 ),
-                gapH32,
+                gapH16,
                 busy
                     ? TimerWidget(
                         title: 'Creating ticket ...', isSmallSize: true)
-                    : Card(
-                        elevation: 8,
-                        color: Colors.blue.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: QrImageView(
-                            data: data,
-                            size: 360,
-                            padding: EdgeInsets.all(16.0),
-                          ),
-                        ),
-                      ),
-                gapH32,
+                    : gapW32,
+                gapH16,
                 selectedRoutes.isEmpty
                     ? Center(
                         child: Text(
@@ -297,7 +287,7 @@ class _TicketEditorState extends State<TicketEditor> {
                       )
                     : Expanded(
                         child: SizedBox(
-                        width: 600,
+                        width: (width/2),
                         child: bd.Badge(
                           position: bd.BadgePosition.topEnd(top: -20, end: 20),
                           badgeStyle: bd.BadgeStyle(
@@ -312,31 +302,34 @@ class _TicketEditorState extends State<TicketEditor> {
                               itemCount: selectedRoutes.length,
                               itemBuilder: (_, index) {
                                 var r = selectedRoutes[index];
-                                return Card(
-                                  elevation: 8,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          height: 20,
-                                          width: 20,
-                                          color: getColor(r.color!),
-                                          child: Center(
-                                            child: Text(
-                                              '${index + 1}',
-                                              style: myTextStyle(
-                                                  color: Colors.white),
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4),
+                                  child: Card(
+                                    elevation: 4,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            height: 20,
+                                            width: 20,
+                                            color: getColor(r.color!),
+                                            child: Center(
+                                              child: Text(
+                                                '${index + 1}',
+                                                style: myTextStyle(
+                                                    color: Colors.white),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        gapW32,
-                                        Text(
-                                          '${r.name}',
-                                          style: myTextStyle(
-                                              weight: FontWeight.w900),
-                                        ),
-                                      ],
+                                          gapW32,
+                                          Text(
+                                            '${r.name}',
+                                            style: myTextStyle(
+                                                weight: FontWeight.w900),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 );
@@ -346,14 +339,14 @@ class _TicketEditorState extends State<TicketEditor> {
                 selectedRoutes.isEmpty
                     ? gapW32
                     : SizedBox(
-                        height: 600,
+                        height: 320,
                         width: 400,
                         child: Center(
                           child: Form(
                             key: key,
                             child: Column(
                               children: [
-                                gapH32,
+                                gapH16,
                                 ticketType == 'One Trip'
                                     ? gapH4
                                     : TextFormField(
@@ -371,7 +364,7 @@ class _TicketEditorState extends State<TicketEditor> {
                                               weight: FontWeight.w900),
                                         ),
                                       ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: valueController,
                                   keyboardType: TextInputType.numberWithOptions(
@@ -392,7 +385,7 @@ class _TicketEditorState extends State<TicketEditor> {
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 ElevatedButton(
                                     onPressed: () {
                                       _onSubmit();

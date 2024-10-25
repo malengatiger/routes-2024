@@ -265,7 +265,7 @@ class VehiclesEditState extends State<VehiclesEdit>
               _showEditor
                   ? Center(
                       child: SizedBox(
-                        width: 500,
+                        width: 400,
                         child: Form(
                             key: _formKey,
                             child: Column(
@@ -292,9 +292,9 @@ class VehiclesEditState extends State<VehiclesEdit>
                                       },
                                       child: Text('Get File')),
                                 ),
-                                gapH32,
+                                gapH16,
                                 csvFile == null
-                                    ? gapH32
+                                    ? gapH16
                                     : SizedBox(
                                         width: 400,
                                         child: ElevatedButton(
@@ -324,9 +324,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                       ),
                                 csvFile == null
                                     ? gapH8
-                                    : SizedBox(
-                                        height: 64,
-                                      ),
+                                    : gapH32,
                                 TextFormField(
                                   controller: registrationController,
                                   keyboardType: TextInputType.name,
@@ -344,7 +342,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: makeController,
                                   keyboardType: TextInputType.name,
@@ -360,7 +358,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: modelController,
                                   keyboardType: TextInputType.name,
@@ -376,7 +374,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: yearController,
                                   keyboardType: TextInputType.emailAddress,
@@ -392,7 +390,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: capacityController,
                                   keyboardType: TextInputType.phone,
@@ -408,7 +406,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     return null;
                                   },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: ownerNameController,
                                   keyboardType: TextInputType.name,
@@ -424,7 +422,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                   //   return null;
                                   // },
                                 ),
-                                gapH32,
+                                gapH16,
                                 TextFormField(
                                   controller: cellphoneController,
                                   keyboardType: TextInputType.phone,
@@ -433,15 +431,8 @@ class VehiclesEditState extends State<VehiclesEdit>
                                     hintText: 'Enter Owner Cellphone',
                                     border: OutlineInputBorder(),
                                   ),
-                                  // validator: (value) {
-                                  //   if (value == null || value.isEmpty) {
-                                  //     return 'Please enter Owner Cellphone';
-                                  //   }
-                                  //   return null;
-                                  // },
                                 ),
-                                gapH8,
-                                gapH32,
+                                gapH16,
                                 busy
                                     ? SizedBox(
                                         width: 24,
@@ -457,6 +448,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                             style: ButtonStyle(
                                               elevation:
                                                   WidgetStatePropertyAll(8),
+                                              backgroundColor: WidgetStatePropertyAll(Theme.of(context).primaryColor),
                                             ),
                                             onPressed: () {
                                               _onSubmit();
@@ -466,8 +458,8 @@ class VehiclesEditState extends State<VehiclesEdit>
                                                 child: Text(
                                                   'Submit',
                                                   style:
-                                                      myTextStyleMediumLargeWithSize(
-                                                          context, 20),
+                                                      myTextStyle(
+                                                          fontSize: 20, color: Colors.white),
                                                 ))),
                                       ): gapH32,
                                 result == null
@@ -482,8 +474,8 @@ class VehiclesEditState extends State<VehiclesEdit>
                             )),
                       ),
                     )
-                  : gapH32,
-              gapH32,
+                  : gapH16,
+              gapH16,
               _showEditor ? gapH4 : gapH32,
               Expanded(
                   child: VehicleListWidget(
