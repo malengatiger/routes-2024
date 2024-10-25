@@ -6,11 +6,14 @@ import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/data/ticket.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/widgets/scanners/gen_code.dart';
+import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:routes_2024/ui/association/ticket_maker.dart';
 import 'package:badges/badges.dart' as bd;
+import 'package:uuid/uuid.dart';
+import 'package:uuid/v4.dart';
 
 class TicketEditor extends StatefulWidget {
   const TicketEditor(
@@ -170,6 +173,7 @@ class _TicketEditorState extends State<TicketEditor> {
 
     try {
       _currentTicket = Ticket(
+          ticketId: Uuid().v4(),
           associationId: widget.association.associationId!,
           userId: user!.userId,
           associationName: widget.association.associationName!,
@@ -178,6 +182,9 @@ class _TicketEditorState extends State<TicketEditor> {
           ticketRoutes: ticketRoutes,
           ticketType: mType);
 
+      setState(() {
+        busy = true;
+      });
       var bytes = await generateQrCode(_currentTicket!.toJson());
       var qrCodeUrl = await dataApi.uploadQRCodeFile(
           imageBytes: bytes, associationId: widget.association.associationId!);
@@ -222,15 +229,15 @@ class _TicketEditorState extends State<TicketEditor> {
             child: Column(
               children: [
                 Text(
-                  'Ticket Creator',
-                  style: myTextStyle(weight: FontWeight.w900, fontSize: 20),
+                  'Taxi Ticket Creator',
+                  style: myTextStyle(weight: FontWeight.w900, fontSize: 28),
                 ),
                 gapH32,
                 _getTicketTypeDropDown(),
                 gapH32,
                 Text(
                   ticketType,
-                  style: myTextStyle(weight: FontWeight.w900, fontSize: 24),
+                  style: myTextStyle(weight: FontWeight.w900, fontSize: 32),
                 ),
                 gapH32,
                 Row(
@@ -264,17 +271,28 @@ class _TicketEditorState extends State<TicketEditor> {
                   ],
                 ),
                 gapH32,
-                QrImageView(
-                  data: data,
-                  size: 360,
-                  padding: EdgeInsets.all(16.0),
-                ),
+                busy
+                    ? TimerWidget(
+                        title: 'Creating ticket ...', isSmallSize: true)
+                    : Card(
+                        elevation: 8,
+                        color: Colors.blue.shade50,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: QrImageView(
+                            data: data,
+                            size: 360,
+                            padding: EdgeInsets.all(16.0),
+                          ),
+                        ),
+                      ),
                 gapH32,
                 selectedRoutes.isEmpty
                     ? Center(
                         child: Text(
                           'No selected routes yet',
-                          style: myTextStyle(fontSize: 24, weight: FontWeight.w900),
+                          style: myTextStyle(
+                              fontSize: 24, weight: FontWeight.w900),
                         ),
                       )
                     : Expanded(
@@ -307,16 +325,16 @@ class _TicketEditorState extends State<TicketEditor> {
                                           child: Center(
                                             child: Text(
                                               '${index + 1}',
-                                              style:
-                                                  myTextStyle(color: Colors.white),
+                                              style: myTextStyle(
+                                                  color: Colors.white),
                                             ),
                                           ),
                                         ),
                                         gapW32,
                                         Text(
                                           '${r.name}',
-                                          style:
-                                              myTextStyle(weight: FontWeight.w900),
+                                          style: myTextStyle(
+                                              weight: FontWeight.w900),
                                         ),
                                       ],
                                     ),
@@ -344,7 +362,8 @@ class _TicketEditorState extends State<TicketEditor> {
                                             TextInputType.numberWithOptions(
                                                 signed: false, decimal: true),
                                         style: myTextStyle(
-                                            fontSize: 28, weight: FontWeight.w900),
+                                            fontSize: 28,
+                                            weight: FontWeight.w900),
                                         decoration: InputDecoration(
                                           label: Text('Number of Trips'),
                                           labelStyle: myTextStyle(
@@ -381,7 +400,8 @@ class _TicketEditorState extends State<TicketEditor> {
                                     child: Text(
                                       'Submit New Ticket',
                                       style: myTextStyle(
-                                          weight: FontWeight.w900, fontSize: 20),
+                                          weight: FontWeight.w900,
+                                          fontSize: 20),
                                     )),
                               ],
                             ),

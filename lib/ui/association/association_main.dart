@@ -6,6 +6,7 @@ import 'package:kasie_transie_library/widgets/scanners/qrcode_generator.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/association_edit.dart';
+import 'package:routes_2024/ui/association/example_file_widget.dart';
 import 'package:routes_2024/ui/association/routes_edit.dart';
 import 'package:routes_2024/ui/association/ticket_maker.dart';
 import 'package:routes_2024/ui/association/users_edit.dart';
@@ -77,20 +78,21 @@ class AssociationMainState extends State<AssociationMain>
       case 3:
         _navigateToRoutes();
         break;
-      case 4:
-        currentWidget = RoutesEdit();
-        break;
-      case 5:
 
+      case 4:
         NavigationUtils.navigateTo(
             context: context,
             widget: TicketMaker(association: widget.association!),
             transitionType: PageTransitionType.leftToRight);
         break;
 
+      case 5:
+        currentWidget = ExampleFileWidget();
+        break;
+
       default:
         currentWidget = Container(
-          color: Colors.red,
+          color: Colors.indigo,
           child: Center(
             child: Text('WTF?'),
           ),
@@ -250,6 +252,7 @@ class KasieNavigation extends StatelessWidget {
               title: Text('Routes'),
             ),
           ),
+
           gapH32,
           GestureDetector(
             onTap: () {
@@ -257,12 +260,14 @@ class KasieNavigation extends StatelessWidget {
             },
             child: ListTile(
               leading: Icon(
-                Icons.folder_copy_rounded,
-                size: 48,
+                Icons.airplane_ticket,
+                size: 48, color: Theme.of(context).primaryColor,
               ),
-              title: Text('Example upload Files'),
+              title: Text('Ticket Maker'),
             ),
           ),
+          gapH32,
+          gapH32,
           gapH32,
           GestureDetector(
             onTap: () {
@@ -270,10 +275,10 @@ class KasieNavigation extends StatelessWidget {
             },
             child: ListTile(
               leading: Icon(
-                Icons.airplane_ticket,
+                Icons.folder_copy_rounded,
                 size: 48,
               ),
-              title: Text('Ticket Maker'),
+              title: Text('Example upload Files'),
             ),
           ),
           gapH32,

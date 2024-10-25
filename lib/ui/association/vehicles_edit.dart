@@ -12,6 +12,7 @@ import 'package:badges/badges.dart' as bd;
 import 'package:kasie_transie_library/widgets/scanners/gen_code.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:routes_2024/ui/association/vehicle_list_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class VehiclesEdit extends StatefulWidget {
   const VehiclesEdit({super.key, required this.association});
@@ -113,7 +114,7 @@ class VehiclesEditState extends State<VehiclesEdit>
       vehicle!.year = yearController.text;
     } else {
       vehicle = Vehicle(
-          vehicleId: '${DateTime.now().millisecondsSinceEpoch}',
+          vehicleId: Uuid().v4(),
           associationId: widget.association.associationId!,
           associationName: widget.association.associationName,
           vehicleReg: registrationController.text,
@@ -152,10 +153,6 @@ class VehiclesEditState extends State<VehiclesEdit>
   }
 
   PlatformFile? csvFile, vehiclePictureFile;
-
-
-// ... other imports ...
-
   String? csvString;
   void _pickVehicleFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -189,6 +186,7 @@ class VehiclesEditState extends State<VehiclesEdit>
     pp('\n\n$mm ..... send the Vehicle File to upload ...');
     setState(() {
       _showSubmit = false;
+      busy = true;
     });
     addCarsResponse = AddCarsResponse([], []);
     try {

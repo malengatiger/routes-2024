@@ -103,6 +103,7 @@ class TicketMakerState extends State<TicketMaker>
                             child: AssociationTicketList(
                                 tickets: tickets,
                                 onTicket: (t) {
+                                  pp('$mm ticket selected: ${t.value}');
                                   setState(() {
                                     selectedTicket = t;
                                   });
@@ -194,6 +195,7 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
                           children: [
                             Card(
                               elevation: 8,
+                              color: Colors.yellow.shade100,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Image.network(
@@ -208,10 +210,17 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
                                 GestureDetector(
                                   onTap: () {
                                     pp(' routes tapped, should show list ');
-                                    setState(() {
-                                      _showTicketRoutes = true;
-                                      _showTicketRoutesIndex = index;
-                                    });
+                                    if (_showTicketRoutesIndex == index) {
+                                      setState(() {
+                                        _showTicketRoutes = false;
+                                        _showTicketRoutesIndex = null;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        _showTicketRoutes = true;
+                                        _showTicketRoutesIndex = index;
+                                      });
+                                    }
                                   },
                                   child: Card(
                                     elevation: 8,
@@ -268,7 +277,7 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
                                             return Row(
                                               children: [
                                                 SizedBox(
-                                                  width: 16,
+                                                  width: 24,
                                                   child: Text(
                                                     '${index + 1}',
                                                     style: myTextStyle(
@@ -277,9 +286,11 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
                                                   ),
                                                 ),
                                                 gapW32,
-                                                Text(
-                                                  '${tr.routeName}',
-                                                  style: myTextStyle(fontSize: 12),
+                                                Flexible(
+                                                  child: Text(
+                                                    '${tr.routeName}',
+                                                    style: myTextStyle(fontSize: 12),
+                                                  ),
                                                 ),
                                               ],
                                             );
@@ -300,10 +311,10 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
 
   double _getHeight(Ticket ticket) {
     if (ticket.ticketRoutes!.length < 5.0) {
-      return ticket.ticketRoutes!.length * 48.0;
+      return ticket.ticketRoutes!.length * 64.0;
     }
     if (ticket.ticketRoutes!.length < 15.0) {
-      return ticket.ticketRoutes!.length * 40;
+      return ticket.ticketRoutes!.length * 48;
     }
     return ticket.ticketRoutes!.length * 28;
   }

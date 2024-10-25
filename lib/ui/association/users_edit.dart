@@ -302,6 +302,7 @@ class UsersEditState extends State<UsersEdit>
               imageBytes: bytes,
               associationId: widget.association.associationId!);
           user.qrCodeUrl = url;
+          user.password = 'pass${DateTime.now().millisecondsSinceEpoch}_${random.toString()}';
           var res = await dataApiDog.addUser(user);
           addUsersResponse.users.add(res);
         } catch (e, s) {

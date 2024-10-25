@@ -172,7 +172,7 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
       children: [
         GridView.builder(
             gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 6),
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5),
             itemCount: widget.vehicles.length,
             itemBuilder: (_, index) {
               var car = widget.vehicles[index];
@@ -349,11 +349,11 @@ class VehicleProfilePicture extends StatelessWidget {
       );
     }
     return SizedBox(
-        width: 72,
-        height: 72,
+        width: 60,
+        height: 60,
         child: CircleAvatar(
           backgroundImage: NetworkImage(car.photos!.first.url!),
-          radius: 72,
+          radius: 60,
         ));
   }
 }
