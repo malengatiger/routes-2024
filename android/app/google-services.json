@@ -31,10 +31,46 @@
               "client_type": 3
             },
             {
-              "client_id": "854189510560-5gs4ds1u1e4ej73m3ss1uack8hsegkcd.apps.googleusercontent.com",
+              "client_id": "854189510560-1p65sk1d1fgd0cg7nu15g9dhj81har7p.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.boha.routes2024"
+                "bundle_id": "com.boha.ambassadorApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854189510560:android:21d79e2127f0904d36dec5",
+        "android_client_info": {
+          "package_name": "com.kasie_transie_marshal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854189510560-fdgdcjt8474qt48co33v0i333vkslilp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3finIgPi481q3-GaEDjOLcoPbs664gTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "854189510560-fdgdcjt8474qt48co33v0i333vkslilp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "854189510560-1p65sk1d1fgd0cg7nu15g9dhj81har7p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.boha.ambassadorApp"
               }
             }
           ]

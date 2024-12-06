@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/data/example_file.dart';
-import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
-import 'package:kasie_transie_library/widgets/scanners/gen_code.dart';
+import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:http/http.dart' as http;
 import 'package:universal_html/html.dart' as html;
 import 'package:path_provider/path_provider.dart';

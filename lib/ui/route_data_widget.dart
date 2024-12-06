@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
@@ -10,7 +8,6 @@ import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/color_and_locale.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/data/data_schemas.dart';
-import 'package:kasie_transie_library/data/route_bag.dart';
 import 'package:kasie_transie_library/data/route_data.dart';
 import 'package:kasie_transie_library/l10n/translation_handler.dart';
 import 'package:kasie_transie_library/maps/city_creator_map.dart';
@@ -37,16 +34,16 @@ import 'package:routes_2024/ui/route_editor.dart';
 import 'assoc_routes.dart';
 import 'route_list.dart';
 
-class RouteDataWidget extends ConsumerStatefulWidget {
-  const RouteDataWidget(this.association, {super.key});
+class RouteDataWidget extends StatefulWidget {
+  const RouteDataWidget({super.key, required this.association});
 
   final Association association;
 
   @override
-  ConsumerState createState() => RouteDataState();
+  State createState() => RouteDataState();
 }
 
-class RouteDataState extends ConsumerState<RouteDataWidget>
+class RouteDataState extends State<RouteDataWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   static const mm = '😡😡😡😡 RouteDataWidget: 💪 ';
@@ -128,7 +125,7 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
 
   void _control() async {
     user = prefs.getUser();
-    _getData();
+    _getData(false);
   }
 
   void _listen() async {
@@ -146,7 +143,7 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
 
   void _handleRouteRefresh(lib.Route route) async {
     pp('$mm This route was updated somewhere: ${route.name}');
-    _getData();
+    _getData(true);
   }
 
   void _noteRouteUpdate(lib.RouteUpdateRequest request) async {
@@ -161,7 +158,7 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
 
   int routeCitiesTotal = 0;
 
-  Future _getData() async {
+  Future _getData(bool refresh) async {
     pp('\n\n$mm ................... get data for routeBuilder dashboard ...');
     user = prefs.getUser();
     if (user == null) {
@@ -172,7 +169,7 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
     });
     try {
       AssociationRouteData? routeData = await listApiDog
-            .getAssociationRouteData(widget.association.associationId!);
+            .getAssociationRouteData(widget.association.associationId!, refresh);
       _populate(routeData!);
     } catch (e, stack) {
       pp('$mm ERROR getting route data $e : $stack');
@@ -404,14 +401,10 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
   }
 
   void _navigateToCityCreator() {
-    NavigationUtils.navigateTo(
-        context: context,
-        widget: CityCreatorMap(
-          onCityAdded: (c) {
-            pp('$mm ... city added: ${c.name}');
-          },
-        ),
-        transitionType: PageTransitionType.leftToRight);
+    NavigationUtils.navigateTo(context: context, widget: CityCreatorMap(onCityAdded: (c){
+      pp('$mm ... city added: ${c.name}');
+
+    }), transitionType: PageTransitionType.leftToRight);
   }
 
   _onCreateNewRoute() async {
@@ -420,7 +413,7 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
         widget: RouteEditor(
           association: widget.association,
           onRouteAdded: (r) {
-            _getData();
+            _getData(true);
           },
         ),
         transitionType: PageTransitionType.leftToRight);
@@ -429,11 +422,9 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
   @override
   Widget build(BuildContext context) {
     final type = getThisDeviceType();
-    var padding = 16.0;
     var fontSize = 20.0;
     var centerTitle = true;
     if (type == 'phone') {
-      padding = 12.0;
       fontSize = 24;
       centerTitle = false;
     }
@@ -467,7 +458,7 @@ class RouteDataState extends ConsumerState<RouteDataWidget>
                 )),
             IconButton(
                 onPressed: () {
-                  _getData();
+                  _getData(true);
                 },
                 tooltip: 'Refresh the association route data',
                 icon: Icon(

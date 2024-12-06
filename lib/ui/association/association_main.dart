@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
-import 'package:kasie_transie_library/widgets/scanners/qrcode_generator.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/association_edit.dart';
@@ -13,7 +12,6 @@ import 'package:routes_2024/ui/association/users_edit.dart';
 import 'package:routes_2024/ui/association/vehicles_edit.dart';
 
 import '../route_data_widget.dart';
-import '../route_list.dart';
 
 class AssociationMain extends StatefulWidget {
   const AssociationMain({super.key, this.association});
@@ -76,7 +74,9 @@ class AssociationMainState extends State<AssociationMain>
         currentWidget = RoutesEdit();
         break;
       case 3:
-        _navigateToRoutes();
+        if (widget.association != null) {
+          _navigateToRoutes(widget.association!);
+        }
         break;
 
       case 4:
@@ -102,10 +102,10 @@ class AssociationMainState extends State<AssociationMain>
     setState(() {});
   }
 
-  _navigateToRoutes() async {
+  _navigateToRoutes(Association ass) async {
     NavigationUtils.navigateTo(
         context: context,
-        widget: RouteDataWidget(widget.association!),
+        widget: RouteDataWidget(association: ass,),
         transitionType: PageTransitionType.leftToRight);
   }
 
@@ -138,13 +138,13 @@ class AssociationMainState extends State<AssociationMain>
                 return Row(
                   children: [
                     SizedBox(
-                      width: (width / 2) - 460,
+                      width: (width * 0.3),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Card(
                           elevation: 8,
                           child: KasieNavigation(
-                              width: (width / 2) - 160,
+                              width: (width * .3),
                               onTapped: (index) {
                                 pp('$mm nav drawer header tapped: $index');
                                 this.index = index;
@@ -153,13 +153,14 @@ class AssociationMainState extends State<AssociationMain>
                         ),
                       ),
                     ),
+                    gapW32,
                     SizedBox(
-                      width: (width / 2) + 400,
+                      width: (width * 0.65),
                       child: currentWidget == null
                           ? Container(color: Colors.teal)
                           : Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Card(elevation: 8, child: currentWidget!),
+                              padding: const EdgeInsets.all(12.0),
+                              child: currentWidget!,
                             ),
                     ),
                   ],
@@ -200,85 +201,99 @@ class KasieNavigation extends StatelessWidget {
           gapH32,
           gapH32,
           GestureDetector(
-            onTap: () {
-              onTapped(0);
-            },
-            child: ListTile(
-              leading: Icon(Icons.people,
-                  size: 36, color: Theme.of(context).primaryColor),
-              title: Text('Staff', style: myTextStyle(weight: FontWeight.w900, fontSize: 18)),
-            ),
-          ),
+              onTap: () {
+                onTapped(0);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.people,
+                    size: 36,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  gapW32,
+                  Text(
+                    'Manage Staff',
+                    style: myTextStyleMediumLarge(context, 18),
+                  ),
+                ],
+              )),
           gapH32,
           GestureDetector(
-            onTap: () {
-              onTapped(1);
-            },
-            child: ListTile(
-              leading: Icon(
-                Icons.car_crash_rounded,
-                size: 36,
-                color: Theme.of(context).primaryColor,
-              ),
-              title: Text('Vehicles', style: myTextStyle(weight: FontWeight.w900, fontSize: 18),),
-            ),
-          ),
-          // gapH32,
-          // GestureDetector(
-          //   onTap: () {
-          //     onTapped(2);
-          //   },
-          //   child: ListTile(
-          //     leading: Icon(
-          //       Icons.airplane_ticket,
-          //       size: 36,
-          //       color: Theme.of(context).primaryColor,
-          //     ),
-          //     title: Text('Commuter Tickets', style: myTextStyle(weight: FontWeight.w900, fontSize: 18)),
-          //   ),
-          // ),
+              onTap: () {
+                onTapped(1);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.car_crash_rounded,
+                    size: 36,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  gapW32,
+                  Text(
+                    'Manage Vehicles',
+                    style: myTextStyleMediumLarge(context, 18),
+                  ),
+                ],
+              )),
           gapH32,
           GestureDetector(
-            onTap: () {
-              onTapped(3);
-            },
-            child: ListTile(
-              leading: Icon(
-                Icons.roundabout_right,
-                size: 36,
-                color: Theme.of(context).primaryColor,
-              ),
-              title: Text('Routes', style: myTextStyle(weight: FontWeight.w900, fontSize: 18)),
-            ),
-          ),
-
+              onTap: () {
+                onTapped(3);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.roundabout_right,
+                    size: 36,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  gapW32,
+                  Text(
+                    'Manage Routes',
+                    style: myTextStyleMediumLarge(context, 18),
+                  ),
+                ],
+              )),
           gapH32,
           GestureDetector(
-            onTap: () {
-              onTapped(4);
-            },
-            child: ListTile(
-              leading: Icon(
-                Icons.airplane_ticket,
-                size: 36, color: Theme.of(context).primaryColor,
-              ),
-              title: Text('Ticket Maker', style: myTextStyle(weight: FontWeight.w900, fontSize: 18)),
-            ),
-          ),
+              onTap: () {
+                onTapped(4);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.airplane_ticket,
+                    size: 36,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  gapW32,
+                  Text(
+                    'Ticket Maker',
+                    style: myTextStyleMediumLarge(context, 18),
+                  ),
+                ],
+              )),
           gapH32,
           gapH32,
           GestureDetector(
-            onTap: () {
-              onTapped(5);
-            },
-            child: ListTile(
-              leading: Icon(
-                Icons.folder_copy_rounded,
-                size: 36,
-              ),
-              title: Text('Example upload Files'),
-            ),
-          ),
+              onTap: () {
+                onTapped(5);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.folder_copy_rounded,
+                    size: 24,
+                  ),
+                  gapW32,
+                  Text(
+                    'Example Files',
+                    style: myTextStyleMediumLarge(context, 14),
+                  ),
+                ],
+              )),
           gapH32,
         ],
       ),

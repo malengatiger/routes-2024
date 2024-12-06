@@ -1,19 +1,18 @@
 import 'dart:convert';
-
+import 'dart:typed_data' as typed;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:kasie_transie_library/bloc/cloud_storage_bloc.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/data/ticket.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-import 'package:kasie_transie_library/widgets/scanners/gen_code.dart';
-import 'package:kasie_transie_library/widgets/timer_widget.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/utils/functions.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/ticket_maker.dart';
 import 'package:badges/badges.dart' as bd;
 import 'package:uuid/uuid.dart';
-import 'package:uuid/v4.dart';
 
 class TicketEditor extends StatefulWidget {
   const TicketEditor(
@@ -35,10 +34,12 @@ class _TicketEditorState extends State<TicketEditor> {
   TextEditingController tripsController = TextEditingController();
   lib.Route? route;
   List<lib.Route> selectedRoutes = [];
+  QRGenerationService qrGeneration = GetIt.instance<QRGenerationService>();
 
   String ticketType = '';
   String data = 'Heita daar!';
   bool busy = false;
+  bool isValidOnAllRoutes = false;
   DataApiDog dataApi = GetIt.instance<DataApiDog>();
 
   void _updateData() {
@@ -86,16 +87,18 @@ class _TicketEditorState extends State<TicketEditor> {
 
   Ticket? _currentTicket;
   Prefs prefs = GetIt.instance<Prefs>();
-
+  int maxRoutes = 12;
   _onSubmit() async {
     pp('$mm ... submit ticket');
     if (!key.currentState!.validate()) {
       return;
     }
-    if (selectedRoutes.isEmpty) {
+    if (selectedRoutes.isEmpty && !isValidOnAllRoutes) {
       showErrorToast(
-          message: 'Please add one or more routes to the ticket',
+          message:
+              'Please add one or more routes to the ticket or make the ticket valid on all routes',
           context: context);
+      return;
     }
     var user = prefs.getUser();
     List<TicketRoute> ticketRoutes = [];
@@ -164,13 +167,17 @@ class _TicketEditorState extends State<TicketEditor> {
         }
       }
     }
-    for (var r in selectedRoutes) {
-      ticketRoutes.add(TicketRoute(
-          routeName: r.name,
-          startCityName: r.routeStartEnd!.startCityName,
-          endCityName: r.routeStartEnd!.endCityName));
+    if (isValidOnAllRoutes) {
+      pp('$mm Ticket is valid on all routes');
+    } else {
+      for (var r in selectedRoutes) {
+        ticketRoutes.add(TicketRoute(
+            routeId: r.routeId,
+            routeName: r.name,
+            startCityName: r.routeStartEnd!.startCityName,
+            endCityName: r.routeStartEnd!.endCityName));
+      }
     }
-
     try {
       _currentTicket = Ticket(
           ticketId: Uuid().v4(),
@@ -180,18 +187,25 @@ class _TicketEditorState extends State<TicketEditor> {
           value: double.parse(valueController.text),
           numberOfTrips: numberOfTrips,
           ticketRoutes: ticketRoutes,
+          created: DateTime.now().toUtc().toIso8601String(),
+          validOnAllRoutes: isValidOnAllRoutes,
           ticketType: mType);
 
       setState(() {
         busy = true;
       });
-      var bytes = await generateQrCode(_currentTicket!.toJson());
-      var qrCodeUrl = await dataApi.uploadQRCodeFile(
-          imageBytes: bytes, associationId: widget.association.associationId!);
-
-      _currentTicket!.qrCodeUrl = qrCodeUrl;
+      var qrBucket = await qrGeneration.generateAndUploadQrCodeWithLogo(
+          data: _currentTicket!.toJson(),
+          associationId: widget.association.associationId!);
+      _currentTicket!.bucketFileName = qrBucket!.bucketFileName;
+      _currentTicket!.qrCodeBytes = qrBucket.qrCodeBytes;
       _currentTicket = await dataApi.addTicket(_currentTicket!);
-      var msg = 'Ticket added OK and valid for ${ticketRoutes.length} routes';
+      var msg = 'Ticket added OK and valid for ';
+      if (isValidOnAllRoutes) {
+        msg = '$msg all routes';
+      } else {
+        msg = '$msg ${ticketRoutes.length} routes';
+      }
       pp('$mm $msg');
       if (mounted) {
         showOKToast(message: msg, context: context);
@@ -208,204 +222,249 @@ class _TicketEditorState extends State<TicketEditor> {
       busy = false;
     });
   }
+  CloudStorageBloc csb = GetIt.instance<CloudStorageBloc>();
+  List<typed.Uint8List> images = [];
 
-  _pickAllRoutes() {
-    for (var r in widget.routes) {
-      selectedRoutes.add(r);
-    }
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
-    return Card(
-      elevation: 8,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SizedBox(
-          width: (width/2),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                Text(
-                  'Taxi Ticket Creator',
-                  style: myTextStyle(weight: FontWeight.w900, fontSize: 28),
-                ),
-                gapH16,
-                _getTicketTypeDropDown(),
-                gapH16,
-                Text(
-                  ticketType,
-                  style: myTextStyle(weight: FontWeight.w900, fontSize: 32),
-                ),
-                gapH16,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    widget.routes.length < 20
-                        ? TextButton(
-                            onPressed: () {
-                              _pickAllRoutes();
-                            },
-                            child: Text('Pick all routes'))
-                        : gapW32,
-                    AssociationRouteList(
-                        routes: widget.routes,
-                        onRoute: (r) {
-                          if (selectedRoutes.contains(r)) {
-                            selectedRoutes.remove(r);
-                            setState(() {
-                              route = null;
-                            });
-                          } else {
-                            selectedRoutes.add(r);
-                            setState(() {
-                              route = r;
-                            });
-                          }
-                          _updateData();
-                        },
-                        height: 600,
-                        isDropDown: true),
-                  ],
-                ),
-                gapH16,
-                busy
-                    ? TimerWidget(
-                        title: 'Creating ticket ...', isSmallSize: true)
-                    : gapW32,
-                gapH16,
-                selectedRoutes.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No selected routes yet',
+    return Stack(
+      children: [
+        ScreenTypeLayout.builder(
+          mobile: (ctx) {
+            return Container(
+              color: Colors.yellow,
+            );
+          },
+          tablet: (ctx) {
+            return Card(
+              elevation: 8,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SizedBox(
+                  width: (width / 2),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Taxi Ticket Creator',
                           style: myTextStyle(
-                              fontSize: 24, weight: FontWeight.w900),
+                              weight: FontWeight.w900, fontSize: 20),
                         ),
-                      )
-                    : Expanded(
-                        child: SizedBox(
-                        width: (width/2),
-                        child: bd.Badge(
-                          position: bd.BadgePosition.topEnd(top: -20, end: 20),
-                          badgeStyle: bd.BadgeStyle(
-                            padding: EdgeInsets.all(12),
-                            elevation: 16.0,
-                          ),
-                          badgeContent: Text(
-                            '${selectedRoutes.length}',
-                            style: myTextStyle(color: Colors.white),
-                          ),
-                          child: ListView.builder(
-                              itemCount: selectedRoutes.length,
-                              itemBuilder: (_, index) {
-                                var r = selectedRoutes[index];
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4),
-                                  child: Card(
-                                    elevation: 4,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            height: 20,
-                                            width: 20,
-                                            color: getColor(r.color!),
-                                            child: Center(
-                                              child: Text(
-                                                '${index + 1}',
-                                                style: myTextStyle(
-                                                    color: Colors.white),
+                        gapH16,
+                        _getTicketTypeDropDown(),
+                        gapH16,
+                        Text(
+                          ticketType,
+                          style: myTextStyle(
+                              weight: FontWeight.w900, fontSize: 28),
+                        ),
+                        gapH16,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Ticket is valid on all routes'),
+                            gapW32,
+                            Switch(
+                                value: isValidOnAllRoutes,
+                                onChanged: (w) {
+                                  setState(() {
+                                    isValidOnAllRoutes = w;
+                                    selectedRoutes.clear();
+                                  });
+                                }),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            isValidOnAllRoutes
+                                ? gapW32
+                                : AssociationRouteList(
+                                    routes: widget.routes,
+                                    onRoute: (r) {
+                                      if (selectedRoutes.contains(r)) {
+                                        selectedRoutes.remove(r);
+                                        setState(() {
+                                          route = null;
+                                        });
+                                        _updateData();
+                                        return;
+                                      }
+                                      if (selectedRoutes.length < maxRoutes) {
+                                        selectedRoutes.insert(0, r);
+                                        setState(() {
+                                          route = r;
+                                        });
+                                        _updateData();
+                                      } else {
+                                        showErrorToast(
+                                            message:
+                                                'Route limit of $maxRoutes has been reached.\n A QR code cannot be created with more routes}',
+                                            context: context);
+                                      }
+                                    },
+                                    height: 600,
+                                    isDropDown: true),
+                          ],
+                        ),
+                        gapH16,
+                        gapH16,
+                        selectedRoutes.isEmpty
+                            ? Center(
+                                child: Text(
+                                  isValidOnAllRoutes
+                                      ? 'Ticket is valid on all routes'
+                                      : 'No selected routes yet',
+                                  style: myTextStyle(
+                                      fontSize: 24, weight: FontWeight.w900),
+                                ),
+                              )
+                            : Expanded(
+                                child: SizedBox(
+                                width: (width / 2),
+                                child: bd.Badge(
+                                  position: bd.BadgePosition.topEnd(
+                                      top: -20, end: 20),
+                                  badgeStyle: bd.BadgeStyle(
+                                    padding: EdgeInsets.all(12),
+                                    elevation: 16.0,
+                                  ),
+                                  badgeContent: Text(
+                                    '${selectedRoutes.length}',
+                                    style: myTextStyle(color: Colors.white),
+                                  ),
+                                  child: ListView.builder(
+                                      itemCount: selectedRoutes.length,
+                                      itemBuilder: (_, index) {
+                                        var r = selectedRoutes[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0, vertical: 4),
+                                          child: Card(
+                                            elevation: 4,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(12.0),
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    height: 20,
+                                                    width: 20,
+                                                    color: getColor(r.color!),
+                                                    child: Center(
+                                                      child: Text(
+                                                        '${index + 1}',
+                                                        style: myTextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  gapW32,
+                                                  Text(
+                                                    '${r.name}',
+                                                    style: myTextStyle(
+                                                        weight:
+                                                            FontWeight.w900),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
-                                          gapW32,
-                                          Text(
-                                            '${r.name}',
-                                            style: myTextStyle(
+                                        );
+                                      }),
+                                ),
+                              )),
+                        SizedBox(
+                          height: 320,
+                          width: 400,
+                          child: Center(
+                            child: Form(
+                              key: key,
+                              child: Column(
+                                children: [
+                                  gapH32,
+                                  ticketType == 'One Trip'
+                                      ? gapH4
+                                      : TextFormField(
+                                          controller: tripsController,
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  signed: false, decimal: true),
+                                          style: myTextStyle(
+                                              fontSize: 28,
+                                              weight: FontWeight.w900),
+                                          decoration: InputDecoration(
+                                            label: Text('Number of Trips'),
+                                            labelStyle: myTextStyle(
+                                                fontSize: 18,
                                                 weight: FontWeight.w900),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                        ),
-                      )),
-                selectedRoutes.isEmpty
-                    ? gapW32
-                    : SizedBox(
-                        height: 320,
-                        width: 400,
-                        child: Center(
-                          child: Form(
-                            key: key,
-                            child: Column(
-                              children: [
-                                gapH16,
-                                ticketType == 'One Trip'
-                                    ? gapH4
-                                    : TextFormField(
-                                        controller: tripsController,
-                                        keyboardType:
-                                            TextInputType.numberWithOptions(
-                                                signed: false, decimal: true),
-                                        style: myTextStyle(
-                                            fontSize: 28,
-                                            weight: FontWeight.w900),
-                                        decoration: InputDecoration(
-                                          label: Text('Number of Trips'),
-                                          labelStyle: myTextStyle(
-                                              fontSize: 18,
-                                              weight: FontWeight.w900),
                                         ),
-                                      ),
-                                gapH16,
-                                TextFormField(
-                                  controller: valueController,
-                                  keyboardType: TextInputType.numberWithOptions(
-                                      signed: false, decimal: true),
-                                  style: myTextStyle(
-                                      fontSize: 36,
-                                      weight: FontWeight.w900,
-                                      color: Colors.green),
-                                  decoration: InputDecoration(
-                                    label: Text('Ticket Value'),
-                                    labelStyle: myTextStyle(
-                                        fontSize: 18, weight: FontWeight.w900),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value!.isEmpty) {
-                                      return 'Please enter value of ticket';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                gapH16,
-                                ElevatedButton(
-                                    onPressed: () {
-                                      _onSubmit();
+                                  gapH16,
+                                  TextFormField(
+                                    controller: valueController,
+                                    keyboardType:
+                                        TextInputType.numberWithOptions(
+                                            signed: false, decimal: true),
+                                    style: myTextStyle(
+                                        fontSize: 36,
+                                        weight: FontWeight.w900,
+                                        color: Colors.green),
+                                    decoration: InputDecoration(
+                                      label: Text('Ticket Value'),
+                                      labelStyle: myTextStyle(
+                                          fontSize: 18,
+                                          weight: FontWeight.w900),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter value of ticket';
+                                      }
+                                      return null;
                                     },
-                                    child: Text(
-                                      'Submit New Ticket',
-                                      style: myTextStyle(
-                                          weight: FontWeight.w900,
-                                          fontSize: 20),
-                                    )),
-                              ],
+                                  ),
+                                  gapH32,
+                                  SizedBox(
+                                    width: 400,
+                                    child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            elevation:
+                                                WidgetStatePropertyAll(8.0),
+                                            backgroundColor:
+                                                WidgetStatePropertyAll(
+                                                    Theme.of(context)
+                                                        .primaryColor)),
+                                        onPressed: () {
+                                          _onSubmit();
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: Text(
+                                            'Submit New Ticket',
+                                            style: myTextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        )),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-              ],
-            ),
-          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
-      ),
+      ],
     );
   }
 

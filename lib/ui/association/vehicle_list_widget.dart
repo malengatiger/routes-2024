@@ -8,13 +8,17 @@ import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/device_location_bloc.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
+import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:badges/badges.dart' as bd;
 import 'package:routes_2024/ui/association/vehicle_photos.dart';
 
 class VehicleListWidget extends StatefulWidget {
   const VehicleListWidget(
-      {super.key, required this.vehicles, required this.onVehiclePicked, required this.onEditVehicle});
+      {super.key,
+      required this.vehicles,
+      required this.onVehiclePicked,
+      required this.onEditVehicle});
 
   final List<Vehicle> vehicles;
   final Function(Vehicle) onVehiclePicked;
@@ -37,12 +41,21 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
   PlatformFile? vehiclePictureFile;
   bool _showActions = false;
   int? _showIndex;
+  QRGenerationService qrGeneration = GetIt.instance<QRGenerationService>();
 
   @override
   void initState() {
     super.initState();
+    printCars();
   }
-
+void printCars() {
+    pp('$mm printing cars ...');
+    int cnt = 1;
+    for (var c in widget.vehicles) {
+      pp('$mm car #$cnt: ${c.toJson()}');
+      cnt++;
+    }
+}
   void _pickVehiclePictureFile(Vehicle vehicle) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -165,6 +178,28 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
     pp('$mm send vehicle email');
   }
 
+  _updateQRCode(Vehicle vehicle) async {
+    pp('$mm _updateQRCode ...');
+    try {
+      var qrBucket = await qrGeneration.generateAndUploadQrCodeWithLogo(data: vehicle.toJson(), associationId: vehicle.associationId!);
+      vehicle.bucketFileName = qrBucket?.bucketFileName;
+      vehicle.qrCodeBytes = qrBucket?.qrCodeBytes;
+      var res = await dataApiDog.updateVehicle(vehicle);
+      if (mounted) {
+        showOKToast(
+            message:
+            'Vehicle QRCode updated on KasieTransie: ${vehicle.vehicleReg}',
+            context: context);
+      }
+    } catch (e, s) {
+      pp('$e $s');
+      if (mounted) {
+        showErrorToast(message: '$e', context: context);
+      }
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
@@ -172,7 +207,7 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
       children: [
         GridView.builder(
             gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5),
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
             itemCount: widget.vehicles.length,
             itemBuilder: (_, index) {
               var car = widget.vehicles[index];
@@ -233,63 +268,75 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
                             myTextStyle(fontSize: 10, weight: FontWeight.w900),
                       ),
                       if (_showActions && _showIndex == index)
-                        Card(
-                          elevation: 8,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                kIsWeb
-                                    ? gapH4
-                                    : IconButton(
-                                        onPressed: () {
-                                          _takeVehiclePicture(car);
-                                        },
-                                        tooltip: 'Take photo of vehicle',
-                                        icon: Icon(
-                                          Icons.camera_alt_outlined,
-                                          color: Colors.green,
-                                        )),
-                                IconButton(
-                                    tooltip: 'Send email to Owner',
-                                    onPressed: () {
-                                      _sendVehicleEmail(car);
-                                    },
-                                    icon: Icon(
-                                      Icons.email_outlined,
-                                      color: Colors.blue,
-                                    )),
-                                IconButton(
-                                    onPressed: () {
-                                      _pickVehiclePictureFile(car);
-                                    },
-                                    tooltip: 'Pick vehicle image file',
-                                    icon: Icon(
-                                      Icons.upload,
-                                      color: Colors.pink,
-                                    )),
-                                IconButton(
-                                    tooltip: 'Show all vehicle photos',
-                                    onPressed: () {
-                                      _showCarPhotos(car);
-                                    },
-                                    icon: Icon(
-                                      Icons.list,
-                                      color: Colors.amber,
-                                    )),
-                                IconButton(
-                                    onPressed: () {
-                                     setState(() {
-                                       widget.onEditVehicle();
-                                     });
-                                    },
-                                    tooltip: 'Edit the vehicle details',
-                                    icon: Icon(
-                                      Icons.edit,
-                                      color: Colors.indigo,
-                                    )),
-                              ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Card(
+                            elevation: 8,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  kIsWeb
+                                      ? gapH4
+                                      : IconButton(
+                                          onPressed: () {
+                                            _takeVehiclePicture(car);
+                                          },
+                                          tooltip: 'Take photo of vehicle',
+                                          icon: Icon(
+                                            Icons.camera_alt_outlined,
+                                            color: Colors.green,
+                                          )),
+                                  IconButton(
+                                      tooltip: 'Send email to Owner',
+                                      onPressed: () {
+                                        _sendVehicleEmail(car);
+                                      },
+                                      icon: Icon(
+                                        Icons.email_outlined,
+                                        color: Colors.blue,
+                                      )),
+                                  IconButton(
+                                      tooltip: 'Update QR Code',
+                                      onPressed: () {
+                                        _updateQRCode(car);
+                                      },
+                                      icon: Icon(
+                                        Icons.barcode_reader,
+                                        color: Colors.black,
+                                      )),
+                                  IconButton(
+                                      onPressed: () {
+                                        _pickVehiclePictureFile(car);
+                                      },
+                                      tooltip: 'Pick vehicle image file',
+                                      icon: Icon(
+                                        Icons.upload,
+                                        color: Colors.pink,
+                                      )),
+                                  IconButton(
+                                      tooltip: 'Show all vehicle photos',
+                                      onPressed: () {
+                                        _showCarPhotos(car);
+                                      },
+                                      icon: Icon(
+                                        Icons.list,
+                                        color: Colors.amber,
+                                      )),
+                                  IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          widget.onEditVehicle();
+                                        });
+                                      },
+                                      tooltip: 'Edit the vehicle details',
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.indigo,
+                                      )),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -338,12 +385,12 @@ class VehicleProfilePicture extends StatelessWidget {
   Widget build(BuildContext context) {
     if (car.photos == null || car.photos!.isEmpty) {
       return SizedBox(
-        width: 48,
-        height: 48,
+        width: 36,
+        height: 36,
         child: Image.asset(
           'assets/car1.png',
-          height: 48,
-          width: 48,
+          height: 36,
+          width: 36,
           fit: BoxFit.cover,
         ),
       );

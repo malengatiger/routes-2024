@@ -1,34 +1,38 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/bloc/register_services.dart';
 import 'package:kasie_transie_library/bloc/theme_bloc.dart';
 import 'package:kasie_transie_library/data/color_and_locale.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
+import 'package:kasie_transie_library/utils/emojis.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/theme.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-import 'package:kasie_transie_library/widgets/scanners/qrcode_generator.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:get_it/get_it.dart';
-import 'package:routes_2024/ui/association/association_main.dart';
 import 'firebase_options.dart';
 import 'intro/kasie_intro.dart';
 import 'intro/splash_page.dart';
+import 'package:firebase_storage/firebase_storage.dart' as storage;
 
 late FirebaseApp firebaseApp;
 fb.User? fbAuthedUser;
-const mx = '🔵🔵🔵🔵 🍅 KasieTransie RouteBuilder : main  🍅 🔵🔵';
+const mx = '🔵🔵🔵🔵 🍅 KasieTransie Association Administrator : main  🍅 🔵🔵';
 late ColorAndLocale colorAndLocale;
+const bucket = 'gs://kasie-transie-3.appspot.com';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   pp('\n\n$mx DefaultFirebaseOptions.currentPlatform: '
       '\n\n${DefaultFirebaseOptions.currentPlatform.toString()}\n\n');
   //
+  // SET PERSISTENCE *BEFORE* INITIALIZING FIREBASE
+
   firebaseApp = await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform);
 
@@ -37,21 +41,33 @@ Future<void> main() async {
 
   fbAuthedUser = fb.FirebaseAuth.instance.currentUser;
   if (fbAuthedUser != null) {
-    //TODO: REMOVE after test ....
-
     pp('$mx fbAuthUser: ${fbAuthedUser!.uid}');
     pp("$mx .... fbAuthUser is cool! ......  🥬🥬🥬 on to the party!! \n ${await fbAuthedUser?.getIdToken()}");
   } else {
     pp('$mx fbAuthUser: is null.  😈👿 Need to sign up or in. Authenticate the app!');
   }
   try {
-    await RegisterServices.register();
-    ListApiDog listApiDog = GetIt.instance<ListApiDog>();
-    listApiDog.getAllPhotosAndVideos();
-    themeBloc = GetIt.instance<ThemeBloc>();
-  } catch (e) {
-    pp(e);
+    final fbs = storage.FirebaseStorage.instanceFor(
+        app: firebaseApp,
+        bucket: bucket);
+    pp('$mx 🌸🌸 FirebaseStorage: 🍎🍎 ${fbs.toString()}');
+    var msg = await RegisterServices.register(firebaseStorage: fbs);
+    pp('$mx $msg');
+    kasieThemeManager = GetIt.instance<KasieThemeManager>();
+  } catch (e,s) {
+    pp('$e $s');
   }
+  String? token;
+  if (fbAuthedUser != null) {
+    token = await fbAuthedUser!.getIdToken();
+  }
+  if (token != null) {
+    pp('$mx 🌸🌸 Firebase id token 🍎🍎\n\n $token\n\n');
+  } else {
+    pp('$mx getAuthToken has fallen down. ${E.redDot}${E.redDot}${E.redDot}  '
+        '\n Firebase id token not found 🍎');
+  }
+
   Prefs prefs = GetIt.instance<Prefs>();
   colorAndLocale = prefs.getColorAndLocale();
 
@@ -60,32 +76,32 @@ Future<void> main() async {
     myPrettyJsonPrint(me!.toJson());
   }
 
-  FirebaseUIAuth.configureProviders([
-    EmailAuthProvider(),
-    PhoneAuthProvider(),
-  ]);
+  // FirebaseUIAuth.configureProviders([
+  //   EmailAuthProvider(),
+  //   PhoneAuthProvider(),
+  // ]);
 
-  runApp(const ProviderScope(child: KasieTransieApp()));
+  runApp(const KasieTransieApp());
 }
 
-temporarySignOut(Prefs prefs) async {
-  //TODO: REMOVE after test ....
-  prefs.removeUser();
-  await fb.FirebaseAuth.instance.signOut();
-  pp('\n\n$mx  😈 👿cached User and Firebase creds cleaned up for testing. 🌶 REMOVE when done! 🌶 \n\n');
-}
+// temporarySignOut(Prefs prefs) async {
+//   //TODO: REMOVE after test ....
+//   prefs.removeUser();
+//   await fb.FirebaseAuth.instance.signOut();
+//   pp('\n\n$mx  😈 👿cached User and Firebase creds cleaned up for testing. 🌶 REMOVE when done! 🌶 \n\n');
+// }
 
 int themeIndex = 0;
 lib.User? me;
-late ThemeBloc themeBloc;
+late KasieThemeManager kasieThemeManager;
 
-class KasieTransieApp extends ConsumerWidget {
+class KasieTransieApp extends StatelessWidget {
   const KasieTransieApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: themeBloc.localeAndThemeStream,
+        stream: kasieThemeManager.localeAndThemeStream,
         builder: (ctx, snapshot) {
           if (snapshot.hasData) {
             pp(' 🔵 🔵 🔵'

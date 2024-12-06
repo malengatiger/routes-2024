@@ -168,6 +168,7 @@ class AssociationEditState extends State<AssociationEdit>
                             if (value == null || value.isEmpty) {
                               return 'Please enter Association Name';
                             }
+                            return null;
                           },
                         ),
                         gapH32,
@@ -183,6 +184,7 @@ class AssociationEditState extends State<AssociationEdit>
                             if (value == null || value.isEmpty) {
                               return 'Please enter Administrator Name';
                             }
+                            return null;
                           },
                         ),
                         gapH16,
@@ -198,6 +200,7 @@ class AssociationEditState extends State<AssociationEdit>
                             if (value == null || value.isEmpty) {
                               return 'Please enter Administrator Surname';
                             }
+                            return null;
                           },
                         ),
                         gapH16,
@@ -213,6 +216,7 @@ class AssociationEditState extends State<AssociationEdit>
                             if (value == null || value.isEmpty) {
                               return 'Please enter Administrator Email';
                             }
+                            return null;
                           },
                         ),
                         gapH16,
@@ -228,6 +232,7 @@ class AssociationEditState extends State<AssociationEdit>
                             if (value == null || value.isEmpty) {
                               return 'Please enter Administrator Cellphone';
                             }
+                            return null;
                           },
                         ),
                         gapH32,

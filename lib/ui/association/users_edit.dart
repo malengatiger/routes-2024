@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +12,10 @@ import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:badges/badges.dart' as bd;
-import 'package:kasie_transie_library/widgets/scanners/gen_code.dart';
+import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_html/html.dart';
+import 'package:uuid/uuid.dart';
 
 class UsersEdit extends StatefulWidget {
   const UsersEdit({super.key, required this.association, this.user});
@@ -53,8 +54,10 @@ class UsersEditState extends State<UsersEdit>
   TextEditingController cellphoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
-  ListApiDog listApiDog = GetIt.instance<ListApiDog>();
+  final DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
+  final ListApiDog listApiDog = GetIt.instance<ListApiDog>();
+  final QRGenerationService qrGeneration =
+      GetIt.instance<QRGenerationService>();
 
   bool busy = false;
   Prefs prefs = GetIt.instance<Prefs>();
@@ -124,9 +127,12 @@ class UsersEditState extends State<UsersEdit>
     });
     try {
       users = await listApiDog.getAssociationUsers(
-              widget.association.associationId!, true);
+          widget.association.associationId!, true);
       pp('$mm association users found: ${users.length}');
-    } catch (e,s) {
+      if (users.isEmpty) {
+        _showEditor = true;
+      }
+    } catch (e, s) {
       pp('$e $s');
       if (mounted) {
         showErrorToast(message: '$e', context: context);
@@ -154,7 +160,7 @@ class UsersEditState extends State<UsersEdit>
     });
     if (widget.user == null) {
       selectedUser = User(
-          userId: '${DateTime.now().millisecondsSinceEpoch}',
+          userId: Uuid().v4(),
           associationId: widget.association.associationId!,
           associationName: widget.association.associationName!,
           countryId: widget.association.countryId,
@@ -166,11 +172,13 @@ class UsersEditState extends State<UsersEdit>
           userType: userType);
 
       try {
-        var bytes = await generateQrCode(selectedUser!.toJson());
-        var url = await dataApiDog.uploadQRCodeFile(
-            imageBytes: bytes,
+        var qrBucket = await qrGeneration.generateAndUploadQrCodeWithLogo(
+            data: selectedUser!.toJson(),
             associationId: widget.association.associationId!);
-        selectedUser!.qrCodeUrl = url;
+        pp('$mm user qrBucket: ${qrBucket!.bucketFileName}');
+
+        selectedUser!.bucketFileName = qrBucket.bucketFileName;
+        selectedUser!.qrCodeBytes = qrBucket.qrCodeBytes;
         var res = await dataApiDog.addUser(selectedUser!);
         pp('$mm user: $res');
         _getUsers();
@@ -197,6 +205,7 @@ class UsersEditState extends State<UsersEdit>
   PlatformFile? csvFile;
   PlatformFile? thumbFile;
 
+  List<User> usersFromCsv = [];
   PlatformFile? userFile;
   CloudStorageBloc storage = GetIt.instance<CloudStorageBloc>();
 
@@ -292,7 +301,7 @@ class UsersEditState extends State<UsersEdit>
     });
     addUsersResponse = AddUsersResponse([], []);
     try {
-      var users = getUsersFromCsv(
+      usersFromCsv = getUsersFromCsv(
           csv: csvString!,
           countryId: widget.association.countryId!,
           associationId: widget.association.associationId!,
@@ -300,7 +309,7 @@ class UsersEditState extends State<UsersEdit>
 
       pp('$mm  upload the Users found in File ... 🍎 ${users.length} 🍎');
 
-      for (var user in users) {
+      for (var user in usersFromCsv) {
         setState(() {
           firstNameController.text = user.firstName!;
           lastNameController.text = user.lastName!;
@@ -309,16 +318,18 @@ class UsersEditState extends State<UsersEdit>
           passwordController.text = user.password ?? 'pass123';
         });
         try {
-          var bytes = await generateQrCode(user.toJson());
-          var url = await dataApiDog.uploadQRCodeFile(
-              imageBytes: bytes,
+          user.userId = Uuid().v4();
+          user.password = 'pass123';
+          var qrBucket = await qrGeneration.generateAndUploadQrCodeWithLogo(
+              data: user.toJson(),
               associationId: widget.association.associationId!);
-          user.qrCodeUrl = url;
-          user.password = 'pass${DateTime.now().millisecondsSinceEpoch}_${random.toString()}';
+          pp('$mm  user qrBucket ... 🍎 ${qrBucket!.bucketFileName} 🍎');
+          user.bucketFileName = qrBucket.bucketFileName;
+          user.qrCodeBytes = qrBucket.qrCodeBytes;
           var res = await dataApiDog.addUser(user);
           addUsersResponse.users.add(res);
-        } catch (e, s) {
-          pp('$e\n$e');
+        } catch (e) {
+          pp('😈😈😈😈😈 $e\n$e');
           addUsersResponse.errors.add(user);
         }
       }
@@ -330,7 +341,7 @@ class UsersEditState extends State<UsersEdit>
       passwordController.text = '';
 
       pp('$mm  users registered: 🍎 ${addUsersResponse.users.length}');
-      pp('$mm  users fucked up: 🍎 ${addUsersResponse.errors.length}');
+      pp('$mm  😈😈 users fucked up: 🍎 ${addUsersResponse.errors.length}');
 
       _getUsers();
       if (mounted) {
@@ -340,13 +351,13 @@ class UsersEditState extends State<UsersEdit>
                   'Upload encountered ${addUsersResponse.errors.length} errors',
               context: context);
         } else {
-          var msg = '🌿 Vehicles uploaded OK: ${addUsersResponse.users.length}';
+          var msg = '🌿 Staff uploaded OK: ${addUsersResponse.users.length}';
 
           showOKToast(message: msg, context: context);
         }
       }
     } catch (e, s) {
-      pp('$e $s');
+      pp('$mm 😈😈😈😈😈$e $s');
       if (mounted) {
         showErrorToast(message: '$e', context: context);
       }
@@ -440,9 +451,15 @@ class UsersEditState extends State<UsersEdit>
                                             },
                                             child: Text('Send Users File')),
                                       ),
-                                csvFile == null
-                                    ? gapH8
-                                    : gapH16,
+                                gapH16,
+                                usersFromCsv.isEmpty? gapW16: Row(
+                                  children: [
+                                    const Text('Number of User in File'),
+                                    gapW32,
+                                    Text('${usersFromCsv.length}', style: myTextStyleMediumLarge(context, 24),),
+                                  ],
+                                ),
+                                csvFile == null ? gapH8 : gapH16,
                                 gapH16,
                                 TextFormField(
                                   controller: firstNameController,
@@ -554,14 +571,19 @@ class UsersEditState extends State<UsersEdit>
                                             style: ButtonStyle(
                                               elevation:
                                                   WidgetStatePropertyAll(8),
-                                              backgroundColor: WidgetStatePropertyAll(Theme.of(context).primaryColor),
+                                              backgroundColor:
+                                                  WidgetStatePropertyAll(
+                                                      Theme.of(context)
+                                                          .primaryColor),
                                             ),
                                             onPressed: () {
                                               _onSubmit();
                                             },
                                             child: Padding(
                                                 padding: EdgeInsets.all(20),
-                                                child: Text('Submit', style: myTextStyle(color: Colors.white)))),
+                                                child: Text('Submit',
+                                                    style: myTextStyle(
+                                                        color: Colors.white)))),
                                       ),
                               ],
                             )),
@@ -572,11 +594,9 @@ class UsersEditState extends State<UsersEdit>
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: busy? SizedBox(
-                        height: 400, width: 400,
-                        child: TimerWidget(title: 'Loading staff ...', isSmallSize: true)): GridView.builder(
+                    child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5),
+                            crossAxisCount: 4),
                         itemCount: users.length,
                         itemBuilder: (_, index) {
                           var user = users[index];
@@ -589,7 +609,7 @@ class UsersEditState extends State<UsersEdit>
                             child: Card(
                               elevation: 8,
                               child: SizedBox(
-                                height: 280,
+                                height: 360,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -605,17 +625,20 @@ class UsersEditState extends State<UsersEdit>
                                     Text(
                                       '${user.firstName} ${user.lastName}',
                                       style: myTextStyle(
-                                          weight: FontWeight.w900, fontSize: 16),
+                                          weight: FontWeight.normal,
+                                          fontSize: 14),
                                     ),
                                     gapH4,
                                     Text(
                                       '${user.userType}',
                                       style: myTextStyle(
-                                          weight: FontWeight.w200, fontSize: 10),
+                                          weight: FontWeight.w200,
+                                          fontSize: 10),
                                     ),
                                     if (_showTools && userIndex == index)
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16.0, vertical: 4),
                                         child: Card(
                                           elevation: 8,
                                           child: Row(
@@ -651,7 +674,7 @@ class UsersEditState extends State<UsersEdit>
                           );
                         }),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -698,7 +721,13 @@ class UsersEditState extends State<UsersEdit>
               ],
             ),
           ),
-
+          busy
+              ? Positioned(
+                  child: Center(
+                      child: TimerWidget(
+                          title: 'Loading data ...', isSmallSize: true)),
+                )
+              : gapW32,
         ],
       )),
     );
@@ -714,8 +743,8 @@ class UserProfilePicture extends StatelessWidget {
   Widget build(BuildContext context) {
     if (user.profileUrl == null) {
       return SizedBox(
-        width: 80,
-        height: 80,
+        width: 64,
+        height: 64,
         child: Image.asset(
           'assets/avatar1.png',
           height: 64,
@@ -725,11 +754,11 @@ class UserProfilePicture extends StatelessWidget {
       );
     }
     return SizedBox(
-        width: 80,
-        height: 80,
+        width: 64,
+        height: 64,
         child: CircleAvatar(
           backgroundImage: NetworkImage(user.profileUrl!),
-          radius: 80,
+          radius: 64,
         ));
   }
 }

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD9Lx_JbgcWFeik-Z85AC49oJOMyuF_H5g"></script>
+    <!--
+      If you are serving your web app in a path other than the root, change the
+      href value below to reflect the base path you are serving from.
+
+      The path provided below has to start and end with a slash "/" in order for
+      it to work correctly.
+
+      For more details:
+      * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+      This is a placeholder for base href that will be replaced by the value of
+      the `--base-href` argument provided to `flutter build`.
+    -->
+    <base href="/">
+
+    <meta charset="UTF-8">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <meta name="description" content="Route Builder">
+
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="routes_2024">
+    <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png"/>
+
+    <title>routes_2024</title>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+<script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", './version.json', true);
+        xmlhttp.onload = function () {
+          if (xmlhttp.status == 200) {
+            var version = xmlhttp.responseText.split(',')[1];
+            var currentVersion = window.localStorage.getItem('version');
+            console.log('currentVersion is ' + currentVersion);
+            console.log('version is ' + version);
+            if (currentVersion && currentVersion != version) {
+              console.log('clearing cache');
+              caches.delete('flutter-app-manifest');
+              caches.delete('flutter-temp-cache');
+              caches.delete('flutter-app-cache');
+            }
+            window.localStorage.setItem('version', version);
+          }
+        };
+        xmlhttp.send();
+      });
+    }
+</script>
+<script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

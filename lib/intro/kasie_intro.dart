@@ -10,7 +10,6 @@ import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-import 'package:kasie_transie_library/widgets/scanners/qrcode_generator.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/intro/intro_carousel.dart';
@@ -88,7 +87,7 @@ class KasieIntroState extends State<KasieIntro>
       if (ass != null) {
         NavigationUtils.navigateTo(
             context: context,
-            widget: RouteDataWidget(ass),
+            widget: RouteDataWidget(association: ass,),
             transitionType: PageTransitionType.leftToRight);
       }
     }
@@ -120,7 +119,6 @@ class KasieIntroState extends State<KasieIntro>
     NavigationUtils.navigateTo(
         context: context,
         widget: PhoneAuthSignin(
-            dataApiDog: dataApiDog,
             onGoodSignIn: () {
               onSuccessfulSignIn();
             },
@@ -251,7 +249,7 @@ class KasieIntroState extends State<KasieIntro>
         child: Scaffold(
       appBar: AppBar(
         title: Text(
-          'KasieTransie Route Builder',
+          'KasieTransie Association SignIn',
           style: myTextStyleLargeWithColor(context, color),
         ),
       ),
@@ -353,7 +351,7 @@ class KasieIntroState extends State<KasieIntro>
               case 1:
                 NavigationUtils.navigateTo(
                     context: context,
-                    widget: RouteDataWidget(associations[0]),
+                    widget: RouteDataWidget(association: associations[0]),
                     transitionType: PageTransitionType.leftToRight);
             }
           }

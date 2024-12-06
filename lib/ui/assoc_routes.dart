@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/bloc/sem_cache.dart';
@@ -28,7 +27,7 @@ import 'package:routes_2024/ui/route_list.dart';
 import 'package:get_it/get_it.dart';
 import 'package:page_transition/page_transition.dart';
 
-class AssociationRoutes extends ConsumerStatefulWidget {
+class AssociationRoutes extends StatefulWidget {
   final String associationId;
   final String associationName;
 
@@ -39,10 +38,10 @@ class AssociationRoutes extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<AssociationRoutes> createState() => AssociationRoutesState();
+  State<AssociationRoutes> createState() => AssociationRoutesState();
 }
 
-class AssociationRoutesState extends ConsumerState<AssociationRoutes> {
+class AssociationRoutesState extends State<AssociationRoutes> {
   final mm = '🔆🔆🔆🔆🔆 AssociationRoutes 🔵🔵 ';
   bool busy = false;
   var routes = <lib.Route>[];

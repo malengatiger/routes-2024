@@ -1,7 +1,6 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
@@ -21,7 +20,7 @@ import 'package:responsive_builder/responsive_builder.dart' as responsive;
 import 'package:routes_2024/ui/route_detail_form_container.dart';
 import 'package:uuid/uuid.dart' as uu;
 
-class RouteEditor extends ConsumerStatefulWidget {
+class RouteEditor extends StatefulWidget {
   const RouteEditor({required this.onRouteAdded, super.key, this.route, required this.association});
 
   final lib.Route? route;
@@ -29,10 +28,10 @@ class RouteEditor extends ConsumerStatefulWidget {
   final Function(lib.Route) onRouteAdded;
 
   @override
-  ConsumerState createState() => RouteEditorState();
+  State createState() => RouteEditorState();
 }
 
-class RouteEditorState extends ConsumerState<RouteEditor>
+class RouteEditorState extends State<RouteEditor>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   late AnimationController _controller;

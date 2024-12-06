@@ -1,15 +1,17 @@
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:badges/badges.dart' as bd;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
+import 'package:kasie_transie_library/data/constants.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-import 'package:badges/badges.dart' as bd;
-import 'package:kasie_transie_library/widgets/scanners/gen_code.dart';
+import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:routes_2024/ui/association/vehicle_list_widget.dart';
 import 'package:uuid/uuid.dart';
@@ -52,8 +54,9 @@ class VehiclesEditState extends State<VehiclesEdit>
   TextEditingController ownerNameController = TextEditingController();
   TextEditingController cellphoneController = TextEditingController();
 
-  DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
-  ListApiDog listApiDog = GetIt.instance<ListApiDog>();
+  final DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
+  final ListApiDog listApiDog = GetIt.instance<ListApiDog>();
+  final QRGenerationService qrGeneration = GetIt.I<QRGenerationService>();
 
   bool busy = false;
   Prefs prefs = GetIt.instance<Prefs>();
@@ -69,7 +72,7 @@ class VehiclesEditState extends State<VehiclesEdit>
     yearController.text = vehicle.year!;
     capacityController.text = '${vehicle.passengerCapacity!}';
     ownerNameController.text = vehicle.ownerName ?? '';
-    cellphoneController.text = vehicle.ownerCellphone ?? '';
+    cellphoneController.text = vehicle.cellphone ?? '';
     country = prefs.getCountry();
     setState(() {});
   }
@@ -85,6 +88,9 @@ class VehiclesEditState extends State<VehiclesEdit>
       cars = await listApiDog.getAssociationCars(
           widget.association.associationId!, refresh);
       cars.sort((a, b) => a.vehicleReg!.compareTo(b.vehicleReg!));
+      if (cars.isEmpty) {
+        _showEditor = true;
+      }
     } catch (e, s) {
       pp('$e $s');
       if (mounted) {
@@ -105,13 +111,49 @@ class VehiclesEditState extends State<VehiclesEdit>
     setState(() {
       busy = true;
     });
+    String? firstName, lastName, email;
+    var strings = ownerNameController.text.split(' ');
+    try {
+      firstName = strings[0];
+      lastName = strings[1];
+      email = '${lastName.toLowerCase()}_${firstName.toLowerCase()}@gmail.com';
+    } catch (e) {
+      //ignore
+    }
+
+    User owner = User(
+        userType: Constants.OWNER,
+        associationId: widget.association.associationId!,
+        associationName: widget.association.associationName,
+        cellphone: cellphoneController.text,
+        firstName: firstName,
+        lastName: lastName,
+        countryId: widget.association.countryId,
+        email: email);
+    if (owner.cellphone == null) {
+      var cell = generateRandomZAPhoneNumber();
+      owner.cellphone = cell;
+    }
+    QRBucket? qrBucket2 =
+    await qrGeneration.generateAndUploadQrCodeWithLogo(
+        data: owner.toJson(),
+        associationId: widget.association.associationId!);
+    owner.bucketFileName = qrBucket2!.bucketFileName;
+    owner.qrCodeBytes = qrBucket2!.qrCodeBytes;
+    var mUser = await dataApiDog.addUser(owner);
+
     if (vehicle != null) {
       vehicle!.vehicleReg = registrationController.text;
       vehicle!.make = makeController.text;
       vehicle!.model = modelController.text;
-      vehicle!.ownerCellphone = cellphoneController.text;
-      vehicle!.ownerName = ownerNameController.text;
+      vehicle!.cellphone = mUser.cellphone;
+      vehicle!.ownerName = '${mUser.firstName} ${mUser.lastName}';
       vehicle!.year = yearController.text;
+      vehicle!.ownerId = mUser.userId;
+      vehicle!.passengerCapacity = capacityController.text as int?;
+      vehicle!.countryId = mUser.countryId;
+      vehicle!.associationId =  widget.association.associationId!;
+      vehicle!.associationName = widget.association.associationName;
     } else {
       vehicle = Vehicle(
           vehicleId: Uuid().v4(),
@@ -125,13 +167,18 @@ class VehiclesEditState extends State<VehiclesEdit>
           passengerCapacity: int.parse(capacityController.text),
           year: yearController.text,
           ownerName: ownerNameController.text,
-          ownerCellphone: cellphoneController.text);
+          ownerId: mUser.userId,
+          cellphone: cellphoneController.text);
     }
     try {
-      var bytes = await generateQrCode(vehicle!.toJson());
-      var url = await dataApiDog.uploadQRCodeFile(imageBytes: bytes,
-          associationId: widget.association.associationId!);
-      vehicle!.qrCodeUrl = url;
+      QRBucket? qrBucket =
+          await qrGeneration.generateAndUploadQrCodeWithLogo(
+              data: vehicle!.toJson(),
+              associationId: widget.association.associationId!);
+      pp('$mm ... qr code qrBucket: ${qrBucket!.bucketFileName}');
+      vehicle!.bucketFileName = qrBucket.bucketFileName;
+      vehicle!.qrCodeBytes = qrBucket!.qrCodeBytes;
+      vehicle!.countryId = widget.association.countryId;
       var res = await dataApiDog.addVehicle(vehicle!);
       cars.insert(0, res);
       if (mounted) {
@@ -154,6 +201,7 @@ class VehiclesEditState extends State<VehiclesEdit>
 
   PlatformFile? csvFile, vehiclePictureFile;
   String? csvString;
+
   void _pickVehicleFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -182,6 +230,7 @@ class VehiclesEditState extends State<VehiclesEdit>
   bool _showSubmit = true;
   List<Vehicle> errorCars = [];
 
+  List<Vehicle> carsFromCSV = [];
   _sendFile() async {
     pp('\n\n$mm ..... send the Vehicle File to upload ...');
     setState(() {
@@ -190,29 +239,85 @@ class VehiclesEditState extends State<VehiclesEdit>
     });
     addCarsResponse = AddCarsResponse([], []);
     try {
-      var cars = getVehiclesFromCsv(
-          csv: csvString!, countryId: widget.association.countryId!,
+      carsFromCSV = getVehiclesFromCsv(
+          csv: csvString!,
+          countryId: widget.association.countryId!,
           associationId: widget.association.associationId!,
           associationName: widget.association.associationName!);
+      pp('$mm ... cars retrieved from csv... ${cars.length}');
 
-      for (var car in cars) {
+      for (var car in carsFromCSV) {
         registrationController.text = car.vehicleReg!;
         makeController.text = car.make!;
         modelController.text = car.model!;
         yearController.text = car.year!;
         ownerNameController.text = car.ownerName!;
-        setState(() {
-
-        });
+        cellphoneController.text =
+            car.cellphone ?? generateRandomZAPhoneNumber();
+        setState(() {});
         try {
-          var bytes = await generateQrCode(car.toJson());
-          var url = await dataApiDog.uploadQRCodeFile(imageBytes: bytes,
-                      associationId: widget.association.associationId!);
-          car.qrCodeUrl = url;
+          String? firstName, lastName;
+          var strings = car.ownerName?.split(' ');
+          try {
+            firstName = strings?[0];
+            lastName = strings?[1];
+          } catch (e) {
+            //ignore
+          }
+          User? mUser;
+          QRBucket? qrBucket =
+              await qrGeneration.generateAndUploadQrCodeWithLogo(
+                  data: car.toJson(),
+                  associationId: widget.association.associationId!);
+          pp('\n\n$mm ...back from generateQrCodeWithLogo: ${qrBucket!.bucketFileName}...\n');
+          car.bucketFileName = qrBucket.bucketFileName;
+          car.qrCodeBytes = qrBucket.qrCodeBytes;
+          car.active = 0;
+          car.countryId = widget.association.countryId!;
+
+          var email =
+              'owner${DateTime.now().millisecondsSinceEpoch}@owners.com';
+          try {
+
+            User owner = User(
+                userType: Constants.OWNER,
+                associationId: widget.association.associationId!,
+                associationName: widget.association.associationName,
+                cellphone: car.cellphone,
+                firstName: firstName?? 'ASSOCIATION',
+                lastName: lastName ?? 'ASSOCIATION',
+                countryId: widget.association.countryId!,
+                email: email,
+                password: 'pass123');
+
+            if (owner.cellphone == null) {
+              var cell = generateRandomZAPhoneNumber();
+              owner.cellphone = cell;
+            }
+            QRBucket? qrBucket2 =
+            await qrGeneration.generateAndUploadQrCodeWithLogo(
+                data: owner.toJson(),
+                associationId: widget.association.associationId!);
+            owner.bucketFileName = qrBucket2!.bucketFileName;
+            owner.qrCodeBytes = qrBucket2.qrCodeBytes;
+            pp('$mm ........ adding owner if user not exist yet ... ${owner.toJson()}');
+            mUser = await dataApiDog.addOwner(owner);
+            pp('$mm ... owner created or retrieved ... ${mUser.toJson()}');
+          } catch (e, s) {
+            pp("$mm 😈😈😈😈😈😈owner creation failed: $e $s");
+          }
+          if (mUser != null) {
+            car.ownerName = '${mUser.firstName} ${mUser.lastName}';
+            car.ownerId = mUser.userId;
+            car.cellphone = mUser.cellphone;
+            car.countryId = mUser.countryId;
+          }
+
+          pp('$mm ... adding vehicle; ... 🔆 🔆 🔆 check qrBucket... ${car.toJson()} 🔆 🔆 🔆');
           var res = await dataApiDog.addVehicle(car);
           addCarsResponse.cars.add(res);
-        } catch (e,s) {
-          pp('$e\n$e');
+        } catch (e) {
+          pp('$mm 😈😈😈😈😈 $e \n$e 😈');
           addCarsResponse.errors.add(car);
         }
       }
@@ -228,19 +333,18 @@ class VehiclesEditState extends State<VehiclesEdit>
       if (mounted) {
         if (addCarsResponse.errors.isNotEmpty) {
           showErrorToast(
-              message: 'Upload encountered ${addCarsResponse.errors.length} errors',
+              message:
+                  'Upload encountered ${addCarsResponse.errors.length} errors',
               context: context);
         } else {
-          var msg =
-              '🌿 Vehicles uploaded OK: ${addCarsResponse.cars
-              .length}';
+          var msg = '🌿 Vehicles uploaded OK: ${addCarsResponse.cars.length}';
           result = msg;
           showOKToast(message: msg, context: context);
         }
       }
       _getCars(true);
     } catch (e, s) {
-      pp('$e $s');
+      pp('😈😈😈😈😈😈$mm $e $s 😈');
       result = '$e';
       if (mounted) {
         showErrorToast(message: '$e', context: context);
@@ -250,6 +354,18 @@ class VehiclesEditState extends State<VehiclesEdit>
       busy = false;
       _showSubmit = true;
     });
+  }
+
+  String generateRandomZAPhoneNumber() {
+    final random = Random();
+    // Generate the subscriber number (9 digits)
+    String subscriberNumber = '';
+    for (int i = 0; i < 9; i++) {
+      subscriberNumber += random.nextInt(10).toString();
+    }
+
+    // Complete E.164 format
+    return '+27$subscriberNumber';
   }
 
   bool _showEditor = false;
@@ -293,6 +409,14 @@ class VehiclesEditState extends State<VehiclesEdit>
                                       child: Text('Get File')),
                                 ),
                                 gapH16,
+                                carsFromCSV.isEmpty? gapW16: Row(
+                                  children: [
+                                    const Text('Number of Vehicles in File'),
+                                    gapW32,
+                                    Text('${carsFromCSV.length}', style: myTextStyleMediumLarge(context, 24),),
+                                  ],
+                                ),
+                                gapH16,
                                 csvFile == null
                                     ? gapH16
                                     : SizedBox(
@@ -322,9 +446,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                                             },
                                             child: Text('Send Vehicles File')),
                                       ),
-                                csvFile == null
-                                    ? gapH8
-                                    : gapH32,
+                                csvFile == null ? gapH8 : gapH32,
                                 TextFormField(
                                   controller: registrationController,
                                   keyboardType: TextInputType.name,
@@ -442,26 +564,31 @@ class VehiclesEditState extends State<VehiclesEdit>
                                           backgroundColor: Colors.pink,
                                         ),
                                       )
-                                    : _showSubmit? SizedBox(
-                                        width: 400,
-                                        child: ElevatedButton(
-                                            style: ButtonStyle(
-                                              elevation:
-                                                  WidgetStatePropertyAll(8),
-                                              backgroundColor: WidgetStatePropertyAll(Theme.of(context).primaryColor),
-                                            ),
-                                            onPressed: () {
-                                              _onSubmit();
-                                            },
-                                            child: Padding(
-                                                padding: EdgeInsets.all(20),
-                                                child: Text(
-                                                  'Submit',
-                                                  style:
-                                                      myTextStyle(
-                                                          fontSize: 20, color: Colors.white),
-                                                ))),
-                                      ): gapH32,
+                                    : _showSubmit
+                                        ? SizedBox(
+                                            width: 400,
+                                            child: ElevatedButton(
+                                                style: ButtonStyle(
+                                                  elevation:
+                                                      WidgetStatePropertyAll(8),
+                                                  backgroundColor:
+                                                      WidgetStatePropertyAll(
+                                                          Theme.of(context)
+                                                              .primaryColor),
+                                                ),
+                                                onPressed: () {
+                                                  _onSubmit();
+                                                },
+                                                child: Padding(
+                                                    padding: EdgeInsets.all(20),
+                                                    child: Text(
+                                                      'Submit',
+                                                      style: myTextStyle(
+                                                          fontSize: 20,
+                                                          color: Colors.white),
+                                                    ))),
+                                          )
+                                        : gapH32,
                                 result == null
                                     ? gapW32
                                     : SizedBox(
@@ -476,6 +603,7 @@ class VehiclesEditState extends State<VehiclesEdit>
                     )
                   : gapH16,
               gapH16,
+              _showEditor ? gapH4 : gapH32,
               _showEditor ? gapH4 : gapH32,
               Expanded(
                   child: VehicleListWidget(
