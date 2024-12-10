@@ -27,6 +27,7 @@ late ColorAndLocale colorAndLocale;
 const bucket = 'gs://kasie-transie-3.appspot.com';
 
 Future<void> main() async {
+  pp('\n\n\n$mx .... app starting, right at the top!\n\n');
   WidgetsFlutterBinding.ensureInitialized();
   pp('\n\n$mx DefaultFirebaseOptions.currentPlatform: '
       '\n\n${DefaultFirebaseOptions.currentPlatform.toString()}\n\n');
@@ -65,7 +66,7 @@ Future<void> main() async {
     pp('$mx 🌸🌸 Firebase id token 🍎🍎\n\n $token\n\n');
   } else {
     pp('$mx getAuthToken has fallen down. ${E.redDot}${E.redDot}${E.redDot}  '
-        '\n Firebase id token not found 🍎');
+        ' Firebase id token not found 🍎');
   }
 
   Prefs prefs = GetIt.instance<Prefs>();
