@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:core';
 
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
-import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/isolates/local_finder.dart';
 import 'package:kasie_transie_library/l10n/translation_handler.dart';
 import 'package:kasie_transie_library/utils/device_location_bloc.dart';
@@ -75,8 +75,10 @@ class RouteEditorState extends State<RouteEditor>
   bool findStartCity = false;
   bool findEndCity = false;
   bool _showTheFuckingSearch = false;
-  double radiusInKM = 500;
+  double radiusInKM = 600;
   bool sendingRouteUpdateMessage = false;
+  SemCache semCache = GetIt.instance<SemCache>();
+  ListApiDog listApiDog = GetIt.instance<ListApiDog>();
 
   @override
   void initState() {
@@ -94,7 +96,7 @@ class RouteEditorState extends State<RouteEditor>
       await _setTexts();
       await _getUser();
       await _getRoutes();
-      await findCitiesByLocation();
+      await _getCities();
     } catch (e) {
       pp(e);
       if (mounted) {
@@ -106,6 +108,14 @@ class RouteEditorState extends State<RouteEditor>
     });
   }
 
+  Future _getCities() async {
+    final loc = await locationBloc.getLocation();
+    _cities = await findCitiesByLocation(latitude: loc.latitude, 
+        longitude: loc.longitude, radiusInKM: 600, limit: 600);
+    setState(() {
+      
+    });
+  }
   Future _setTexts() async {
     final c = prefs.getColorAndLocale();
     final loc = c.locale;
@@ -140,10 +150,6 @@ class RouteEditorState extends State<RouteEditor>
     setState(() {});
   }
 
-  SemCache semCache = GetIt.instance<SemCache>();
-
-  ListApiDog listApiDog = GetIt.instance<ListApiDog>();
-
   _getRoutes() async {
     routes = await semCache.getRoutes(associationId: widget.association.associationId!);
   }
@@ -172,7 +178,7 @@ class RouteEditorState extends State<RouteEditor>
     }
   }
 
-  SettingsModel getDefaultSettings() {
+  lib.SettingsModel getDefaultSettings() {
     var s = lib.SettingsModel.name();
     s.associationId = widget.association.associationId;
     s.commuterGeofenceRadius = 150;
@@ -185,18 +191,18 @@ class RouteEditorState extends State<RouteEditor>
     return s;
   }
 
-  Future findCitiesByLocation() async {
+  Future<List<lib.City>> findCitiesByLocation({required double latitude, required double longitude, required double radiusInKM, required int limit}) async {
+    List<lib.City> cities = [];
     try {
-      final loc = await locationBloc.getLocation();
-      pp('... starting findCitiesByLocation ... lng: ${loc.latitude} lat: ${loc.longitude}');
+      pp('... starting findCitiesByLocation ... lng: $latitude lat: $longitude');
       var f = LocationFinderParameter(
           associationId: widget.association.associationId!,
-          latitude: loc.latitude,
-          limit: 500,
-          longitude: loc.longitude,
+          latitude: latitude,
+          limit: limit,
+          longitude: longitude,
           radiusInKM: radiusInKM);
 
-      _cities = await listApiDog.findCitiesByLocation(f);
+      var cities = await listApiDog.findCitiesByLocation(f);
       pp('$mm cities found by location: ${_cities.length} cities within $radiusInKM km ....');
       if (_cities.isEmpty) {
         if (mounted) {
@@ -205,12 +211,18 @@ class RouteEditorState extends State<RouteEditor>
               context: context);
         }
       }
+      return cities;
     } catch (e) {
       pp(e);
     }
+    return cities;
   }
 
   lib.City? startCity, endCity;
+  List<lib.City> startCities = [];
+  List<lib.City> endCities = [];
+  List<lib.City> finalCities = [];
+
 
   _onRoutePicked(lib.Route route) async {
     pp('\n\n$mm route picked: ${route.toJson()}');
@@ -300,6 +312,11 @@ class RouteEditorState extends State<RouteEditor>
           duration: const Duration(seconds: 3));
       return;
     }
+    startCities = await findCitiesByLocation(latitude: startCity!.position!.coordinates[1],
+        longitude: startCity!.position!.coordinates[0], radiusInKM: 50, limit: 25);
+    endCities = await findCitiesByLocation(latitude: endCity!.position!.coordinates[1],
+        longitude: endCity!.position!.coordinates[0], radiusInKM: 50, limit: 25);
+    _filterCities();
     setState(() {
       sending = true;
     });
@@ -317,6 +334,7 @@ class RouteEditorState extends State<RouteEditor>
         coordinates: endCity!.position!.coordinates,
       ),
     );
+
     final route = lib.Route(
       routeNumber: _routeNumberController.value.text,
       routeId: const uu.Uuid().v4(),
@@ -327,9 +345,9 @@ class RouteEditorState extends State<RouteEditor>
       created: DateTime.now().toUtc().toIso8601String(),
       color: colorString,
       userId: user!.userId,
-      countryId: country!.countryId,
+      countryId: widget.association.countryId,
       isActive: true,
-      countryName: country!.name,
+      countryName: widget.association.countryName,
       userUrl: user!.profileUrl,
       userName: user!.name,
       name: _nameController.value.text,
@@ -337,14 +355,16 @@ class RouteEditorState extends State<RouteEditor>
 
     try {
       var res = await dataApiDog.addRoute(route);
-      pp('$mm ... route has been added ...');
+      pp('$mm ... 🥬🥬🥬🥬🥬 route has been added ...');
       myPrettyJsonPrint(res.toJson());
+      //add cities
+      await _addRouteCities(route.routeId!, route.name!);
       _resetFields();
       widget.onRouteAdded(res);
       if (mounted) {
         //_showDialog(route);
         showToast(
-          message: 'Route has been created:\n ${route.name}',
+          message: 'Route has been created:🥬🥬🥬🥬 ${route.name}',
           backgroundColor: Colors.green.shade700,
           textStyle: myTextStyleMediumBoldWithColor(
               context: context, color: Colors.white, fontSize: 16),
@@ -366,6 +386,35 @@ class RouteEditorState extends State<RouteEditor>
     });
   }
 
+  Future _addRouteCities(String routeId, String routeName) async {
+    pp('$mm _addRouteCities ... ${finalCities.length}');
+    int cnt = 0;
+    for (var city in finalCities) {
+      var rc = lib.RouteCity(routeId, routeName, city.cityId, city.name, DateTime.now().toUtc().toIso8601String(),
+          widget.association.associationId, city.position);
+      var res = await dataApiDog.addRouteCity(rc);
+      if (res != null) {
+        cnt++;
+      }
+    }
+    pp('$mm ... route cities added, $cnt');
+
+  }
+  _filterCities() {
+    HashMap<String, lib.City> map = HashMap();
+    for (var sc in startCities) {
+      map[sc.cityId!] = sc;
+    }
+    for (var sc in endCities) {
+      map[sc.cityId!] = sc;
+    }
+    var list = map.values.toList();
+    for (var value in list) {
+      finalCities.add(value);
+    }
+    pp('$mm filtered cities: ${finalCities.length}');
+
+  }
   _resetFields() {
     _nameController.text = '';
     _routeNumberController.text = '';
@@ -465,11 +514,11 @@ class RouteEditorState extends State<RouteEditor>
                                       colorString = s;
                                     });
                                   },
-                                  onRefresh: (radius) {
+                                  onRefresh: (radius) async {
                                     radiusInKM = radius;
-                                    findCitiesByLocation();
+                                    _getCities();
                                   },
-                                  radiusInKM: 200,
+                                  radiusInKM: 500,
                                   numberOfCities: _cities.length,
                                   createUpdate: createOrUpdate,
                                   routeName: routeName,
@@ -520,7 +569,7 @@ class RouteEditorState extends State<RouteEditor>
                                   },
                                   onRefresh: (radius) {
                                     radiusInKM = radius;
-                                    findCitiesByLocation();
+                                    _getCities();
                                   },
                                 ),
                               ),
@@ -571,7 +620,7 @@ class RouteEditorState extends State<RouteEditor>
                                 },
                                 onRefresh: (radius) {
                                   radiusInKM = radius;
-                                  findCitiesByLocation();
+                                  _getCities();
                                 },
                               ),
                             ),
@@ -591,7 +640,7 @@ class RouteEditorState extends State<RouteEditor>
                           right: leftPadding,
                           child: SizedBox(
                             width: 460,
-                            height: 800,
+                            height: 600,
                             child: CitySearch(
                               title: findStartCity ? startOfRoute : endOfRoute,
                               showScaffold: true,
@@ -611,7 +660,7 @@ class RouteEditorState extends State<RouteEditor>
                               cities: _cities,
                               onCityAdded: (c) {
                                 pp('$mm ... city added: ${c.name}');
-                                findCitiesByLocation();
+                                _getCities();
                               },
                             ),
                           ))

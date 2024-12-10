@@ -88,7 +88,7 @@ class RouteDetailFormContainer extends StatelessWidget {
                             DropdownButton<double>(
                                 hint: Text(
                                   selectSearchArea,
-                                  style: myTextStyleSmall(context),
+                                  style: myTextStyleMediumLarge(context, 16),
                                 ),
                                 items: const [
                                   DropdownMenuItem(
@@ -130,6 +130,10 @@ class RouteDetailFormContainer extends StatelessWidget {
                                   DropdownMenuItem(
                                     value: 500.0,
                                     child: Text('500 km'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 600.0,
+                                    child: Text('600 km'),
                                   ),
                                   DropdownMenuItem(
                                     value: 750.0,
@@ -196,7 +200,9 @@ class RouteDetailFormContainer extends StatelessWidget {
                           },
                           child: CityWidget(
                             city: nearestStart,
-                            title: routeStart,
+                            title: routeStart, onTapped: (){
+                            onRouteStartSearch();
+                          },
                           ),
                         ),
                         const SizedBox(
@@ -207,7 +213,9 @@ class RouteDetailFormContainer extends StatelessWidget {
                               onRouteEndSearch();
                             },
                             child:
-                            CityWidget(city: nearestEnd, title: routeEnd)),
+                            CityWidget(city: nearestEnd, title: routeEnd, onTapped: (){
+                              onRouteEndSearch();
+                            },)),
                         const SizedBox(
                           height: 28,
                         ),
@@ -215,7 +223,7 @@ class RouteDetailFormContainer extends StatelessWidget {
                           width: 400,
                           child: TextFormField(
                             controller: nameController,
-                            style: myTextStyleSmall(context),
+                            style: myTextStyleMediumLarge(context, 20),
                             enabled: false,
                             validator: (value) {
                               if (value!.isEmpty) {
