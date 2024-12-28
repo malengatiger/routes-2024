@@ -12,10 +12,12 @@ import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:badges/badges.dart' as bd;
-import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:universal_html/html.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../library/data_api.dart';
+import '../../library/qr_code_generation.dart';
 
 class UsersEdit extends StatefulWidget {
   const UsersEdit({super.key, required this.association, this.user});
@@ -54,7 +56,7 @@ class UsersEditState extends State<UsersEdit>
   TextEditingController cellphoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  final DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
+  final DataApi dataApiDog = GetIt.instance<DataApi>();
   final ListApiDog listApiDog = GetIt.instance<ListApiDog>();
   final QRGenerationService qrGeneration =
       GetIt.instance<QRGenerationService>();
@@ -126,9 +128,20 @@ class UsersEditState extends State<UsersEdit>
       busy = true;
     });
     try {
-      users = await listApiDog.getAssociationUsers(
+      var allUsers = await listApiDog.getAssociationUsers(
           widget.association.associationId!, true);
       pp('$mm association users found: ${users.length}');
+
+      for (var u in allUsers) {
+        if ((u.firstName!.contains('admin') && u.lastName!.contains('admin')) ||
+            (u.firstName!.contains('vehicle') &&
+                u.lastName!.contains('vehicle')) || (u.firstName!.contains('ASSOCIATION') && u.lastName!.contains('ASSOCIATION'))) {
+          pp('$mm ignore user: ${u.firstName} ${u.lastName}');
+        } else {
+          users.add(u);
+        }
+      }
+      users.sort((a, b) => a.firstName!.compareTo(b.firstName!));
       if (users.isEmpty) {
         _showEditor = true;
       }
@@ -172,13 +185,8 @@ class UsersEditState extends State<UsersEdit>
           userType: userType);
 
       try {
-        var qrBucket = await qrGeneration.generateAndUploadQrCodeWithLogo(
-            data: selectedUser!.toJson(),
-            associationId: widget.association.associationId!);
-        pp('$mm user qrBucket: ${qrBucket!.bucketFileName}');
 
-        selectedUser!.bucketFileName = qrBucket.bucketFileName;
-        selectedUser!.qrCodeBytes = qrBucket.qrCodeBytes;
+
         var res = await dataApiDog.addUser(selectedUser!);
         pp('$mm user: $res');
         _getUsers();
@@ -320,12 +328,7 @@ class UsersEditState extends State<UsersEdit>
         try {
           user.userId = Uuid().v4();
           user.password = 'pass123';
-          var qrBucket = await qrGeneration.generateAndUploadQrCodeWithLogo(
-              data: user.toJson(),
-              associationId: widget.association.associationId!);
-          pp('$mm  user qrBucket ... 🍎 ${qrBucket!.bucketFileName} 🍎');
-          user.bucketFileName = qrBucket.bucketFileName;
-          user.qrCodeBytes = qrBucket.qrCodeBytes;
+
           var res = await dataApiDog.addUser(user);
           addUsersResponse.users.add(res);
         } catch (e) {
@@ -452,13 +455,19 @@ class UsersEditState extends State<UsersEdit>
                                             child: Text('Send Users File')),
                                       ),
                                 gapH16,
-                                usersFromCsv.isEmpty? gapW16: Row(
-                                  children: [
-                                    const Text('Number of User in File'),
-                                    gapW32,
-                                    Text('${usersFromCsv.length}', style: myTextStyleMediumLarge(context, 24),),
-                                  ],
-                                ),
+                                usersFromCsv.isEmpty
+                                    ? gapW16
+                                    : Row(
+                                        children: [
+                                          const Text('Number of User in File'),
+                                          gapW32,
+                                          Text(
+                                            '${usersFromCsv.length}',
+                                            style: myTextStyleMediumLarge(
+                                                context, 24),
+                                          ),
+                                        ],
+                                      ),
                                 csvFile == null ? gapH8 : gapH16,
                                 gapH16,
                                 TextFormField(

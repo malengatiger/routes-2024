@@ -184,8 +184,7 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
                   default:
                     mType = 'One Trip';
                 }
-                var bytes =
-                    Uint8Converter.stringToUint8List(ticket.qrCodeBytes!);
+
                 return Card(
                   elevation: 8,
                   child: Padding(
@@ -195,7 +194,7 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            GestureDetector(
+                            ticket.qrCodeUrl == null? gapW32: GestureDetector(
                               onTap: () {
                                 pp('onTap ... change qrcode size');
                                 _controlQRCodeSize();
@@ -205,8 +204,8 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
                                 color: Colors.yellow.shade50,
                                 child: Padding(
                                   padding: const EdgeInsets.all(4.0),
-                                  child: Image.memory(
-                                    bytes,
+                                  child: Image.network(
+                                    ticket.qrCodeUrl!,
                                     height: _qrCodeSize,
                                     width: _qrCodeSize,
                                   ),
@@ -304,7 +303,7 @@ class _AssociationTicketListState extends State<AssociationTicketList> {
     return ticket.ticketRoutes!.length * 28;
   }
 
-  double _qrCodeSize = 200.0;
+  double _qrCodeSize = 300.0;
 
   void _controlQRCodeSize() {
     pp('_controlQRCodeSize: $_qrCodeSize');

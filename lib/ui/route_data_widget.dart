@@ -231,11 +231,31 @@ class RouteDataState extends State<RouteDataWidget>
             Navigator.of(context).pop();
           },
           onNavigateToMapViewer: () {},
-          onColorChanged: (color, str) {},
+          onColorChanged: (color, str) {
+            pp('$mm onColorChanged ... $str');
+            _updateRouteColor(str);
+          },
         ),
         transitionType: PageTransitionType.leftToRight);
   }
 
+  void _updateRouteColor(String color) async {
+    setState(() {
+      busy = true;
+    });
+    try {
+      route!.color = color;
+      var result = await dataApiDog.updateRouteColor(routeId: route!.routeId!, color: color);
+    } catch (e,s) {
+      pp('$mm $e $s');
+      if (mounted) {
+        showErrorToast(message: 'Route colour update failed: $e', context: context);
+      }
+    }
+    setState(() {
+      busy = false;
+    });
+}
   @override
   void dispose() {
     _controller.dispose();

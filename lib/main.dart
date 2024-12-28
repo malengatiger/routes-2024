@@ -1,11 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kasie_transie_library/bloc/list_api_dog.dart';
-import 'package:kasie_transie_library/bloc/register_services.dart';
 import 'package:kasie_transie_library/bloc/theme_bloc.dart';
 import 'package:kasie_transie_library/data/color_and_locale.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
@@ -15,6 +11,7 @@ import 'package:kasie_transie_library/utils/theme.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:get_it/get_it.dart';
+import 'package:routes_2024/library/register.dart';
 import 'firebase_options.dart';
 import 'intro/kasie_intro.dart';
 import 'intro/splash_page.dart';
@@ -52,8 +49,7 @@ Future<void> main() async {
         app: firebaseApp,
         bucket: bucket);
     pp('$mx 🌸🌸 FirebaseStorage: 🍎🍎 ${fbs.toString()}');
-    var msg = await RegisterServices.register(firebaseStorage: fbs);
-    pp('$mx $msg');
+    await RegisterServices.register(firebaseStorage: fbs);
     kasieThemeManager = GetIt.instance<KasieThemeManager>();
   } catch (e,s) {
     pp('$e $s');

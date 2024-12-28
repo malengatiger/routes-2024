@@ -8,10 +8,12 @@ import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/device_location_bloc.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
-import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:badges/badges.dart' as bd;
 import 'package:routes_2024/ui/association/vehicle_photos.dart';
+
+import '../../library/data_api.dart';
+import '../../library/qr_code_generation.dart';
 
 class VehicleListWidget extends StatefulWidget {
   const VehicleListWidget(
@@ -30,7 +32,7 @@ class VehicleListWidget extends StatefulWidget {
 
 class _VehicleListWidgetState extends State<VehicleListWidget> {
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
-  DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
+  DataApi dataApiDog = GetIt.instance<DataApi>();
   DeviceLocationBloc deviceLocationBloc = GetIt.instance<DeviceLocationBloc>();
   bool busy = false;
   List<VehiclePhoto> photos = [];
@@ -109,7 +111,7 @@ void printCars() {
     try {
       var loc = await deviceLocationBloc.getLocation();
       pp('$mm ............. location: ${loc.latitude} ${loc.longitude}');
-      await dataApiDog.importVehicleProfile(
+      await dataApiDog.uploadVehiclePhoto(
           file: file,
           thumb: file,
           vehicleId: car.vehicleId!,
@@ -181,9 +183,7 @@ void printCars() {
   _updateQRCode(Vehicle vehicle) async {
     pp('$mm _updateQRCode ...');
     try {
-      var qrBucket = await qrGeneration.generateAndUploadQrCodeWithLogo(data: vehicle.toJson(), associationId: vehicle.associationId!);
-      vehicle.bucketFileName = qrBucket?.bucketFileName;
-      vehicle.qrCodeBytes = qrBucket?.qrCodeBytes;
+
       var res = await dataApiDog.updateVehicle(vehicle);
       if (mounted) {
         showOKToast(

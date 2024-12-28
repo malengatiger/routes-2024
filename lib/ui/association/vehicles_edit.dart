@@ -11,10 +11,11 @@ import 'package:kasie_transie_library/data/constants.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:routes_2024/ui/association/vehicle_list_widget.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../library/qr_code_generation.dart';
 
 class VehiclesEdit extends StatefulWidget {
   const VehiclesEdit({super.key, required this.association});
@@ -134,12 +135,7 @@ class VehiclesEditState extends State<VehiclesEdit>
       var cell = generateRandomZAPhoneNumber();
       owner.cellphone = cell;
     }
-    QRBucket? qrBucket2 =
-    await qrGeneration.generateAndUploadQrCodeWithLogo(
-        data: owner.toJson(),
-        associationId: widget.association.associationId!);
-    owner.bucketFileName = qrBucket2!.bucketFileName;
-    owner.qrCodeBytes = qrBucket2!.qrCodeBytes;
+
     var mUser = await dataApiDog.addUser(owner);
 
     if (vehicle != null) {
@@ -152,7 +148,7 @@ class VehiclesEditState extends State<VehiclesEdit>
       vehicle!.ownerId = mUser.userId;
       vehicle!.passengerCapacity = capacityController.text as int?;
       vehicle!.countryId = mUser.countryId;
-      vehicle!.associationId =  widget.association.associationId!;
+      vehicle!.associationId = widget.association.associationId!;
       vehicle!.associationName = widget.association.associationName;
     } else {
       vehicle = Vehicle(
@@ -168,16 +164,10 @@ class VehiclesEditState extends State<VehiclesEdit>
           year: yearController.text,
           ownerName: ownerNameController.text,
           ownerId: mUser.userId,
-          cellphone: cellphoneController.text);
+          cellphone: cellphoneController.text, fcmToken: '');
     }
     try {
-      QRBucket? qrBucket =
-          await qrGeneration.generateAndUploadQrCodeWithLogo(
-              data: vehicle!.toJson(),
-              associationId: widget.association.associationId!);
-      pp('$mm ... qr code qrBucket: ${qrBucket!.bucketFileName}');
-      vehicle!.bucketFileName = qrBucket.bucketFileName;
-      vehicle!.qrCodeBytes = qrBucket!.qrCodeBytes;
+
       vehicle!.countryId = widget.association.countryId;
       var res = await dataApiDog.addVehicle(vehicle!);
       cars.insert(0, res);
@@ -265,26 +255,19 @@ class VehiclesEditState extends State<VehiclesEdit>
             //ignore
           }
           User? mUser;
-          QRBucket? qrBucket =
-              await qrGeneration.generateAndUploadQrCodeWithLogo(
-                  data: car.toJson(),
-                  associationId: widget.association.associationId!);
-          pp('\n\n$mm ...back from generateQrCodeWithLogo: ${qrBucket!.bucketFileName}...\n');
-          car.bucketFileName = qrBucket.bucketFileName;
-          car.qrCodeBytes = qrBucket.qrCodeBytes;
+
           car.active = 0;
           car.countryId = widget.association.countryId!;
 
           var email =
               'owner${DateTime.now().millisecondsSinceEpoch}@owners.com';
           try {
-
             User owner = User(
                 userType: Constants.OWNER,
                 associationId: widget.association.associationId!,
                 associationName: widget.association.associationName,
                 cellphone: car.cellphone,
-                firstName: firstName?? 'ASSOCIATION',
+                firstName: firstName ?? 'ASSOCIATION',
                 lastName: lastName ?? 'ASSOCIATION',
                 countryId: widget.association.countryId!,
                 email: email,
@@ -294,15 +277,10 @@ class VehiclesEditState extends State<VehiclesEdit>
               var cell = generateRandomZAPhoneNumber();
               owner.cellphone = cell;
             }
-            QRBucket? qrBucket2 =
-            await qrGeneration.generateAndUploadQrCodeWithLogo(
-                data: owner.toJson(),
-                associationId: widget.association.associationId!);
-            owner.bucketFileName = qrBucket2!.bucketFileName;
-            owner.qrCodeBytes = qrBucket2.qrCodeBytes;
-            pp('$mm ........ adding owner if user not exist yet ... ${owner.toJson()}');
+
+            pp('$mm ........ adding owner if user not exist yet ... ${owner.firstName}');
             mUser = await dataApiDog.addOwner(owner);
-            pp('$mm ... owner created or retrieved ... ${mUser.toJson()}');
+            pp('$mm ... owner created or retrieved ... ${mUser.firstName}');
           } catch (e, s) {
             pp("$mm 😈😈😈😈😈😈owner creation failed: $e $s");
           }
@@ -313,7 +291,7 @@ class VehiclesEditState extends State<VehiclesEdit>
             car.countryId = mUser.countryId;
           }
 
-          pp('$mm ... adding vehicle; ... 🔆 🔆 🔆 check qrBucket... ${car.toJson()} 🔆 🔆 🔆');
+          pp('$mm ... adding vehicle; ... 🔆 🔆 🔆 check qrBucket... ${car.vehicleReg} 🔆 🔆 🔆');
           var res = await dataApiDog.addVehicle(car);
           addCarsResponse.cars.add(res);
         } catch (e) {
@@ -409,13 +387,20 @@ class VehiclesEditState extends State<VehiclesEdit>
                                       child: Text('Get File')),
                                 ),
                                 gapH16,
-                                carsFromCSV.isEmpty? gapW16: Row(
-                                  children: [
-                                    const Text('Number of Vehicles in File'),
-                                    gapW32,
-                                    Text('${carsFromCSV.length}', style: myTextStyleMediumLarge(context, 24),),
-                                  ],
-                                ),
+                                carsFromCSV.isEmpty
+                                    ? gapW16
+                                    : Row(
+                                        children: [
+                                          const Text(
+                                              'Number of Vehicles in File'),
+                                          gapW32,
+                                          Text(
+                                            '${carsFromCSV.length}',
+                                            style: myTextStyleMediumLarge(
+                                                context, 24),
+                                          ),
+                                        ],
+                                      ),
                                 gapH16,
                                 csvFile == null
                                     ? gapH16

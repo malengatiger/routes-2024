@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
+import 'package:kasie_transie_library/data/constants.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/widgets/country_selection.dart';
+import 'package:uuid/v4.dart';
 
 class AssociationEdit extends StatefulWidget {
   const AssociationEdit({super.key, this.association, required this.onClose});
@@ -55,10 +57,10 @@ class AssociationEditState extends State<AssociationEdit>
   void _setup() async {
     if (widget.association != null) {
       nameController.text = widget.association!.associationName!;
-      adminLastNameController.text = widget.association!.adminUserLastName!;
-      adminFirstNameController.text = widget.association!.adminUserFirstName!;
-      emailController.text = widget.association!.adminEmail!;
-      cellphoneController.text = widget.association!.adminCellphone!;
+      adminLastNameController.text = widget.association!.adminUser!.lastName!;
+      adminFirstNameController.text = widget.association!.adminUser!.firstName!;
+      emailController.text = widget.association!.adminUser!.email!;
+      cellphoneController.text = widget.association!.adminUser!.cellphone!;
       country = prefs.getCountry();
       setState(() {});
     }
@@ -79,17 +81,22 @@ class AssociationEditState extends State<AssociationEdit>
     setState(() {
       busy = true;
     });
+    String id = UuidV4().generate();
     if (widget.association == null) {
+      User a = User(
+        firstName: adminFirstNameController.text,
+        lastName: adminLastNameController.text,
+        email: emailController.text,
+        cellphone: cellphoneController.text,
+        password: passwordController.text, userType: Constants.ADMINISTRATOR_ASSOCIATION,
+        countryId: country!.countryId, associationId: id, associationName: nameController.text,
+      );
       association = Association(
         associationId: '${DateTime.now().millisecondsSinceEpoch}',
         associationName: nameController.text,
         countryId: country!.countryId,
         countryName: country!.name,
-        adminUserFirstName: adminFirstNameController.text,
-        adminUserLastName: adminLastNameController.text,
-        adminCellphone: cellphoneController.text,
-        adminEmail: emailController.text,
-        password: passwordController.text,
+        adminUser: a
       );
 
       try {

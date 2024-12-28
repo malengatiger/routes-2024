@@ -7,11 +7,12 @@ import 'package:get_it/get_it.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/data/example_file.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
-import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:http/http.dart' as http;
 import 'package:universal_html/html.dart' as html;
 import 'package:path_provider/path_provider.dart';
 import 'package:universal_io/io.dart';
+
+import '../../library/qr_code_generation.dart';
 class ExampleFileWidget extends StatefulWidget {
   const ExampleFileWidget({super.key});
 

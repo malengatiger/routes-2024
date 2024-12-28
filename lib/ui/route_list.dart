@@ -137,7 +137,6 @@ class _RouteListWidgetState extends State<RouteListWidget> {
                                     }
                                   },
                                   child: Card(
-                                    shape: getRoundedBorder(radius: 16),
                                     elevation: elevation,
                                     child: Column(
                                       children: [

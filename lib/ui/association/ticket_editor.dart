@@ -6,13 +6,14 @@ import 'package:kasie_transie_library/bloc/cloud_storage_bloc.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/data/ticket.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-import 'package:kasie_transie_library/widgets/scanners/qr_code_generation.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/ticket_maker.dart';
 import 'package:badges/badges.dart' as bd;
 import 'package:uuid/uuid.dart';
+
+import '../../library/qr_code_generation.dart';
 
 class TicketEditor extends StatefulWidget {
   const TicketEditor(
@@ -194,11 +195,7 @@ class _TicketEditorState extends State<TicketEditor> {
       setState(() {
         busy = true;
       });
-      var qrBucket = await qrGeneration.generateAndUploadQrCodeWithLogo(
-          data: _currentTicket!.toJson(),
-          associationId: widget.association.associationId!);
-      _currentTicket!.bucketFileName = qrBucket!.bucketFileName;
-      _currentTicket!.qrCodeBytes = qrBucket.qrCodeBytes;
+
       _currentTicket = await dataApi.addTicket(_currentTicket!);
       var msg = 'Ticket added OK and valid for ';
       if (isValidOnAllRoutes) {
