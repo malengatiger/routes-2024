@@ -56,6 +56,8 @@ class AssociationRoutesState extends State<AssociationRoutes> {
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
   Prefs prefs = GetIt.instance<Prefs>();
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
+  FCMService fcmService = GetIt.instance<FCMService>();
+
   RouteDistanceCalculator routeDistanceCalculator =
       GetIt.instance<RouteDistanceCalculator>();
 
@@ -80,7 +82,7 @@ class AssociationRoutesState extends State<AssociationRoutes> {
   }
 
   Future<void> initialize() async {
-    fcmBloc.subscribeForRouteBuilder('RouteBuilder');
+    fcmService.subscribeForRouteBuilder('RouteBuilder');
   }
 
   void _listen() {
@@ -91,7 +93,7 @@ class AssociationRoutesState extends State<AssociationRoutes> {
         setState(() {});
       }
     });
-    routeChangesSub = fcmBloc.routeChangesStream.listen((event) {
+    routeChangesSub = fcmService.routeChangesStream.listen((event) {
       pp('$mm routeChangesStream delivered a routeId: $event');
       routeId = event;
       setState(() {});
@@ -367,13 +369,7 @@ class AssociationRoutesState extends State<AssociationRoutes> {
 
   @override
   Widget build(BuildContext context) {
-    // if (user != null) {
-    //   final k = ref.watch(
-    //       routesProvider(AssociationParameter(user!.associationId!, false)));
-    //   if (k.hasValue) {
-    //     routes = k.value!;
-    //   }
-    // }
+
     final width = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(

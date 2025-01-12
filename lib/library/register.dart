@@ -10,6 +10,7 @@ import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/bloc/the_great_geofencer.dart';
 import 'package:kasie_transie_library/bloc/theme_bloc.dart';
+import 'package:kasie_transie_library/messaging/fcm_bloc.dart';
 import 'package:kasie_transie_library/utils/device_location_bloc.dart';
 import 'package:kasie_transie_library/utils/error_handler.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
@@ -20,7 +21,7 @@ import 'package:kasie_transie_library/utils/zip_handler.dart';
 import 'package:routes_2024/library/qr_code_generation.dart';
 import 'package:sembast_web/sembast_web.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'data_api.dart';
 
 
@@ -46,9 +47,11 @@ class RegisterServices {
     pp('$mm .... ErrorHandler: 🦠errorHandler initialized');
     final SemCache semCache = SemCache();
     pp('$mm .... SemCache: 🦠cache initialized');
-    final ZipHandler zipHandler = ZipHandler(appAuth, semCache);
+    final ZipHandler zipHandler = ZipHandler();
     pp('$mm .... ZipHandler: 🦠handler initialized');
 
+    final FCMService fcmService = FCMService(FirebaseMessaging.instance);
+    pp('$mm .... ZipHandler: 🦠handler initialized');
     final listApi =
     ListApiDog(client);
     pp('$mm .... ListApiDog: 🦠listApiDog initialized');
@@ -68,7 +71,8 @@ class RegisterServices {
 
     instance.registerLazySingleton<CloudStorageBloc>(() => csb);
     pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... CloudStorageBloc');
-
+    instance.registerLazySingleton<FCMService>(() => fcmService);
+    pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... FCMService');
     instance.registerLazySingleton<KasieThemeManager>(() => KasieThemeManager(prefs));
     pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... KasieThemeManager');
 
@@ -108,6 +112,8 @@ class RegisterServices {
     instance.registerLazySingleton<ErrorHandler>(() => errorHandler);
     pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... ErrorHandler');
 
+    instance.registerLazySingleton<ZipHandler>(() => zipHandler);
+    pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... ZipHandler');
 
     instance.registerLazySingleton<DataApi>(() => DataApi());
     pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... DataApi');
@@ -116,6 +122,6 @@ class RegisterServices {
     pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... QRGenerationService');
 
     pp('\n\n$mm  returning message form RegisterService  🍎🍎🍎\n\n');
-    return '\n🍎🍎🍎 RegisterServices: 15 Service singletons registered!';
+    return '\n🍎🍎🍎 RegisterServices: 16 Service singletons registered!';
   }
 }

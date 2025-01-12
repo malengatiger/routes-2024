@@ -57,7 +57,6 @@ class VehiclesEditState extends State<VehiclesEdit>
 
   final DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   final ListApiDog listApiDog = GetIt.instance<ListApiDog>();
-  final QRGenerationService qrGeneration = GetIt.I<QRGenerationService>();
 
   bool busy = false;
   Prefs prefs = GetIt.instance<Prefs>();

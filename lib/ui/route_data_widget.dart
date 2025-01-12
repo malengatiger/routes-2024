@@ -52,6 +52,7 @@ class RouteDataState extends State<RouteDataWidget>
   DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   ZipHandler zipHandler = GetIt.instance<ZipHandler>();
   SemCache semCache = GetIt.instance<SemCache>();
+  FCMService fcmService = GetIt.instance<FCMService>();
 
   RouteUpdateListener routeUpdateListener =
       GetIt.instance<RouteUpdateListener>();
@@ -129,8 +130,8 @@ class RouteDataState extends State<RouteDataWidget>
   }
 
   void _listen() async {
-    _routeUpdateSubscription = fcmBloc.routeUpdateRequestStream.listen((event) {
-      pp('$mm fcmBloc.routeUpdateRequestStream delivered: ${event.routeName}');
+    _routeUpdateSubscription = fcmService.routeUpdateRequestStream.listen((event) {
+      pp('$mm fcmService.routeUpdateRequestStream delivered: ${event.routeName}');
       _noteRouteUpdate(event);
     });
 

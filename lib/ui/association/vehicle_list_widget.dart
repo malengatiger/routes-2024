@@ -32,7 +32,7 @@ class VehicleListWidget extends StatefulWidget {
 
 class _VehicleListWidgetState extends State<VehicleListWidget> {
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
-  DataApi dataApiDog = GetIt.instance<DataApi>();
+  DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   DeviceLocationBloc deviceLocationBloc = GetIt.instance<DeviceLocationBloc>();
   bool busy = false;
   List<VehiclePhoto> photos = [];
@@ -43,7 +43,6 @@ class _VehicleListWidgetState extends State<VehicleListWidget> {
   PlatformFile? vehiclePictureFile;
   bool _showActions = false;
   int? _showIndex;
-  QRGenerationService qrGeneration = GetIt.instance<QRGenerationService>();
 
   @override
   void initState() {

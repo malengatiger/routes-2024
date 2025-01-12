@@ -643,7 +643,6 @@ class RouteEditorState extends State<RouteEditor>
                             height: 600,
                             child: CitySearch(
                               title: findStartCity ? startOfRoute : endOfRoute,
-                              showScaffold: true,
                               onCitySelected: (c) {
                                 pp('.... city at start: ${c.name}');
                                 if (findEndCity) {

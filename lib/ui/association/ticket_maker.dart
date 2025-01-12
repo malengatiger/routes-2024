@@ -4,7 +4,6 @@ import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/data/ticket.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
-import 'package:kasie_transie_library/utils/uint_conveter.dart';
 import 'package:routes_2024/ui/association/ticket_editor.dart';
 
 class TicketMaker extends StatefulWidget {

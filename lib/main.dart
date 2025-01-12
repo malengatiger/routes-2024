@@ -81,13 +81,6 @@ Future<void> main() async {
   runApp(const KasieTransieApp());
 }
 
-// temporarySignOut(Prefs prefs) async {
-//   //TODO: REMOVE after test ....
-//   prefs.removeUser();
-//   await fb.FirebaseAuth.instance.signOut();
-//   pp('\n\n$mx  😈 👿cached User and Firebase creds cleaned up for testing. 🌶 REMOVE when done! 🌶 \n\n');
-// }
-
 int themeIndex = 0;
 lib.User? me;
 late KasieThemeManager kasieThemeManager;
@@ -97,6 +90,7 @@ class KasieTransieApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    kasieThemeManager = GetIt.instance<KasieThemeManager>();
     return StreamBuilder(
         stream: kasieThemeManager.localeAndThemeStream,
         builder: (ctx, snapshot) {

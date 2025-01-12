@@ -56,10 +56,8 @@ class UsersEditState extends State<UsersEdit>
   TextEditingController cellphoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  final DataApi dataApiDog = GetIt.instance<DataApi>();
+  final DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
   final ListApiDog listApiDog = GetIt.instance<ListApiDog>();
-  final QRGenerationService qrGeneration =
-      GetIt.instance<QRGenerationService>();
 
   bool busy = false;
   Prefs prefs = GetIt.instance<Prefs>();
@@ -264,8 +262,8 @@ class UsersEditState extends State<UsersEdit>
     });
     try {
       // thumbFile = await getPhotoThumbnail(file: userFile!);
-      await dataApiDog.importUserProfile(
-          file: userFile!, thumb: userFile!, userId: user.userId!);
+      // await dataApiDog.upl(
+      //     file: userFile!, thumb: userFile!, userId: user.userId!);
       _getUsers();
     } catch (e, s) {
       pp('$e $s');

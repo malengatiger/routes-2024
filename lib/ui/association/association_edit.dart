@@ -7,6 +7,7 @@ import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/widgets/country_selection.dart';
 import 'package:uuid/v4.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AssociationEdit extends StatefulWidget {
   const AssociationEdit({super.key, this.association, required this.onClose});
@@ -88,19 +89,41 @@ class AssociationEditState extends State<AssociationEdit>
         lastName: adminLastNameController.text,
         email: emailController.text,
         cellphone: cellphoneController.text,
-        password: passwordController.text, userType: Constants.ADMINISTRATOR_ASSOCIATION,
-        countryId: country!.countryId, associationId: id, associationName: nameController.text,
+        password: passwordController.text,
+        userType: Constants.ADMINISTRATOR_ASSOCIATION,
+        countryId: country!.countryId,
+        associationId: id,
+        associationName: nameController.text,
       );
       association = Association(
-        associationId: '${DateTime.now().millisecondsSinceEpoch}',
-        associationName: nameController.text,
-        countryId: country!.countryId,
-        countryName: country!.name,
-        adminUser: a
-      );
+          associationId: '${DateTime.now().millisecondsSinceEpoch}',
+          associationName: nameController.text,
+          countryId: country!.countryId,
+          countryName: country!.name,
+          adminUser: a);
 
       try {
-        var res = await dataApiDog.registerAssociation(association!);
+        await dataApiDog.registerAssociation(association!);
+        var s = SettingsModel(
+            associationId: association!.associationId!,
+            locale: 'en',
+            created: DateTime.now().toUtc().toIso8601String(),
+            refreshRateInSeconds: 300,
+            themeIndex: 0,
+            geofenceRadius: 500,
+            commuterGeofenceRadius: 500,
+            vehicleSearchMinutes: 10,
+            heartbeatIntervalSeconds: 300,
+            loiteringDelay: 60,
+            commuterSearchMinutes: 10,
+            commuterGeoQueryRadius: 500,
+            vehicleGeoQueryRadius: 10000,
+            numberOfLandmarksToScan: 0,
+            geofenceRefreshMinutes: 30,
+            distanceFilter: 500);
+
+        await dataApiDog.addSettings(s);
+
         if (mounted) {
           showOKToast(
               message: 'Association registered on KasieTransie',
@@ -133,7 +156,17 @@ class AssociationEditState extends State<AssociationEdit>
             width: 480,
             child: Column(
               children: [
-
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        icon: const FaIcon(FontAwesomeIcons.xmark))
+                  ],
+                ),
+                gapH32,
                 Form(
                     key: _formKey,
                     child: Column(
@@ -165,7 +198,8 @@ class AssociationEditState extends State<AssociationEdit>
                         TextFormField(
                           controller: nameController,
                           keyboardType: TextInputType.name,
-                          style: myTextStyle(fontSize: 20, weight: FontWeight.w900),
+                          style: myTextStyle(
+                              fontSize: 20, weight: FontWeight.w900),
                           decoration: InputDecoration(
                             label: Text('Association Name'),
                             hintText: 'Enter Association Name',
@@ -257,22 +291,32 @@ class AssociationEditState extends State<AssociationEdit>
                                 width: 400,
                                 child: ElevatedButton(
                                     style: ButtonStyle(
-                                      elevation: WidgetStatePropertyAll(8),
-                                      backgroundColor: WidgetStatePropertyAll(Theme.of(context).primaryColor)
-                                    ),
+                                        elevation: WidgetStatePropertyAll(8),
+                                        backgroundColor: WidgetStatePropertyAll(
+                                            Theme.of(context).primaryColor)),
                                     onPressed: () {
                                       _onSubmit();
                                     },
                                     child: Padding(
                                         padding: EdgeInsets.all(20),
-                                        child: Text('Submit', style: myTextStyle(color: Colors.white, fontSize: 20),))),
+                                        child: Text(
+                                          'Submit',
+                                          style: myTextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ))),
                               ),
                       ],
                     )),
               ],
             ),
           ),
-        )
+        ),
+        Positioned(
+            bottom: 24, right: 24,
+            child: ElevatedButton(onPressed: (){
+              Navigator.of(context).pop();
+            }, child: const Text('Done'))),
       ],
     );
   }

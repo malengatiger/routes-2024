@@ -35,7 +35,6 @@ class _TicketEditorState extends State<TicketEditor> {
   TextEditingController tripsController = TextEditingController();
   lib.Route? route;
   List<lib.Route> selectedRoutes = [];
-  QRGenerationService qrGeneration = GetIt.instance<QRGenerationService>();
 
   String ticketType = '';
   String data = 'Heita daar!';
