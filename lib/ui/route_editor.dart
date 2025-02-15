@@ -19,6 +19,7 @@ import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:responsive_builder/responsive_builder.dart' as responsive;
 import 'package:routes_2024/ui/route_detail_form_container.dart';
 import 'package:uuid/uuid.dart' as uu;
+import 'package:permission_handler/permission_handler.dart';
 
 class RouteEditor extends StatefulWidget {
   const RouteEditor({required this.onRouteAdded, super.key, this.route, required this.association});
@@ -93,10 +94,10 @@ class RouteEditorState extends State<RouteEditor>
       busy = true;
     });
     try {
+      await _getCities();
       await _setTexts();
       await _getUser();
       await _getRoutes();
-      await _getCities();
     } catch (e) {
       pp(e);
       if (mounted) {
@@ -108,10 +109,23 @@ class RouteEditorState extends State<RouteEditor>
     });
   }
 
+   _getPermission() async {
+    var res = await Permission.location.isGranted;
+    if (!res) {
+      await Permission.location.request();
+    }
+  }
+  int limit = 600;
   Future _getCities() async {
+    pp('$mm .............. _getCities ...');
+    await _getPermission();
+
     final loc = await locationBloc.getLocation();
-    _cities = await findCitiesByLocation(latitude: loc.latitude, 
-        longitude: loc.longitude, radiusInKM: 600, limit: 600);
+    _cities = await _findCitiesByLocation(latitude: loc.latitude,
+        longitude: loc.longitude, radiusInKM: radiusInKM, limit: limit);
+
+    pp('$mm .............. _getCities ... found: ${_cities.length}');
+
     setState(() {
       
     });
@@ -191,10 +205,10 @@ class RouteEditorState extends State<RouteEditor>
     return s;
   }
 
-  Future<List<lib.City>> findCitiesByLocation({required double latitude, required double longitude, required double radiusInKM, required int limit}) async {
+  Future<List<lib.City>> _findCitiesByLocation({required double latitude, required double longitude, required double radiusInKM, required int limit}) async {
     List<lib.City> cities = [];
     try {
-      pp('... starting findCitiesByLocation ... lng: $latitude lat: $longitude');
+      pp('$mm ... starting findCitiesByLocation ... lng: $latitude lat: $longitude');
       var f = LocationFinderParameter(
           associationId: widget.association.associationId!,
           latitude: latitude,
@@ -204,13 +218,6 @@ class RouteEditorState extends State<RouteEditor>
 
       var cities = await listApiDog.findCitiesByLocation(f);
       pp('$mm cities found by location: ${_cities.length} cities within $radiusInKM km ....');
-      if (_cities.isEmpty) {
-        if (mounted) {
-          showErrorSnackBar(
-              message: 'No cities/towns/places found. Cannot execute!',
-              context: context);
-        }
-      }
       return cities;
     } catch (e) {
       pp(e);
@@ -312,9 +319,9 @@ class RouteEditorState extends State<RouteEditor>
           duration: const Duration(seconds: 3));
       return;
     }
-    startCities = await findCitiesByLocation(latitude: startCity!.position!.coordinates[1],
+    startCities = await _findCitiesByLocation(latitude: startCity!.position!.coordinates[1],
         longitude: startCity!.position!.coordinates[0], radiusInKM: 50, limit: 25);
-    endCities = await findCitiesByLocation(latitude: endCity!.position!.coordinates[1],
+    endCities = await _findCitiesByLocation(latitude: endCity!.position!.coordinates[1],
         longitude: endCity!.position!.coordinates[0], radiusInKM: 50, limit: 25);
     _filterCities();
     setState(() {

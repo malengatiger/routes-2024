@@ -11,7 +11,8 @@ import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/association_edit.dart';
 import 'package:routes_2024/ui/association/association_main.dart';
 import 'package:badges/badges.dart' as bd;
-
+import 'package:routes_2024/ui/fuel_brand_editor.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class AssociationList extends StatefulWidget {
   const AssociationList({super.key});
 
@@ -97,6 +98,14 @@ class AssociationListState extends State<AssociationList>
                   color: Theme.of(context).primaryColor,
                   size: 48,
                 )),
+
+            IconButton(
+                tooltip: 'Fuel Brands',
+                onPressed: () {
+                  NavigationUtils.navigateTo(context: context, widget: FuelBrandEditor());
+                },
+                icon: FaIcon(FontAwesomeIcons.gasPump)),
+            gapW32,gapW32,
             IconButton(
                 tooltip: 'Refresh the list of associations/organization',
                 onPressed: () {

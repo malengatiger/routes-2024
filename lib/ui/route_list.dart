@@ -6,7 +6,7 @@ import 'package:kasie_transie_library/bloc/sem_cache.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 class RouteListWidget extends StatefulWidget {
   const RouteListWidget(
       {super.key,
@@ -47,7 +47,14 @@ class _RouteListWidgetState extends State<RouteListWidget> {
   @override
   void initState() {
     super.initState();
+    _getPermission();
     _setRoutes();
+  }
+  _getPermission() async {
+    var res = await Permission.location.isGranted;
+    if (!res) {
+      await Permission.location.request();
+    }
   }
 
   _setRoutes() async {

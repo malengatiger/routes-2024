@@ -11,7 +11,6 @@ import 'package:kasie_transie_library/data/constants.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'package:routes_2024/ui/association/vehicle_list_widget.dart';
 import 'package:uuid/uuid.dart';
 
@@ -163,10 +162,10 @@ class VehiclesEditState extends State<VehiclesEdit>
           year: yearController.text,
           ownerName: ownerNameController.text,
           ownerId: mUser.userId,
-          cellphone: cellphoneController.text, fcmToken: '');
+          cellphone: cellphoneController.text,
+          fcmToken: '');
     }
     try {
-
       vehicle!.countryId = widget.association.countryId;
       var res = await dataApiDog.addVehicle(vehicle!);
       cars.insert(0, res);
@@ -220,6 +219,7 @@ class VehiclesEditState extends State<VehiclesEdit>
   List<Vehicle> errorCars = [];
 
   List<Vehicle> carsFromCSV = [];
+
   _sendFile() async {
     pp('\n\n$mm ..... send the Vehicle File to upload ...');
     setState(() {
@@ -291,6 +291,7 @@ class VehiclesEditState extends State<VehiclesEdit>
           }
 
           pp('$mm ... adding vehicle; ... 🔆 🔆 🔆 check qrBucket... ${car.vehicleReg} 🔆 🔆 🔆');
+          car.fcmToken = 'No token available yet';
           var res = await dataApiDog.addVehicle(car);
           addCarsResponse.cars.add(res);
         } catch (e) {
@@ -677,8 +678,15 @@ class VehiclesEditState extends State<VehiclesEdit>
           busy
               ? Positioned(
                   child: Center(
-                      child: TimerWidget(
-                          title: 'Uploading vehicle file', isSmallSize: true)))
+                    child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          backgroundColor: Colors.red,
+                        )),
+                  ),
+                )
               : gapW32,
         ],
       )),

@@ -171,7 +171,9 @@ class RouteDataState extends State<RouteDataWidget>
     try {
       AssociationRouteData? routeData = await listApiDog
             .getAssociationRouteData(widget.association.associationId!, refresh);
-      _populate(routeData!);
+      if (routeData != null) {
+        _populate(routeData!);
+      }
     } catch (e, stack) {
       pp('$mm ERROR getting route data $e : $stack');
       if (mounted) {
