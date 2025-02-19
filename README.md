@@ -25,6 +25,8 @@ Data managed by this app includes the following:
 
 ## Maps
 <img width="1547" alt="Screenshot 2025-02-19 at 14 25 33" src="https://github.com/user-attachments/assets/df81d84e-b8f5-425f-bb97-e8a2138d03c8" />
+<img width="372" alt="map2,png" src="https://github.com/user-attachments/assets/541a5eca-652e-4bae-b836-3b873667f84a" />
+
 
 ### What???
 <img width="1549" alt="Screenshot 2025-02-19 at 18 33 02" src="https://github.com/user-attachments/assets/ec75915a-d21d-4be0-bc49-c99029168e61" />
