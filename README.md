@@ -8,13 +8,16 @@ Web and iOS
 This Web and iOS app manages the data for each asspciation. It provides functionality to manage the Association users, vehicles, commuter tickets and route maps
 
 
-## Start
+This is available if the the app user is internal. Enables administration of any Association at a time
+
 <img width="1520" alt="Screenshot 2025-02-08 at 13 24 48" src="https://github.com/user-attachments/assets/8514fe10-425d-476c-9694-0efb451723e2" />
 
 ## Create an Association?Organization
 <img width="1520" alt="Screenshot 2025-02-08 at 13 23 13" src="https://github.com/user-attachments/assets/07f9a7db-6c25-4b55-9aff-69446db7a655" />
 
 ### Taxi Route Builder
+All the Taxi Routes for each Association are built and managed
+
 <img width="1547" alt="Screenshot 2025-02-19 at 14 25 33" src="https://github.com/user-attachments/assets/df81d84e-b8f5-425f-bb97-e8a2138d03c8" />
 
 ## Some Example Maps
