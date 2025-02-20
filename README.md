@@ -32,14 +32,14 @@ All the Taxi Routes for each Association are built and managed
 
 ## Data managed by this app includes the following:
 
-### Users
-### Vehicles
-### Settings
-### Association
-### Routes
-### RouteLandmarks
-### RoutePoints
-### Ticket
+Users
+Vehicles
+Settings
+Association
+Routes
+RouteLandmarks
+RoutePoints
+Ticket
 
 
 
