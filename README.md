@@ -12,7 +12,7 @@ This is available if the the app user is internal. Enables administration of any
 
 <img width="1520" alt="Screenshot 2025-02-08 at 13 24 48" src="https://github.com/user-attachments/assets/8514fe10-425d-476c-9694-0efb451723e2" />
 
-## Create an Association?Organization
+## Create an Association/Organization
 <img width="1520" alt="Screenshot 2025-02-08 at 13 23 13" src="https://github.com/user-attachments/assets/07f9a7db-6c25-4b55-9aff-69446db7a655" />
 
 ### Association Taxis
