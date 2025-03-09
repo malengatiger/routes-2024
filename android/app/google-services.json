@@ -64,6 +64,25 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:657690570978:android:ed074c6d3686f73e646ebb",
+        "android_client_info": {
+          "package_name": "com.kasie.association"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5AGxqLVyDNjRoRRDYVcnBq6_HMPAu3MU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:657690570978:android:1aa4b2f6867aeb38646ebb",
         "android_client_info": {
           "package_name": "com.kasie.commuter"

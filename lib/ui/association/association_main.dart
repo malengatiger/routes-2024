@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
+import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/association_edit.dart';
 import 'package:routes_2024/ui/association/example_file_widget.dart';
 import 'package:routes_2024/ui/association/routes_edit.dart';
+import 'package:routes_2024/ui/association/the_demo.dart';
 import 'package:routes_2024/ui/association/ticket_maker.dart';
 import 'package:routes_2024/ui/association/users_edit.dart';
 import 'package:routes_2024/ui/association/vehicles_edit.dart';
-
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 import '../route_data_widget.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart' as web;
 class AssociationMain extends StatefulWidget {
   const AssociationMain({super.key, this.association});
 
@@ -27,10 +31,15 @@ class AssociationMainState extends State<AssociationMain>
   late AnimationController _controller;
   static const mm = '️💛️💛️💛 AssociationMain ️💛';
 
+  Prefs prefs = GetIt.instance<Prefs>();
+
+  DataApiDog dataApiDog = GetIt.instance<DataApiDog>();
+
   @override
   void initState() {
     _controller = AnimationController(vsync: this);
     super.initState();
+    _setFirebaseMessaging();
     if (widget.association == null) {
       currentWidget = AssociationEdit(
         onClose: () {},
@@ -89,6 +98,12 @@ class AssociationMainState extends State<AssociationMain>
       case 5:
         currentWidget = ExampleFileWidget();
         break;
+      case 6:
+        NavigationUtils.navigateTo(
+            context: context,
+            widget: TheDemo(association: widget.association!),
+            transitionType: PageTransitionType.leftToRight);
+        break;
 
       default:
         currentWidget = Container(
@@ -108,6 +123,70 @@ class AssociationMainState extends State<AssociationMain>
         widget: RouteDataWidget(association: ass,),
         transitionType: PageTransitionType.leftToRight);
   }
+
+  String? token;
+  _setFirebaseMessaging() async {
+    pp('$mm ... _setFirebaseMessaging ...!');
+    var m = web.FirebaseMessaging.instance;
+    token = await m.getToken();
+    final fcmToken = await web.FirebaseMessaging.instance.getToken(
+        vapidKey:
+        "BLksUVvP3uZvFJSOtJMdyHdymY08HtfuEPLTlr1Q4O__Uo9vzbC-reM924TZ3O_zNDos20cIOPKf6vqSx-6YO4A");
+    token = fcmToken;
+    debugPrint('$mm  ... Firebase token 1: $token ....');
+    debugPrint('$mm  ... Firebase token 2: $fcmToken ....');
+
+    debugPrint('$mm  ... Firebase requestPermission ....');
+    var perm = await m.requestPermission();
+
+    debugPrint('$mm  ... Firebase registerBackgroundMessageHandler ....');
+    dataApiDog.init();
+    if (prefs.getAssociation() != null) {
+      var userId = fb.FirebaseAuth.instance.currentUser!.uid;
+      debugPrint(
+        '\n\n\n$mm  ... Firebase Token: $token send to backend .... 😡 userId: $userId',
+      );
+      var res = await dataApiDog.addAssociationToken(
+        token: token!,
+        userId: userId,
+        associationId: prefs.getAssociation()!.associationId!,
+      );
+
+      debugPrint('🔵🔵🔵🔵 AssociationToken: $res');
+      _fcmTokenStream();
+    }
+  }
+
+  Future<web.RemoteMessage> handler(web.RemoteMessage remoteMessage) async {
+    pp('\n\n\n$mm message received: $remoteMessage\n\n\n');
+    // messageService.addRemoteMessage(remoteMessage);
+    return remoteMessage;
+  }
+
+  web.FirebaseMessaging messaging = web.FirebaseMessaging.instance;
+  String? _token;
+  late Stream<String> _tokenStream;
+
+  void _fcmTokenStream() {
+    pp('\n\n$mm _fcmTokenStream ...............');
+    messaging
+        .getToken(
+        vapidKey:
+        'BLksUVvP3uZvFJSOtJMdyHdymY08HtfuEPLTlr1Q4O__Uo9vzbC-reM924TZ3O_zNDos20cIOPKf6vqSx-6YO4A')
+        .then(setToken)
+        .catchError((e) {
+      pp('$mm 😈😈😈😈😈Error getting FCM token: $e');
+      return e;
+    });
+    _tokenStream = messaging.onTokenRefresh;
+    _tokenStream.listen(setToken);
+  }
+
+  Future<void> setToken(String? value) async {
+    pp('$mm 🔵🔵🔵🔵 .... setToken: $value');
+    token = value;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -272,6 +351,26 @@ class KasieNavigation extends StatelessWidget {
                   Text(
                     'Ticket Maker',
                     style: myTextStyleMediumLarge(context, 18),
+                  ),
+                ],
+              )),
+          gapH32,
+          gapH32,
+          GestureDetector(
+              onTap: () {
+                onTapped(6);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.edit,
+                    size: 16,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  gapW32,
+                  Text(
+                    'Demo Runner',
+                    style: myTextStyle(fontSize: 14),
                   ),
                 ],
               )),

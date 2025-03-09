@@ -13,10 +13,8 @@ import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:badges/badges.dart' as bd;
 import 'package:kasie_transie_library/widgets/timer_widget.dart';
-import 'package:universal_html/html.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../library/data_api.dart';
 import '../../library/qr_code_generation.dart';
 
 class UsersEdit extends StatefulWidget {

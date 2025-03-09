@@ -112,9 +112,6 @@ class RegisterServices {
     instance.registerLazySingleton<ErrorHandler>(() => errorHandler);
     pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... ErrorHandler');
 
-    instance.registerLazySingleton<ZipHandler>(() => zipHandler);
-    pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... ZipHandler');
-
     instance.registerLazySingleton<DataApi>(() => DataApi());
     pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... DataApi');
 

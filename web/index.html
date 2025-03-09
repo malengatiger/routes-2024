@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD9Lx_JbgcWFeik-Z85AC49oJOMyuF_H5g"></script>
     <!--
       If you are serving your web app in a path other than the root, change the
       href value below to reflect the base path you are serving from.
@@ -19,43 +18,52 @@
 
     <meta charset="UTF-8">
     <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-    <meta name="description" content="Route Builder">
+    <meta name="description" content="Demo app for Kasie Transie">
 
     <!-- iOS meta tags & icons -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="routes_2024">
+    <meta name="apple-mobile-web-app-title" content="app">
     <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png"/>
 
-    <title>routes_2024</title>
+    <title>app</title>
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
+<script src="flutter.js" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoeBeUgjNwqW_bYOstD9oA1UQ514AZXHA"></script>
+<!--<script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>-->
+<!--<script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-messaging-compat.js"></script>-->
+
+<!--<script>-->
+<!--    // Import the functions you need from the SDKs you need-->
+<!--    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0//firebase-app.js";-->
+<!--    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.1.0//firebase-analytics.js";-->
+<!--    import { getMessaging } from "https://www.gstatic.com/firebasejs/10.1.0//firebase-messagin.js";-->
+<!--</script>-->
+
 <script>
+
+
+    // Check if service workers are supported by the browser
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("GET", './version.json', true);
-        xmlhttp.onload = function () {
-          if (xmlhttp.status == 200) {
-            var version = xmlhttp.responseText.split(',')[1];
-            var currentVersion = window.localStorage.getItem('version');
-            console.log('currentVersion is ' + currentVersion);
-            console.log('version is ' + version);
-            if (currentVersion && currentVersion != version) {
-              console.log('clearing cache');
-              caches.delete('flutter-app-manifest');
-              caches.delete('flutter-temp-cache');
-              caches.delete('flutter-app-cache');
-            }
-            window.localStorage.setItem('version', version);
-          }
-        };
-        xmlhttp.send();
+      window.addEventListener('load', function() {
+        console.log('🥬🥬🥬 index.html : Attempting to register service worker ......')
+        // Register the service worker
+        navigator.serviceWorker.register('firebase-messaging-sw.js')
+          .then((registration) => {
+            console.log('🥬🥬🥬🥬 serviceWorker.register: 🥬Service Worker registered with scope:', registration.scope);
+            console.log(`🥬 registration : 🌼🌼 ${JSON.stringify(registration)} 🌼🌼`)
+          })
+          .catch((error) => {
+            console.error('😈😈😈😈 Service Worker registration failed:', error);
+          });
       });
+    } else {
+      console.error('Service workers are not supported by this browser.');
     }
 </script>
 <script src="flutter_bootstrap.js" async></script>

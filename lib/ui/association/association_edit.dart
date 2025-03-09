@@ -61,7 +61,7 @@ class AssociationEditState extends State<AssociationEdit>
       adminLastNameController.text = widget.association!.adminUser!.lastName!;
       adminFirstNameController.text = widget.association!.adminUser!.firstName!;
       emailController.text = widget.association!.adminUser!.email!;
-      cellphoneController.text = widget.association!.adminUser!.cellphone!;
+      cellphoneController.text = widget.association!.adminUser!.cellphone?? '';
       country = prefs.getCountry();
       setState(() {});
     }

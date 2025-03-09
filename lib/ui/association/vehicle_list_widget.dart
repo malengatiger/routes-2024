@@ -206,7 +206,7 @@ void printCars() {
       children: [
         GridView.builder(
             gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
             itemCount: widget.vehicles.length,
             itemBuilder: (_, index) {
               var car = widget.vehicles[index];

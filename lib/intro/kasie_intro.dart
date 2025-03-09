@@ -11,7 +11,6 @@ import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-import 'package:kasie_transie_library/widgets/auth/email_auth_container.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/intro/intro_carousel.dart';
@@ -150,9 +149,10 @@ class KasieIntroState extends State<KasieIntro>
     pp('$mm ... onSuccessfulSignIn ....');
 
     var user = prefs.getUser();
-    if (user != null) {
-      if (user.associationId == 'ADMIN') {
-        if (mounted) {
+    pp('$mm ... onSuccessfulSignIn .... user: ${user?.toJson()}');
+
+
+      if (user!.associationId == 'ADMIN') {
           showOKToast(
               message: 'Sign in good, Boss!',
               duration: Duration(seconds: 2),
@@ -161,9 +161,8 @@ class KasieIntroState extends State<KasieIntro>
               context: context,
               widget: const AssociationList(),
               transitionType: PageTransitionType.leftToRight);
-        }
+
       } else {
-        if (mounted) {
           showOKToast(
               message: 'Sign in good, Boss!',
               duration: Duration(seconds: 2),
@@ -173,10 +172,10 @@ class KasieIntroState extends State<KasieIntro>
               widget:
                   AssociationRoutes(user.associationId!, user.associationName!),
               transitionType: PageTransitionType.leftToRight);
-        }
+
       }
     }
-  }
+
 
   static const tag = 'pass123';
 
@@ -327,7 +326,7 @@ class KasieIntroState extends State<KasieIntro>
                 shape: getRoundedBorder(radius: 8),
                 child: DotsIndicator(
                   dotsCount: 10,
-                  position: currentIndexPage,
+                  position: double.parse('${currentIndexPage}'),
                   decorator: const DotsDecorator(
                     colors: [
                       Colors.grey,

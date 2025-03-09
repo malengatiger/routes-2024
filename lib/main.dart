@@ -17,11 +17,13 @@ import 'intro/kasie_intro.dart';
 import 'intro/splash_page.dart';
 import 'package:firebase_storage/firebase_storage.dart' as storage;
 
+import 'library/firebase_messaging_handler.dart';
+
 late FirebaseApp firebaseApp;
 fb.User? fbAuthedUser;
 const mx = '🔵🔵🔵🔵 🍅 KasieTransie Association Administrator : main  🍅 🔵🔵';
 late ColorAndLocale colorAndLocale;
-const bucket = 'gs://kasie-transie-3.appspot.com';
+const bucket = 'gs://kasie-transie-4.appspot.com';
 
 Future<void> main() async {
   pp('\n\n\n$mx .... app starting, right at the top!\n\n');
@@ -64,6 +66,10 @@ Future<void> main() async {
     pp('$mx getAuthToken has fallen down. ${E.redDot}${E.redDot}${E.redDot}  '
         ' Firebase id token not found 🍎');
   }
+
+  FirebaseMessagingHandler().initialize(); // Initialize FCM
+
+
 
   Prefs prefs = GetIt.instance<Prefs>();
   colorAndLocale = prefs.getColorAndLocale();
