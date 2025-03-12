@@ -24,6 +24,8 @@ fb.User? fbAuthedUser;
 const mx = '🔵🔵🔵🔵 🍅 KasieTransie Association Administrator : main  🍅 🔵🔵';
 late ColorAndLocale colorAndLocale;
 const bucket = 'gs://kasie-transie-4.appspot.com';
+Prefs prefs = GetIt.instance<Prefs>();
+FirebaseMessagingHandler firebaseMessagingHandler = GetIt.instance<FirebaseMessagingHandler>();
 
 Future<void> main() async {
   pp('\n\n\n$mx .... app starting, right at the top!\n\n');
@@ -67,22 +69,13 @@ Future<void> main() async {
         ' Firebase id token not found 🍎');
   }
 
-  FirebaseMessagingHandler().initialize(); // Initialize FCM
-
-
-
-  Prefs prefs = GetIt.instance<Prefs>();
+  firebaseMessagingHandler.initialize();
   colorAndLocale = prefs.getColorAndLocale();
 
   me = prefs.getUser();
   if (me != null) {
     myPrettyJsonPrint(me!.toJson());
   }
-
-  // FirebaseUIAuth.configureProviders([
-  //   EmailAuthProvider(),
-  //   PhoneAuthProvider(),
-  // ]);
 
   runApp(const KasieTransieApp());
 }

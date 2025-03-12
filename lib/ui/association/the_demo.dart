@@ -22,7 +22,7 @@ class TheDemo extends StatefulWidget {
 class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
-  static const mm = 'TheDemo';
+  static const mm = '😹😹😹 TheDemo 😹 ';
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
   @override
   void initState() {
@@ -48,23 +48,22 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
     });
 
     associationRouteData = await listApiDog.getAssociationRouteData(
-        widget.association.associationId!, true);
+        widget.association.associationId!, false);
     for (var rd in associationRouteData!.routeDataList) {
       if (rd.landmarks.isEmpty) {
         pp('$mm Route has no landmarks: ${rd.route!.name}');
         continue;
       }
       ;
-      pp('$mm Route: ${rd.route!.name}');
       routes.add(rd.route!);
     }
     routes.sort((a, b) => a.name!.compareTo(b.name!));
     cars = await listApiDog.getAssociationCars(
-        widget.association.associationId!, true);
+        widget.association.associationId!, false);
     cars.sort((a, b) => a.vehicleReg!.compareTo(b.vehicleReg!));
 
     users = await listApiDog.getAssociationUsers(
-        widget.association.associationId!, true);
+        widget.association.associationId!, false);
     for (var u in users) {
       if (u.userType == Constants.AMBASSADOR) {
         ambassadors.add(u);
@@ -118,7 +117,7 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
     listApiDog.startCarDemo(route: route!, car: car!, ambassador: ambassador!, marshal: marshal!, associationId: marshal!.associationId!);
     if (mounted) {
       showOKToast(
-          duration: Duration(seconds: 5),
+          duration: Duration(seconds: 3),
           padding: 24,
           message: 'Car demo has started', context: context);
     }

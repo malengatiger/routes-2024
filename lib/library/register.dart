@@ -18,6 +18,7 @@ import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:kasie_transie_library/utils/route_distance_calculator.dart';
 import 'package:kasie_transie_library/utils/route_update_listener.dart';
 import 'package:kasie_transie_library/utils/zip_handler.dart';
+import 'package:routes_2024/library/firebase_messaging_handler.dart';
 import 'package:routes_2024/library/qr_code_generation.dart';
 import 'package:sembast_web/sembast_web.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,7 +61,7 @@ class RegisterServices {
       prefs: prefs, firebaseStorage: firebaseStorage,
       locationBloc: deviceLocationBloc, );
     pp('$mm .... CloudStorageBloc: 🦠csb initialized');
-
+    final FirebaseMessagingHandler firebaseMessagingHandler = FirebaseMessagingHandler();
     //
     pp('\n\n$mm ..... 🦠🦠🦠🦠🦠registerLazySingletons ...');
 
@@ -69,6 +70,8 @@ class RegisterServices {
     instance.registerLazySingleton<Prefs>(() => prefs);
     pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... Prefs');
 
+    instance.registerLazySingleton<FirebaseMessagingHandler>(() => firebaseMessagingHandler);
+    pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... CloudStorageBloc');
     instance.registerLazySingleton<CloudStorageBloc>(() => csb);
     pp('$mm 🦠🦠🦠🦠🦠registerLazySingletons ... CloudStorageBloc');
     instance.registerLazySingleton<FCMService>(() => fcmService);

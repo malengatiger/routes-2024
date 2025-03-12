@@ -109,12 +109,12 @@ class KasieIntroState extends State<KasieIntro>
   }
 
   onSignInWithEmail() async {
-    pp('$mm ... ............. onSignInWithEmail; ... starting EmailAuthContainer ...');
+    pp('$mm ... .............navigating to  EmailAuthSignin ...');
     try {
       await NavigationUtils.navigateTo(
           context: context,
           widget: EmailAuthSignin(onGoodSignIn: () {
-            onSuccessfulSignIn();
+            onSuccessfulSignIn(context);
           }, onSignInError: () {
             if (mounted) {
               showErrorToast(message: 'Sign in bad, Boss!', context: context);
@@ -134,7 +134,7 @@ class KasieIntroState extends State<KasieIntro>
     NavigationUtils.navigateTo(
         context: context,
         widget: PhoneAuthSignin(onGoodSignIn: () {
-          onSuccessfulSignIn();
+          onSuccessfulSignIn(context);
         }, onSignInError: () {
           showSnackBar(message: "Sign In failed", context: context);
         }),
@@ -145,37 +145,35 @@ class KasieIntroState extends State<KasieIntro>
     pp('$mm ... onRegister ....');
   }
 
-  void onSuccessfulSignIn() {
-    pp('$mm ... onSuccessfulSignIn ....');
-
+  void onSuccessfulSignIn(BuildContext context) {
+    pp('\n\n$mm ... onSuccessfulSignIn ....');
     var user = prefs.getUser();
     pp('$mm ... onSuccessfulSignIn .... user: ${user?.toJson()}');
 
+    if (user!.associationId == 'ADMIN') {
+      // showOKToast(
+      //     message: 'Sign in good, Boss! lets go to AssociationList!',
+      //     duration: Duration(seconds: 2),
+      //     context: context);
+      pp('$mm userId: ADMIN: ... onSuccessfulSignIn .... navigate to AssociationList ...');
+      // NavigationUtils.navigateTo(
+      //     context: context,
+      //     widget: const AssociationList(),
+      //     transitionType: PageTransitionType.leftToRight);
+      NavigationUtils.navigateNormal(context, const AssociationList());
 
-      if (user!.associationId == 'ADMIN') {
-          showOKToast(
-              message: 'Sign in good, Boss!',
-              duration: Duration(seconds: 2),
-              context: context);
-          NavigationUtils.navigateTo(
-              context: context,
-              widget: const AssociationList(),
-              transitionType: PageTransitionType.leftToRight);
-
-      } else {
-          showOKToast(
-              message: 'Sign in good, Boss!',
-              duration: Duration(seconds: 2),
-              context: context);
-          NavigationUtils.navigateTo(
-              context: context,
-              widget:
-                  AssociationRoutes(user.associationId!, user.associationName!),
-              transitionType: PageTransitionType.leftToRight);
-
-      }
+    } else {
+      showOKToast(
+          message: 'Sign in good, Boss! lets do AssociationRoutes',
+          duration: Duration(seconds: 2),
+          context: context);
+      NavigationUtils.navigateTo(
+          context: context,
+          widget: AssociationRoutes(user.associationId!, user.associationName!),
+          transitionType: PageTransitionType.leftToRight);
     }
-
+    Navigator.of(context).pop();
+  }
 
   static const tag = 'pass123';
 
