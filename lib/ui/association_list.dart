@@ -33,6 +33,7 @@ class AssociationListState extends State<AssociationList>
   void initState() {
     _controller = AnimationController(vsync: this);
     super.initState();
+    pp('$mm initState .........................');
     _getAssociations(false);
   }
 

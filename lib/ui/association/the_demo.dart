@@ -147,7 +147,7 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('The Demo'),
+          title: Text('Taxi Activity', style: myTextStyleBold()),
         ),
         body: SafeArea(
             child: Stack(
@@ -156,7 +156,7 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
               children: [
                 route == null
                     ? gapW32
-                    : Text('${route!.name}', style: myTextStyle(fontSize: 24)),
+                    : Text('${route!.name}', style: myTextStyleBold(fontSize: 36)),
                 gapH32,
                 car == null
                     ? gapW32
@@ -262,3 +262,5 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
         )));
   }
 }
+//dpouble fashion sandwich
+//salmon sushi roll

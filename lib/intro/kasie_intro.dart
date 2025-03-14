@@ -53,8 +53,7 @@ class KasieIntroState extends State<KasieIntro>
   }
 
   void _getAuthenticationStatus() async {
-    pp('\n\n$mm _getAuthenticationStatus ....... '
-        'check Kasie user');
+       pp( '$mm _getAuthenticationStatus: check Kasie user');
 
     try {
       await Future.delayed(const Duration(milliseconds: 200));
@@ -72,7 +71,9 @@ class KasieIntroState extends State<KasieIntro>
       authed = true;
 
       if (user!.associationId! == 'ADMIN') {
-        associations = await _getAssociations();
+    pp('\n\n$mm user is ADMIN .... get association list ....');
+
+    associations = await _getAssociations();
         if (associations.isEmpty) {
           if (mounted) {
             showErrorSnackBar(
@@ -80,8 +81,11 @@ class KasieIntroState extends State<KasieIntro>
           }
           return;
         }
+
         if (mounted) {
-          NavigationUtils.navigateTo(
+    pp('\n\n$mm ; NavigationUtils.navigateTo  .......  AssociationList');
+
+    NavigationUtils.navigateTo(
               context: context,
               widget: AssociationList(),
               transitionType: PageTransitionType.leftToRight);

@@ -17,6 +17,7 @@ import 'package:routes_2024/ui/association/vehicles_edit.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import '../route_data_widget.dart';
 import 'package:firebase_messaging/firebase_messaging.dart' as web;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class AssociationMain extends StatefulWidget {
   const AssociationMain({super.key, this.association});
 
@@ -362,15 +363,13 @@ class KasieNavigation extends StatelessWidget {
               },
               child: Row(
                 children: [
-                  Icon(
-                    Icons.edit,
-                    size: 16,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  FaIcon(FontAwesomeIcons.taxi, size: 36,
+                    color: Theme.of(context).primaryColor,),
+
                   gapW32,
                   Text(
-                    'Demo Runner',
-                    style: myTextStyle(fontSize: 14),
+                    'Taxi Activity',
+                    style: myTextStyleBold(fontSize: 28),
                   ),
                 ],
               )),

@@ -297,13 +297,14 @@ class ManageCarDemoState extends State<ManageCarDemo> {
           point.position!.coordinates[1], point.position!.coordinates[0]));
     }
     var polyLine = Polyline(
-        color: color,
+        color: widget.route.color == null ? Colors.black : getColor(widget.route.color!),
         width: 8,
         points: list,
         polylineId: PolylineId(DateTime.now().toIso8601String()));
 
     _polyLines.add(polyLine);
     //
+    widget.routeData.landmarks.sort((a, b) => a.index!.compareTo(b.index!));
     landmarkIndex = 0;
     for (var mark in widget.routeData.landmarks) {
       var latLng =
@@ -347,7 +348,7 @@ class ManageCarDemoState extends State<ManageCarDemo> {
     final CameraPosition newCameraPosition = CameraPosition(
         target: LatLng(vehicleArrival.position!.coordinates[1],
             vehicleArrival.position!.coordinates[0]),
-        zoom: 14, // Adjust the zoom level as needed
+        zoom: 16, // Adjust the zoom level as needed
         bearing: 0, // Optional: Adjust the bearing (rotation) of the camera
         tilt: 0 // Optional: Adjust the tilt of the camera
         );
@@ -393,17 +394,24 @@ class ManageCarDemoState extends State<ManageCarDemo> {
           children: [
             Column(
               children: [
-                Text('${widget.car.vehicleReg}',
-                    style: myTextStyleBold(fontSize: 24)),
+                Row(mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    gapW32,
+
+                    Text('${widget.car.vehicleReg}',
+                        style: myTextStyleBold(fontSize: 36)),
+                    gapW32,
+                    Text('Route'),
+                    gapW8,
+                    Text('${widget.route.name}',
+                        style: myTextStyleBold(fontSize: 24)),
+                  ],
+                ),
                 gapH8,
-                Text('${widget.route.name}',
-                    style: myTextStyleBold(fontSize: 24)),
-                gapH8,
-                arrivals.isEmpty? gapW32 : Text('${arrivals.last.landmarkName}',
-                    style: myTextStyle(fontSize: 16)),
+
                 gapH8,
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 200),
+                  padding: EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
                     children: [
                       DataCard(
@@ -431,13 +439,16 @@ class ManageCarDemoState extends State<ManageCarDemo> {
                       gapW32,
                       Row(
                         children: [
-                          Text('Total Cash', style: myTextStyle(fontSize: 20)),
+                          Text('Total Cash', style: myTextStyle(fontSize: 14)),
                           gapW32,
                           Text(nf.format(totalCash ?? '0.00'),
                               style: myTextStyle(
-                                  fontSize: 24, weight: FontWeight.w900)),
+                                  fontSize: 56, weight: FontWeight.w900)),
                         ],
-                      )
+                      ),
+                      gapW32,
+                      arrivals.isEmpty? gapW32 : Text(arrivals.last.landmarkName == null? '':arrivals.last.landmarkName!,
+                          style: myTextStyleBold(fontSize: 20, color: Colors.blue)),
                     ],
                   ),
                 ),
@@ -507,7 +518,7 @@ class DataCard extends StatelessWidget {
                 ),
                 gapH16,
                 Text(text,
-                    style: myTextStyle(fontSize: 16, color: Colors.black))
+                    style: myTextStyle(fontSize: 12, color: Colors.black))
               ],
             ),
           )),
