@@ -10,6 +10,7 @@ import 'package:responsive_builder/responsive_builder.dart';
 import 'package:routes_2024/ui/association/association_edit.dart';
 import 'package:routes_2024/ui/association/example_file_widget.dart';
 import 'package:routes_2024/ui/association/routes_edit.dart';
+import 'package:routes_2024/ui/association/taxi_activity.dart';
 import 'package:routes_2024/ui/association/the_demo.dart';
 import 'package:routes_2024/ui/association/ticket_maker.dart';
 import 'package:routes_2024/ui/association/users_edit.dart';
@@ -18,6 +19,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 import '../route_data_widget.dart';
 import 'package:firebase_messaging/firebase_messaging.dart' as web;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 class AssociationMain extends StatefulWidget {
   const AssociationMain({super.key, this.association});
 
@@ -102,10 +104,20 @@ class AssociationMainState extends State<AssociationMain>
       case 6:
         NavigationUtils.navigateTo(
             context: context,
-            widget: TheDemo(association: widget.association!),
+            widget: TheDemo(
+              association: widget.association!,
+              isDemo: true,
+            ),
             transitionType: PageTransitionType.leftToRight);
         break;
-
+      case 7:
+        NavigationUtils.navigateTo(
+            context: context,
+            widget: AssociationTaxiActivity(
+              association: widget.association!,
+            ),
+            transitionType: PageTransitionType.leftToRight);
+        break;
       default:
         currentWidget = Container(
           color: Colors.indigo,
@@ -121,7 +133,9 @@ class AssociationMainState extends State<AssociationMain>
   _navigateToRoutes(Association ass) async {
     NavigationUtils.navigateTo(
         context: context,
-        widget: RouteDataWidget(association: ass,),
+        widget: RouteDataWidget(
+          association: ass,
+        ),
         transitionType: PageTransitionType.leftToRight);
   }
 
@@ -132,7 +146,7 @@ class AssociationMainState extends State<AssociationMain>
     token = await m.getToken();
     final fcmToken = await web.FirebaseMessaging.instance.getToken(
         vapidKey:
-        "BLksUVvP3uZvFJSOtJMdyHdymY08HtfuEPLTlr1Q4O__Uo9vzbC-reM924TZ3O_zNDos20cIOPKf6vqSx-6YO4A");
+            "BLksUVvP3uZvFJSOtJMdyHdymY08HtfuEPLTlr1Q4O__Uo9vzbC-reM924TZ3O_zNDos20cIOPKf6vqSx-6YO4A");
     token = fcmToken;
     debugPrint('$mm  ... Firebase token 1: $token ....');
     debugPrint('$mm  ... Firebase token 2: $fcmToken ....');
@@ -172,8 +186,8 @@ class AssociationMainState extends State<AssociationMain>
     pp('\n\n$mm _fcmTokenStream ...............');
     messaging
         .getToken(
-        vapidKey:
-        'BLksUVvP3uZvFJSOtJMdyHdymY08HtfuEPLTlr1Q4O__Uo9vzbC-reM924TZ3O_zNDos20cIOPKf6vqSx-6YO4A')
+            vapidKey:
+                'BLksUVvP3uZvFJSOtJMdyHdymY08HtfuEPLTlr1Q4O__Uo9vzbC-reM924TZ3O_zNDos20cIOPKf6vqSx-6YO4A')
         .then(setToken)
         .catchError((e) {
       pp('$mm 😈😈😈😈😈Error getting FCM token: $e');
@@ -187,7 +201,6 @@ class AssociationMainState extends State<AssociationMain>
     pp('$mm 🔵🔵🔵🔵 .... setToken: $value');
     token = value;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -359,13 +372,34 @@ class KasieNavigation extends StatelessWidget {
           gapH32,
           GestureDetector(
               onTap: () {
+                onTapped(7);
+              },
+              child: Row(
+                children: [
+                  FaIcon(
+                    FontAwesomeIcons.car,
+                    size: 36,
+                    color: Colors.red,
+                  ),
+                  gapW32,
+                  Text(
+                    'Association Taxi Activity',
+                    style: myTextStyleBold(fontSize: 28),
+                  ),
+                ],
+              )),
+          gapH32,
+          GestureDetector(
+              onTap: () {
                 onTapped(6);
               },
               child: Row(
                 children: [
-                  FaIcon(FontAwesomeIcons.taxi, size: 36,
-                    color: Theme.of(context).primaryColor,),
-
+                  FaIcon(
+                    FontAwesomeIcons.taxi,
+                    size: 36,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   gapW32,
                   Text(
                     'Taxi Activity',

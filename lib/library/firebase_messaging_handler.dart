@@ -74,14 +74,14 @@ class FirebaseMessagingHandler {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      pp('User granted permission');
+      pp('$mm User granted permission');
     } else {
       pp('User declined or has not accepted permission');
     }
 
     // Get the FCM token
     String? token = await _firebaseMessaging.getToken();
-    pp('FCM Token: $token');
+    pp('$mm FCM Token: $token');
 
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {

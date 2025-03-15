@@ -222,8 +222,8 @@ class ManageCarDemoState extends State<ManageCarDemo> {
     pp('$mm _putMarkerOnMap ...  route: ${widget.routeData.route!.name!}; arrival: ${arrival.landmarkName} ${arrival.position!.coordinates} ');
 
     //delete existing arrival marker
-    _allMarkers.removeWhere((marker) =>
-        marker.markerId.value.contains(arrival.vehicleReg!));
+    _allMarkers.removeWhere(
+        (marker) => marker.markerId.value.contains(arrival.vehicleReg!));
     //add arrival marker
     var index = 0;
     for (var mark in widget.routeData.landmarks) {
@@ -266,7 +266,9 @@ class ManageCarDemoState extends State<ManageCarDemo> {
 
     var marker0 = Marker(
         markerId: MarkerId('${arrival.vehicleReg}'),
-        icon: icon0, zIndex: 3, anchor: Offset(1.0, 1.0),
+        icon: icon0,
+        zIndex: 3,
+        anchor: Offset(1.0, 1.0),
         onTap: () {
           pp('$mm .............. marker tapped, index: '
               'car: ${arrival.vehicleReg} - ');
@@ -297,7 +299,9 @@ class ManageCarDemoState extends State<ManageCarDemo> {
           point.position!.coordinates[1], point.position!.coordinates[0]));
     }
     var polyLine = Polyline(
-        color: widget.route.color == null ? Colors.black : getColor(widget.route.color!),
+        color: widget.route.color == null
+            ? Colors.black
+            : getColor(widget.route.color!),
         width: 8,
         points: list,
         polylineId: PolylineId(DateTime.now().toIso8601String()));
@@ -356,8 +360,8 @@ class ManageCarDemoState extends State<ManageCarDemo> {
     controller.animateCamera(CameraUpdate.newCameraPosition(newCameraPosition));
   }
 
-  int? numPassengers;
-  double? totalCash;
+  int numPassengers = 0;
+  double totalCash = 0.00;
   final df = NumberFormat('###,###,##0');
   final nf = NumberFormat('###,###,##0.00');
 
@@ -394,64 +398,17 @@ class ManageCarDemoState extends State<ManageCarDemo> {
           children: [
             Column(
               children: [
-                Row(mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    gapW32,
-
-                    Text('${widget.car.vehicleReg}',
-                        style: myTextStyleBold(fontSize: 36)),
-                    gapW32,
-                    Text('Route'),
-                    gapW8,
-                    Text('${widget.route.name}',
-                        style: myTextStyleBold(fontSize: 24)),
-                  ],
-                ),
-                gapH8,
-
-                gapH8,
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    children: [
-                      DataCard(
-                          number: 1,
-                          text: 'Taxi Dispatches',
-                          color: Colors.teal),
-                      gapW16,
-                      DataCard(number: 1, text: 'Trips', color: Colors.blue),
-                      gapW16,
-                      DataCard(
-                          number: arrivals.length,
-                          text: 'Taxi Arrivals',
-                          color: Colors.amber.shade700),
-                      gapW16,
-                      DataCard(
-                        number: numPassengers ?? 0,
-                        text: 'Passengers',
-                        color: Colors.red,
-                      ),
-                      gapW16,
-                      DataCard(
-                          number: cashPayments.length,
-                          text: 'Cash Transactions',
-                          color: Colors.green.shade700),
-                      gapW32,
-                      Row(
-                        children: [
-                          Text('Total Cash', style: myTextStyle(fontSize: 14)),
-                          gapW32,
-                          Text(nf.format(totalCash ?? '0.00'),
-                              style: myTextStyle(
-                                  fontSize: 56, weight: FontWeight.w900)),
-                        ],
-                      ),
-                      gapW32,
-                      arrivals.isEmpty? gapW32 : Text(arrivals.last.landmarkName == null? '':arrivals.last.landmarkName!,
-                          style: myTextStyleBold(fontSize: 20, color: Colors.blue)),
-                    ],
-                  ),
-                ),
+                ActivityHeader(
+                    vehicleReg: widget.car.vehicleReg!,
+                    totalCash: totalCash,
+                    routeName: widget.route.name!,
+                    passengers: numPassengers,
+                    dispatches: dispatches.length,
+                    trips: trips.length,
+                    arrivals: arrivals.length,
+                    cashPayments: cashPayments.length,
+                    telemetry: telemetry.length,
+                    landmarkName: arrivals.isEmpty? '': arrivals.last.landmarkName!),
                 gapH32,
                 _myCurrentCameraPosition == null
                     ? gapW32
@@ -522,6 +479,89 @@ class DataCard extends StatelessWidget {
               ],
             ),
           )),
+    );
+  }
+}
+
+class ActivityHeader extends StatelessWidget {
+  const ActivityHeader(
+      {super.key,
+      required this.vehicleReg,
+      required this.totalCash,
+      required this.routeName,
+      required this.passengers,
+      required this.dispatches,
+      required this.trips,
+      required this.arrivals,
+      required this.cashPayments,
+      required this.telemetry,
+      required this.landmarkName});
+
+  final String vehicleReg, routeName, landmarkName;
+  final int passengers, dispatches, trips, arrivals, cashPayments, telemetry;
+  final double totalCash;
+
+  @override
+  Widget build(BuildContext context) {
+    var nf = NumberFormat('###,###,##0.00');
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            gapW32,
+            Text(vehicleReg, style: myTextStyleBold(fontSize: 36)),
+            gapW32,
+            // Text('Route'),
+            gapW8,
+            Text(routeName, style: myTextStyleBold(fontSize: 24)),
+          ],
+        ),
+        gapH8,
+        gapH8,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24),
+          child: Row(
+            children: [
+              DataCard(
+                  number: dispatches,
+                  text: 'Taxi Dispatches',
+                  color: Colors.teal),
+              gapW16,
+              DataCard(number: trips, text: 'Trips', color: Colors.blue),
+              gapW16,
+              DataCard(
+                  number: arrivals,
+                  text: 'Taxi Arrivals',
+                  color: Colors.amber.shade700),
+              gapW16,
+              DataCard(
+                number: passengers,
+                text: 'Passengers',
+                color: Colors.red,
+              ),
+              gapW16,
+              DataCard(
+                  number: cashPayments,
+                  text: 'Cash Transactions',
+                  color: Colors.green.shade700),
+              gapW32,
+              Row(
+                children: [
+                  Text('Total Cash', style: myTextStyle(fontSize: 14)),
+                  gapW32,
+                  Text(nf.format(totalCash ?? '0.00'),
+                      style:
+                          myTextStyle(fontSize: 56, weight: FontWeight.w900)),
+                ],
+              ),
+              gapW32,
+              Text(landmarkName,
+                  style: myTextStyleBold(fontSize: 20, color: Colors.blue)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

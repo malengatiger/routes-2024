@@ -53,7 +53,7 @@ class KasieIntroState extends State<KasieIntro>
   }
 
   void _getAuthenticationStatus() async {
-       pp( '$mm _getAuthenticationStatus: check Kasie user');
+    pp('$mm _getAuthenticationStatus: check Kasie user');
 
     try {
       await Future.delayed(const Duration(milliseconds: 200));
@@ -71,9 +71,9 @@ class KasieIntroState extends State<KasieIntro>
       authed = true;
 
       if (user!.associationId! == 'ADMIN') {
-    pp('\n\n$mm user is ADMIN .... get association list ....');
+        pp('\n\n$mm user is ADMIN .... get association list ....');
 
-    associations = await _getAssociations();
+        associations = await _getAssociations();
         if (associations.isEmpty) {
           if (mounted) {
             showErrorSnackBar(
@@ -83,24 +83,14 @@ class KasieIntroState extends State<KasieIntro>
         }
 
         if (mounted) {
-    pp('\n\n$mm ; NavigationUtils.navigateTo  .......  AssociationList');
-
-    NavigationUtils.navigateTo(
-              context: context,
-              widget: AssociationList(),
-              transitionType: PageTransitionType.leftToRight);
+          _navigateToAssociationList();
         }
       } else {
         //normal association admin user ....
         var ass = prefs.getAssociation();
         if (ass != null) {
           if (mounted) {
-            NavigationUtils.navigateTo(
-                context: context,
-                widget: RouteDataWidget(
-                  association: ass,
-                ),
-                transitionType: PageTransitionType.leftToRight);
+            _navigateToRouteDataWidget(ass);
           }
         }
       }
@@ -110,6 +100,26 @@ class KasieIntroState extends State<KasieIntro>
 
     pp('$mm ... setting state, 💙authed = $authed  💙 ${user!.toJson()} 💙');
     setState(() {});
+  }
+
+  _navigateToAssociationList() {
+    pp('\n\n$mm ; NavigationUtils.navigateTo  .......  AssociationList');
+
+    NavigationUtils.navigateTo(
+        context: context,
+        widget: AssociationList(),
+        transitionType: PageTransitionType.leftToRight);
+  }
+
+  _navigateToRouteDataWidget(Association association) {
+    pp('\n\n$mm ; NavigationUtils.navigateTo  .......  AssociationList');
+
+    NavigationUtils.navigateTo(
+        context: context,
+        widget: RouteDataWidget(
+          association: association,
+        ),
+        transitionType: PageTransitionType.leftToRight);
   }
 
   onSignInWithEmail() async {
@@ -150,31 +160,18 @@ class KasieIntroState extends State<KasieIntro>
   }
 
   void onSuccessfulSignIn(BuildContext context) {
-    pp('\n\n$mm ... onSuccessfulSignIn ....');
+    pp('\n\n$mm ... onSuccessfulSignIn .... $context');
     var user = prefs.getUser();
     pp('$mm ... onSuccessfulSignIn .... user: ${user?.toJson()}');
 
     if (user!.associationId == 'ADMIN') {
-      // showOKToast(
-      //     message: 'Sign in good, Boss! lets go to AssociationList!',
-      //     duration: Duration(seconds: 2),
-      //     context: context);
       pp('$mm userId: ADMIN: ... onSuccessfulSignIn .... navigate to AssociationList ...');
-      // NavigationUtils.navigateTo(
-      //     context: context,
-      //     widget: const AssociationList(),
-      //     transitionType: PageTransitionType.leftToRight);
-      NavigationUtils.navigateNormal(context, const AssociationList());
-
+      _navigateToAssociationList();
     } else {
-      showOKToast(
-          message: 'Sign in good, Boss! lets do AssociationRoutes',
-          duration: Duration(seconds: 2),
-          context: context);
-      NavigationUtils.navigateTo(
-          context: context,
-          widget: AssociationRoutes(user.associationId!, user.associationName!),
-          transitionType: PageTransitionType.leftToRight);
+      var association = prefs.getAssociation();
+      if (association != null) {
+        _navigateToRouteDataWidget(association);
+      }
     }
     Navigator.of(context).pop();
   }

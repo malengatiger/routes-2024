@@ -12,9 +12,11 @@ import 'package:kasie_transie_library/widgets/timer_widget.dart';
 import 'manage_car_demo.dart';
 
 class TheDemo extends StatefulWidget {
-  const TheDemo({super.key, required this.association});
+  const TheDemo({super.key, required this.association, required this.isDemo});
 
   final lib.Association association;
+  final bool isDemo;
+
   @override
   TheDemoState createState() => TheDemoState();
 }
@@ -24,6 +26,7 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
 
   static const mm = '😹😹😹 TheDemo 😹 ';
   ListApiDog listApiDog = GetIt.instance<ListApiDog>();
+
   @override
   void initState() {
     _controller = AnimationController(vsync: this);
@@ -42,6 +45,7 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
   lib.Route? route;
   lib.Vehicle? car;
   bool busy = false;
+
   _getData() async {
     setState(() {
       busy = true;
@@ -114,123 +118,134 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
 
     getRouteData(route!.routeId!);
 
-    listApiDog.startCarDemo(route: route!, car: car!, ambassador: ambassador!, marshal: marshal!, associationId: marshal!.associationId!);
+    if (widget.isDemo) {
+       listApiDog.startCarDemo(route: route!,
+          car: car!,
+          ambassador: ambassador!,
+          marshal: marshal!,
+          associationId: marshal!.associationId!);
+
     if (mounted) {
       showOKToast(
           duration: Duration(seconds: 3),
           padding: 24,
           message: 'Car demo has started', context: context);
+
+      pp('$mm ... navigating to ManageCarDemo');
+      NavigationUtils.navigateTo(
+          context: context,
+          widget: ManageCarDemo(
+            routeData: routeData!,
+            route: route!,
+            car: car!,
+            ambassador: ambassador!,
+            marshal: marshal!,
+          ));
     }
-    pp('$mm ... navigating to ManageCarDemo');
-    NavigationUtils.navigateTo(
-        context: context,
-        widget: ManageCarDemo(
-          routeData: routeData!,
-          route: route!,
-          car: car!,
-          ambassador: ambassador!,
-          marshal: marshal!,
-        ));
     setState(() {
       busy = false;
       car = null;
     });
   }
+}
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Taxi Activity', style: myTextStyleBold()),
-        ),
-        body: SafeArea(
-            child: Stack(
-          children: [
-            Column(
-              children: [
-                route == null
-                    ? gapW32
-                    : Text('${route!.name}', style: myTextStyleBold(fontSize: 36)),
-                gapH32,
-                car == null
-                    ? gapW32
-                    : Text('${car!.vehicleReg}',
-                        style:
-                            myTextStyle(fontSize: 48, weight: FontWeight.w900)),
-                gapH32,
-                Expanded(
-                    child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Card(
-                          elevation: 4,
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 560,
-                                child: ListView.builder(
-                                    itemCount: routes.length,
-                                    itemBuilder: (_, index) {
-                                      return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              route = routes[index];
-                                            });
-                                          },
-                                          child: Card(
-                                            elevation: 4,
-                                            color: Colors.amber.shade100,
-                                            child: ListTile(
-                                              leading: FaIcon(
-                                                  FontAwesomeIcons.route),
-                                              title:
-                                                  Text('${routes[index].name}'),
-                                            ),
-                                          ));
-                                    }),
-                              ),
-                              gapW32,
-                              SizedBox(
-                                width: 300,
-                                child: ListView.builder(
-                                    itemCount: cars.length,
-                                    itemBuilder: (_, index) {
-                                      return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              car = cars[index];
-                                            });
-                                          },
-                                          child: Card(
-                                            elevation: 8,
-                                            color: Colors.teal.shade100,
-                                            child: ListTile(
-                                              leading:
-                                                  FaIcon(FontAwesomeIcons.car),
-                                              title: Text(
-                                                  '${cars[index].vehicleReg}'),
-                                            ),
-                                          ));
-                                    }),
-                              ),
-                              gapW32,
-                              car == null
-                                  ? gapW32
-                                  : Center(
-                                      child: SizedBox(
+@override
+void dispose() {
+  _controller.dispose();
+  super.dispose();
+}
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+      appBar: AppBar(
+        title: Text('Taxi Activity', style: myTextStyleBold()),
+      ),
+      body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  route == null
+                      ? gapW32
+                      : Text(
+                      '${route!.name}', style: myTextStyleBold(fontSize: 36)),
+                  gapH32,
+                  car == null
+                      ? gapW32
+                      : Text('${car!.vehicleReg}',
+                      style:
+                      myTextStyle(fontSize: 48, weight: FontWeight.w900)),
+                  gapH32,
+                  Expanded(
+                      child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Card(
+                            elevation: 4,
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 560,
+                                  child: ListView.builder(
+                                      itemCount: routes.length,
+                                      itemBuilder: (_, index) {
+                                        return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                route = routes[index];
+                                              });
+                                            },
+                                            child: Card(
+                                              elevation: 4,
+                                              color: Colors.amber.shade100,
+                                              child: ListTile(
+                                                leading: FaIcon(
+                                                    FontAwesomeIcons.route),
+                                                title:
+                                                Text('${routes[index].name}'),
+                                              ),
+                                            ));
+                                      }),
+                                ),
+                                gapW32,
+                                SizedBox(
+                                  width: 300,
+                                  child: ListView.builder(
+                                      itemCount: cars.length,
+                                      itemBuilder: (_, index) {
+                                        return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                car = cars[index];
+                                              });
+                                            },
+                                            child: Card(
+                                              elevation: 8,
+                                              color: Colors.teal.shade100,
+                                              child: ListTile(
+                                                leading:
+                                                FaIcon(FontAwesomeIcons.car),
+                                                title: Text(
+                                                    '${cars[index]
+                                                        .vehicleReg}'),
+                                              ),
+                                            ));
+                                      }),
+                                ),
+                                gapW32,
+                                car == null
+                                    ? gapW32
+                                    : Center(
+                                    child: SizedBox(
                                       width: 400,
                                       child: ElevatedButton(
                                         style: ButtonStyle(
                                           elevation:
-                                              WidgetStatePropertyAll(8.0),
+                                          WidgetStatePropertyAll(8.0),
                                           backgroundColor:
-                                              WidgetStatePropertyAll(
-                                                  Colors.red),
+                                          WidgetStatePropertyAll(
+                                              Colors.red),
                                         ),
                                         onPressed: () {
                                           _startCarDemo();
@@ -246,21 +261,20 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
                                         ),
                                       ),
                                     ))
-                            ],
-                          ),
-                        )))
-              ],
-            ),
-            busy
-                ? Center(
-                    child: TimerWidget(
+                              ],
+                            ),
+                          )))
+                ],
+              ),
+              busy
+                  ? Center(
+                  child: TimerWidget(
                     title: 'Loading data ...',
                     isSmallSize: true,
                   ))
-                : gapH32,
-          ],
-        )));
-  }
-}
+                  : gapH32,
+            ],
+          )));
+}}
 //dpouble fashion sandwich
 //salmon sushi roll
