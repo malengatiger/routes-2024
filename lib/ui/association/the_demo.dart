@@ -55,13 +55,18 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
         widget.association.associationId!, false);
     for (var rd in associationRouteData!.routeDataList) {
       if (rd.landmarks.isEmpty) {
-        pp('$mm Route has no landmarks: ${rd.route!.name}');
+        pp('$mm Route has no landmarks: ${rd.route!.name} ${rd.route?.routeId}');
         continue;
       }
-      ;
+      pp('$mm Route has good landmarks: ${rd.route!.name} ${rd.route?.routeId}');
       routes.add(rd.route!);
     }
+    pp('$mm Good Routes with landmarks: 🎽🎽 ${routes.length} 🎽');
+
     routes.sort((a, b) => a.name!.compareTo(b.name!));
+    for (var r in routes) {
+      pp('$mm route: ${r.name} - routeId: ${r.routeId}');
+    }
     cars = await listApiDog.getAssociationCars(
         widget.association.associationId!, false);
     cars.sort((a, b) => a.vehicleReg!.compareTo(b.vehicleReg!));
@@ -131,7 +136,7 @@ class TheDemoState extends State<TheDemo> with SingleTickerProviderStateMixin {
           padding: 24,
           message: 'Car demo has started', context: context);
 
-      pp('$mm ... navigating to ManageCarDemo');
+      pp('$mm ... navigating to ManageCarDemo for route: ${route!.name} - ${route?.routeId}');
       NavigationUtils.navigateTo(
           context: context,
           widget: ManageCarDemo(

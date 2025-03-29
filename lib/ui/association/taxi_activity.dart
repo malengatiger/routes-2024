@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:badges/badges.dart' as bd;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
 import 'package:kasie_transie_library/bloc/list_api_dog.dart';
 import 'package:kasie_transie_library/data/commuter_cash_payment.dart';
@@ -9,11 +11,9 @@ import 'package:kasie_transie_library/data/data_schemas.dart' as lib;
 import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
-import 'package:intl/intl.dart';
 import 'package:routes_2024/ui/association/manage_car_demo.dart';
-import '../../library/firebase_messaging_handler.dart';
 import 'package:badges/badges.dart' as bd;
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../library/firebase_messaging_handler.dart';
 
 class AssociationTaxiActivity extends StatefulWidget {
   const AssociationTaxiActivity({super.key, required this.association});
@@ -69,16 +69,19 @@ class AssociationTaxiActivityState extends State<AssociationTaxiActivity>
   }
 
   _selectCars() async {
-    NavigationUtils.navigateNormal(
+    await NavigationUtils.navigateNormal(
         context,
         VehicleSelectionWidget(
           vehicles: cars,
           onCarsSelected: (list) {
+            pp('$mm ......... selected cars: 🌿${list.length} 🌿');
+
             setState(() {
               selectedCars = list;
             });
+
             for (var s in selectedCars) {
-              pp('$mm selected car: 🌿${s.vehicleReg} 🌿');
+              pp('$mm ......... selected car: 🌿${s.vehicleReg} 🌿 ${s.vehicleId}');
             }
           },
         ));
@@ -87,7 +90,7 @@ class AssociationTaxiActivityState extends State<AssociationTaxiActivity>
   bool isOneOfTheCars(String vehicleReg) {
     for (var car in selectedCars) {
       if (car.vehicleReg == vehicleReg) {
-        pp('$mm isOneOfTheCars; is recognized: ${car.vehicleReg} ...');
+        pp('$mm .... isOneOfTheCars; is recognized: ${car.vehicleReg} ...');
         return true;
       }
     }
@@ -98,126 +101,123 @@ class AssociationTaxiActivityState extends State<AssociationTaxiActivity>
   _listen() async {
     handler.initialize();
     arrivalsSub = handler.arrivalStream.listen((onData) {
-      if (!isOneOfTheCars(onData.vehicleReg!)) {
-        return;
-      }
-      pp('\n\n$mm arrivalStream received arrival car: ... ${onData.toJson()}');
-      var isFound = false;
-      for (var arrival in arrivals) {
-        if (arrival.vehicleArrivalId == onData.vehicleArrivalId) {
-          isFound = true;
-          break;
+      if (isOneOfTheCars(onData.vehicleReg!)) {
+        pp('\n\n$mm arrivalStream received arrival car: ... ${onData.toJson()}');
+        var isFound = false;
+        for (var arrival in arrivals) {
+          if (arrival.vehicleArrivalId == onData.vehicleArrivalId) {
+            isFound = true;
+            break;
+          }
         }
-      }
-      if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
-        return;
-      }
-      arrivals.add(onData);
-      if (mounted) {
-        setState(() {
-          _getLandmarkName();
-        });
+        if (isFound) {
+          pp('$mm 🦐🦐🦐 this is a duplicate arrival record. ');
+          return;
+        }
+        arrivals.add(onData);
+        arrivals.sort((a, b) => b.created!.compareTo(a.created!));
+        if (mounted) {
+          setState(() {
+            _getLandmarkName();
+          });
+        }
       }
     });
     telemetrySub = handler.telemetryStream.listen((onData) {
-      if (!isOneOfTheCars(onData.vehicleReg!)) {
-        return;
-      }
-      pp('\n\n$mm telemetryStream received Telemetry ... ${onData.toJson()}');
-      var isFound = false;
-      for (var vh in telemetry) {
-        if (vh.vehicleTelemetryId == onData.vehicleTelemetryId) {
-          isFound = true;
-          break;
+      if (isOneOfTheCars(onData.vehicleReg!)) {
+        pp('\n\n$mm telemetryStream received Telemetry ... ${onData.toJson()}');
+        var isFound = false;
+        for (var vh in telemetry) {
+          if (vh.vehicleTelemetryId == onData.vehicleTelemetryId) {
+            isFound = true;
+            break;
+          }
         }
+        if (isFound) {
+          pp('$mm 🦐🦐🦐 this is a duplicate telemetry record. ');
+          return;
+        }
+        telemetry.add(onData);
+        pp('$mm telemetry ... ${telemetry.length}');
       }
-      if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
-        return;
-      }
-      telemetry.add(onData);
-      pp('$mm telemetry ... ${telemetry.length}');
     });
     dispatchesSub = handler.dispatchStream.listen((onData) {
-      if (!isOneOfTheCars(onData.vehicleReg!)) {
-        return;
-      }
-      pp('\n\n$mm dispatchStream received Dispatch ... ${onData.toJson()}');
+      if (isOneOfTheCars(onData.vehicleReg!)) {
+        pp('\n\n$mm dispatchStream received Dispatch ... ${onData.toJson()}');
 
-      var isFound = false;
-      for (var arrival in dispatches) {
-        if (arrival.dispatchRecordId == onData.dispatchRecordId) {
-          isFound = true;
-          break;
+        var isFound = false;
+        for (var arrival in dispatches) {
+          if (arrival.dispatchRecordId == onData.dispatchRecordId) {
+            isFound = true;
+            break;
+          }
         }
+        if (isFound) {
+          pp('$mm 🦐🦐🦐 this is a duplicate dispatches record. ');
+          return;
+        }
+        dispatches.add(onData);
+        _calculate();
       }
-      if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
-        return;
-      }
-      dispatches.add(onData);
     });
     commuterCashSub = handler.commuterCashStream.listen((onData) {
-      if (!isOneOfTheCars(onData.vehicleReg!)) {
-        return;
-      }
-      pp('\n\n$mm commuterCashStream received Commuter Cash ... ${onData.toJson()}');
-      var isFound = false;
-      for (var arrival in cashPayments) {
-        if (arrival.commuterCashPaymentId == onData.commuterCashPaymentId) {
-          isFound = true;
-          break;
+      if (isOneOfTheCars(onData.vehicleReg!)) {
+        pp('\n\n$mm commuterCashStream received Commuter Cash ... ${onData.toJson()}');
+        var isFound = false;
+        for (var arrival in cashPayments) {
+          if (arrival.commuterCashPaymentId == onData.commuterCashPaymentId) {
+            isFound = true;
+            break;
+          }
         }
+        if (isFound) {
+          pp('$mm 🦐🦐🦐 this is a duplicate commuter cash record. ');
+          return;
+        }
+        cashPayments.add(onData);
+        _calculate();
+        pp('$mm cashPayments ... ${cashPayments.length}');
       }
-      if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
-        return;
-      }
-      cashPayments.add(onData);
-      _calculate();
-      pp('$mm cashPayments ... ${cashPayments.length}');
     });
     passengerCountSub = handler.passengerCountStream.listen((onData) {
-      if (!isOneOfTheCars(onData.vehicleReg!)) {
-        return;
-      }
-      pp('\n\n$mm passengerCountStream received Passenger Count ... ${onData.toJson()}');
-      var isFound = false;
-      for (var arrival in passengerCounts) {
-        if (arrival.passengerCountId == onData.passengerCountId) {
-          isFound = true;
-          break;
+      if (isOneOfTheCars(onData.vehicleReg!)) {
+        pp('\n\n$mm passengerCountStream received Passenger Count ... ${onData.toJson()}');
+        var isFound = false;
+        for (var arrival in passengerCounts) {
+          if (arrival.passengerCountId == onData.passengerCountId) {
+            isFound = true;
+            break;
+          }
         }
-      }
-      if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
-        return;
-      }
-      passengerCounts.add(onData);
-      pp('$mm passengerCounts ... ${passengerCounts.length}');
+        if (isFound) {
+          pp('$mm 🦐🦐🦐 this is a duplicate passenger count record. ');
+          return;
+        }
+        passengerCounts.add(onData);
+        pp('$mm passengerCounts ... ${passengerCounts.length}');
 
-      _calculate();
+        _calculate();
+      }
     });
 
     tripSub = handler.tripStream.listen((onData) {
-      if (!isOneOfTheCars(onData.vehicleReg!)) {
-        return;
-      }
-      pp('\n\n$mm tripStream received Trip ... ${onData.toJson()}');
-      pp('$mm trips ... ${trips.length}');
-      var isFound = false;
-      for (var arrival in trips) {
-        if (arrival.tripId == onData.tripId) {
-          isFound = true;
-          break;
+      if (isOneOfTheCars(onData.vehicleReg!)) {
+        pp('\n\n$mm tripStream received Trip ... ${onData.toJson()}');
+        pp('$mm trips ... ${trips.length}');
+        var isFound = false;
+        for (var arrival in trips) {
+          if (arrival.tripId == onData.tripId) {
+            isFound = true;
+            break;
+          }
         }
+        if (isFound) {
+          pp('$mm 🦐🦐🦐 this is a duplicate trip record. ');
+          return;
+        }
+        trips.add(onData);
+        _calculate();
       }
-      if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
-        return;
-      }
-      trips.add(onData);
     });
   }
 
@@ -234,17 +234,19 @@ class AssociationTaxiActivityState extends State<AssociationTaxiActivity>
         continue;
       }
       pCounts += pc.passengersIn!;
-      pp('$mm ... 💦 passengersIn: $pCounts');
+      // pp('$mm ... 💦 passengersIn: $pCounts');
     }
     pp('$mm total passengers: $pCounts');
     numPassengers = pCounts;
     var cash = 0.0;
     for (var pc in cashPayments) {
       cash += pc.amount!;
-      pp('$mm ... 🌿 amount: $cash');
+      // pp('$mm ... 🌿 amount: $cash');
     }
     pp('$mm total cash: $cash\n\n');
     totalCash = cash;
+
+    setState(() {});
   }
 
   String landmarkName = '';
@@ -259,11 +261,22 @@ class AssociationTaxiActivityState extends State<AssociationTaxiActivity>
   @override
   void dispose() {
     _controller.dispose();
+    dispatchesSub.cancel();
+    passengerCountSub.cancel();
+    commuterCashSub.cancel();
+    tripSub.cancel();
+    arrivalsSub.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    List<DropdownMenuItem<lib.Vehicle>> items = [];
+    for (var car in selectedCars) {
+      items.add(DropdownMenuItem(value: car, child: Text(car.vehicleReg!)));
+    }
+    var df = DateFormat('EEEE, dd/MM/yyyy hh:mm');
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('Association Taxi Activity'),
@@ -284,38 +297,79 @@ class AssociationTaxiActivityState extends State<AssociationTaxiActivity>
                     cashPayments: cashPayments.length,
                     telemetry: telemetry.length,
                     landmarkName: landmarkName),
-                gapH8,
-                Row(mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    gapW32, gapW32,
-                    Text('${selectedCars.length}', style: myTextStyleBold(fontSize: 24)),
-                    gapW8,
-                    Text('Cars Monitored')
-                  ],
-                ),
                 gapH32,
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 64),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      DropdownButton<lib.Vehicle>(
+                          elevation: 8,
+                          hint: Text('Monitored Cars'),
+                          items: items,
+                          onChanged: (car) {
+                            if (car != null) {
+                              pp('$mm tapped ${car.vehicleReg}');
+                            }
+                          }),
+                    ],
+                  ),
+                ),
+                gapH8,
                 Expanded(
-                    child: ListView.builder(
-                        itemCount: arrivals.length,
-                        itemBuilder: (_, index) {
-                          var arrival = arrivals[index];
-                          return Card(
-                              elevation: 4,
-                              child: Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: Row(
-                                    children: [
-                                      Text('${arrival.created}'),
-                                      gapW32,
-                                      Text('${arrival.vehicleReg}',
-                                          style: myTextStyleBold(fontSize: 18)),
-                                      gapW32,
-                                      Text('${arrival.routeName}'),
-                                      gapW32,
-                                      Text('${arrival.landmarkName}')
-                                    ],
-                                  )));
-                        }))
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 64),
+                    child: SizedBox(
+                      width: 1200,
+                      child: bd.Badge(
+                        position: bd.BadgePosition.topEnd(top: -64, end: 24),
+                        badgeStyle: bd.BadgeStyle(
+                            elevation: 12,
+                            badgeColor: Colors.black,
+                            padding: EdgeInsets.all(20)),
+                        badgeContent: Text(
+                          '${arrivals.length}',
+                          style: myTextStyle(color: Colors.yellow),
+                        ),
+                        child: ListView.builder(
+                            itemCount: arrivals.length,
+                            itemBuilder: (_, index) {
+                              var arrival = arrivals[index];
+                              var date =
+                                  DateTime.parse(arrival.created!).toLocal();
+                              var sDate = df.format(date);
+                              return Card(
+                                  elevation: 4,
+                                  child: Padding(
+                                      padding: EdgeInsets.all(8),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 40,
+                                            child: Text('${index + 1}',
+                                                style: myTextStyleBold(
+                                                    fontSize: 18,
+                                                    color: Colors.blue)),
+                                          ),
+                                          gapW16,
+                                          SizedBox(
+                                            width: 200,
+                                            child: Text(sDate),
+                                          ),
+                                          Text('${arrival.vehicleReg}',
+                                              style: myTextStyleBold(
+                                                  fontSize: 24)),
+                                          gapW32,
+                                          Text('${arrival.routeName}'),
+                                          gapW32,
+                                          Text('${arrival.landmarkName}')
+                                        ],
+                                      )));
+                            }),
+                      ),
+                    ),
+                  ),
+                )
               ],
             )
           ],
@@ -431,34 +485,31 @@ class VehicleSelectionWidgetState extends State<VehicleSelectionWidget> {
                 )),
                 gapH32,
                 gapH32,
-
               ],
             ),
             _selectedVehicles.isEmpty
                 ? gapW32
                 : Positioned(
-              right: 16,
-              bottom: 24,
-              child: SizedBox(
-                width: 400,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                    WidgetStatePropertyAll(Colors.red),
-                    padding:
-                    WidgetStatePropertyAll(EdgeInsets.all(16)),
-                    elevation: WidgetStatePropertyAll(16),
-                  ),
-                  onPressed: () {
-                    widget.onCarsSelected(_selectedVehicles);
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                      'Start Taxi Activity for ${_selectedVehicles.length} cars',
-                      style: myTextStyleBold(color: Colors.white)),
-                ),
-              ),
-            )
+                    right: 16,
+                    bottom: 24,
+                    child: SizedBox(
+                      width: 400,
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(Colors.red),
+                          padding: WidgetStatePropertyAll(EdgeInsets.all(16)),
+                          elevation: WidgetStatePropertyAll(16),
+                        ),
+                        onPressed: () {
+                          widget.onCarsSelected(_selectedVehicles);
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                            'Start Taxi Activity for ${_selectedVehicles.length} cars',
+                            style: myTextStyleBold(color: Colors.white)),
+                      ),
+                    ),
+                  )
           ],
         )));
   }
