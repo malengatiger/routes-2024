@@ -12,13 +12,35 @@ import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:get_it/get_it.dart';
 import 'package:routes_2024/library/register.dart';
+import 'package:routes_2024/ui/association/association_main.dart';
+import 'package:routes_2024/ui/association_list.dart';
 import 'firebase_options.dart';
 import 'intro/kasie_intro.dart';
 import 'intro/splash_page.dart';
 import 'package:firebase_storage/firebase_storage.dart' as storage;
 
 import 'library/firebase_messaging_handler.dart';
+import 'package:go_router/go_router.dart';
 
+// GoRouter configuration
+final _router = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => KasieIntro(),
+    ),
+    GoRoute(
+      name: 'association_list',
+      path: '/association_list',
+      builder: (context, state) => AssociationList(),
+    ),
+    GoRoute(
+      name: 'association_main',
+      path: '/association_main',
+      builder: (context, state) => AssociationMain(),
+    ),
+  ],
+);
 late FirebaseApp firebaseApp;
 fb.User? fbAuthedUser;
 const mx = '🔵🔵🔵🔵 🍅 KasieTransie Association Administrator : main  🍅 🔵🔵';
@@ -102,7 +124,8 @@ class KasieTransieApp extends StatelessWidget {
             themeIndex = colorAndLocale.themeIndex;
           }
 
-          return MaterialApp(
+          return MaterialApp.router(
+              routerConfig: _router,
               debugShowCheckedModeBanner: false,
               title: 'KasieTransie',
               theme: ThemeData(
@@ -116,16 +139,17 @@ class KasieTransieApp extends StatelessWidget {
               // theme: themeBloc.getTheme(themeIndex).darkTheme,
               // darkTheme: themeBloc.getTheme(themeIndex).darkTheme,
               // themeMode: ThemeMode.system,
-              home: AnimatedSplashScreen(
-                splash: const SplashWidget(),
-                animationDuration: const Duration(milliseconds: 2000),
-                curve: Curves.easeInCirc,
-                splashIconSize: 160.0,
-                nextScreen: const KasieIntro(),
-                splashTransition: SplashTransition.fadeTransition,
-                pageTransitionType: PageTransitionType.leftToRight,
-                backgroundColor: Colors.teal.shade900,
-              ));
+              // home: AnimatedSplashScreen(
+              //   splash: const SplashWidget(),
+              //   animationDuration: const Duration(milliseconds: 2000),
+              //   curve: Curves.easeInCirc,
+              //   splashIconSize: 160.0,
+              //   nextScreen: const KasieIntro(),
+              //   splashTransition: SplashTransition.fadeTransition,
+              //   pageTransitionType: PageTransitionType.leftToRight,
+              //   backgroundColor: Colors.teal.shade900,
+              // ),
+          );
         });
   }
 }

@@ -6,6 +6,7 @@ import 'package:kasie_transie_library/data/commuter_cash_payment.dart';
 import 'package:kasie_transie_library/data/constants.dart';
 import 'package:kasie_transie_library/data/data_schemas.dart';
 import 'package:kasie_transie_library/utils/functions.dart';
+
 class FirebaseMessagingHandler {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   static const mm = '🍅🍅🍅🍅 FirebaseMessagingHandler  🍅 🔵🔵';
@@ -85,12 +86,6 @@ class FirebaseMessagingHandler {
 
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      // pp('\n\n$mm Received a message while in the foreground; data: ${message.data}');
-      // if (message.notification != null) {
-      //   pp('$mm Message notification title: ${message.notification?.title}');
-      //   pp('$mm Message notification body: ${message.notification?.body}');
-      // }
-
       deployMessage(message);
 
     });

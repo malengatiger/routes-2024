@@ -42,7 +42,7 @@ class AssociationListState extends State<AssociationList>
     NavigationUtils.navigateTo(
         context: context,
         widget: AssociationMain(
-          association: ass,
+          association: ass, isAdmin: true,
         ),
         transitionType: PageTransitionType.leftToRight);
   }

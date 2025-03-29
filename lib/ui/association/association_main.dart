@@ -21,9 +21,10 @@ import 'package:firebase_messaging/firebase_messaging.dart' as web;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AssociationMain extends StatefulWidget {
-  const AssociationMain({super.key, this.association});
+  const AssociationMain({super.key, this.association, this.isAdmin});
 
   final Association? association;
+  final bool? isAdmin;
 
   @override
   AssociationMainState createState() => AssociationMainState();
@@ -101,16 +102,25 @@ class AssociationMainState extends State<AssociationMain>
       case 5:
         currentWidget = ExampleFileWidget();
         break;
-      case 6:
+      case 7:
         NavigationUtils.navigateTo(
             context: context,
             widget: TheDemo(
               association: widget.association!,
-              isDemo: true,
+              isDemo: widget.isAdmin!,
             ),
             transitionType: PageTransitionType.leftToRight);
         break;
-      case 7:
+      case 8:
+        NavigationUtils.navigateTo(
+            context: context,
+            widget: TheDemo(
+              association: widget.association!,
+              isDemo: widget.isAdmin!,
+            ),
+            transitionType: PageTransitionType.leftToRight);
+        break;
+      case 6:
         NavigationUtils.navigateTo(
             context: context,
             widget: AssociationTaxiActivity(
@@ -118,6 +128,7 @@ class AssociationMainState extends State<AssociationMain>
             ),
             transitionType: PageTransitionType.leftToRight);
         break;
+
       default:
         currentWidget = Container(
           color: Colors.indigo,
@@ -140,6 +151,7 @@ class AssociationMainState extends State<AssociationMain>
   }
 
   String? token;
+
   _setFirebaseMessaging() async {
     pp('$mm ... _setFirebaseMessaging ...!');
     var m = web.FirebaseMessaging.instance;
@@ -237,12 +249,14 @@ class AssociationMainState extends State<AssociationMain>
                         child: Card(
                           elevation: 8,
                           child: KasieNavigation(
-                              width: (width * .3),
-                              onTapped: (index) {
-                                pp('$mm nav drawer header tapped: $index');
-                                this.index = index;
-                                getWidget();
-                              }),
+                            width: (width * .3),
+                            onTapped: (index) {
+                              pp('$mm nav drawer header tapped: $index');
+                              this.index = index;
+                              getWidget();
+                            },
+                            isAdmin: widget.isAdmin!,
+                          ),
                         ),
                       ),
                     ),
@@ -267,10 +281,14 @@ class AssociationMainState extends State<AssociationMain>
 
 class KasieNavigation extends StatelessWidget {
   const KasieNavigation(
-      {super.key, required this.width, required this.onTapped});
+      {super.key,
+      required this.width,
+      required this.onTapped,
+      required this.isAdmin});
 
   final double width;
   final Function(int) onTapped;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -407,6 +425,27 @@ class KasieNavigation extends StatelessWidget {
                   ),
                 ],
               )),
+          gapH32,
+          isAdmin
+              ? GestureDetector(
+                  onTap: () {
+                    onTapped(8);
+                  },
+                  child: Row(
+                    children: [
+                      FaIcon(
+                        FontAwesomeIcons.desktop,
+                        size: 36,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      gapW32,
+                      Text(
+                        'Demo',
+                        style: myTextStyleBold(fontSize: 20),
+                      ),
+                    ],
+                  ))
+              : gapW32,
           gapH32,
           gapH32,
           GestureDetector(

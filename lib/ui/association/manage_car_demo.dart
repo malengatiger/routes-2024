@@ -15,7 +15,8 @@ import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:routes_2024/library/firebase_messaging_handler.dart';
 import 'package:rxdart/rxdart.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 class ManageCarDemo extends StatefulWidget {
   const ManageCarDemo(
       {super.key,
@@ -73,20 +74,13 @@ class ManageCarDemoState extends State<ManageCarDemo> {
   FirebaseMessagingHandler handler = GetIt.instance<FirebaseMessagingHandler>();
 
   bool gettingData = false;
-  final _debounce = BehaviorSubject<void>();
 
   @override
   void initState() {
     super.initState();
     _setCameraPosition();
     _listen();
-    _debounce.stream.debounceTime(Duration(milliseconds: 500)).listen((_) {
-      if (mounted) {
-        setState(() {
-          // pp('$mm  .... setState has been triggered by debounce. 🍎 🍎 🍎 🍎 ');
-        });
-      }
-    });
+   
   }
 
   @override
@@ -97,7 +91,6 @@ class ManageCarDemoState extends State<ManageCarDemo> {
     commuterCashSub.cancel();
     tripSub.cancel();
     arrivalsSub.cancel();
-    _debounce.close();
     super.dispose();
   }
 
@@ -112,13 +105,15 @@ class ManageCarDemoState extends State<ManageCarDemo> {
         }
       }
       if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
+        pp('$mm 🦐🦐🦐 this is a duplicate arrival record. 🥏🥏🥏');
         return;
       }
       arrivals.add(onData);
+      pp('$mm arrivals ... ${arrivals.length}');
+
       _putArrivalMarkerOnMap(onData);
       _animateToVehicle(onData);
-      _debounce.sink.add(null);
+      
     });
     telemetrySub = handler.telemetryStream.listen((onData) {
       pp('\n\n$mm telemetryStream received Telemetry ... ${onData.toJson()}');
@@ -130,16 +125,15 @@ class ManageCarDemoState extends State<ManageCarDemo> {
         }
       }
       if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
+        pp('$mm 🦐🦐🦐 this is a duplicate telemetry record. 🥏🥏🥏');
         return;
       }
       telemetry.add(onData);
       pp('$mm telemetry ... ${telemetry.length}');
-      _debounce.sink.add(null);
+      
     });
     dispatchesSub = handler.dispatchStream.listen((onData) {
       pp('\n\n$mm dispatchStream received Dispatch ... ${onData.toJson()}');
-
       var isFound = false;
       for (var arrival in dispatches) {
         if (arrival.dispatchRecordId == onData.dispatchRecordId) {
@@ -148,11 +142,11 @@ class ManageCarDemoState extends State<ManageCarDemo> {
         }
       }
       if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
+        pp('$mm 🦐🦐🦐 this is a duplicate dispatch record. 🥏🥏🥏');
         return;
       }
       dispatches.add(onData);
-      _debounce.sink.add(null);
+      
     });
     commuterCashSub = handler.commuterCashStream.listen((onData) {
       pp('\n\n$mm commuterCashStream received Commuter Cash ... ${onData.toJson()}');
@@ -164,13 +158,13 @@ class ManageCarDemoState extends State<ManageCarDemo> {
         }
       }
       if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
+        pp('$mm 🦐🦐🦐 this is a duplicate commuter cash record. 🥏🥏🥏');
         return;
       }
       cashPayments.add(onData);
       _calculate();
       pp('$mm cashPayments ... ${cashPayments.length}');
-      _debounce.sink.add(null);
+      
     });
     passengerCountSub = handler.passengerCountStream.listen((onData) {
       pp('\n\n$mm passengerCountStream received Passenger Count ... ${onData.toJson()}');
@@ -182,12 +176,12 @@ class ManageCarDemoState extends State<ManageCarDemo> {
         }
       }
       if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
+        pp('$mm 🦐🦐🦐 this is a duplicate passengerCount record. 🥏🥏🥏');
         return;
       }
       passengerCounts.add(onData);
       pp('$mm passengerCounts ... ${passengerCounts.length}');
-      _debounce.sink.add(null);
+      
       _calculate();
     });
 
@@ -202,11 +196,11 @@ class ManageCarDemoState extends State<ManageCarDemo> {
         }
       }
       if (isFound) {
-        pp('$mm 🦐🦐🦐 this is a duplicate record. ');
+        pp('$mm 🦐🦐🦐 this is a duplicate trip record. 🥏🥏🥏');
         return;
       }
       trips.add(onData);
-      _debounce.sink.add(null);
+      
     });
   }
 
@@ -309,8 +303,17 @@ class ManageCarDemoState extends State<ManageCarDemo> {
     _polyLines.add(polyLine);
     //
     widget.routeData.landmarks.sort((a, b) => a.index!.compareTo(b.index!));
-    landmarkIndex = 0;
+    HashMap<int, lib.RouteLandmark> hashMap = HashMap();
     for (var mark in widget.routeData.landmarks) {
+      if (!hashMap.containsKey(mark.index)) {
+        hashMap[mark.index!] = mark;
+      }
+    }
+    var myMarks = hashMap.values.toList();
+    myMarks.sort((a, b) => a.index!.compareTo(b.index!));
+
+    landmarkIndex = 0;
+    for (var mark in myMarks) {
       var latLng =
           LatLng(mark.position!.coordinates[1], mark.position!.coordinates[0]);
       final icon = await getMarkerBitmap(72,
@@ -352,7 +355,7 @@ class ManageCarDemoState extends State<ManageCarDemo> {
     final CameraPosition newCameraPosition = CameraPosition(
         target: LatLng(vehicleArrival.position!.coordinates[1],
             vehicleArrival.position!.coordinates[0]),
-        zoom: 16, // Adjust the zoom level as needed
+        zoom: 14, // Adjust the zoom level as needed
         bearing: 0, // Optional: Adjust the bearing (rotation) of the camera
         tilt: 0 // Optional: Adjust the tilt of the camera
         );
@@ -373,25 +376,33 @@ class ManageCarDemoState extends State<ManageCarDemo> {
         continue;
       }
       pCounts += pc.passengersIn!;
-      pp('$mm ... 💦 passengersIn: $pCounts');
+      //pp('$mm ... 💦 passengersIn: $pCounts');
     }
     pp('$mm total passengers: $pCounts');
     numPassengers = pCounts;
     var cash = 0.0;
     for (var pc in cashPayments) {
       cash += pc.amount!;
-      pp('$mm ... 🌿 amount: $cash');
+      //pp('$mm ... 🌿 amount: $cash');
     }
-    pp('$mm total cash: $cash\n\n');
+    //pp('$mm total cash: $cash\n\n');
     totalCash = cash;
   }
 
   @override
   Widget build(BuildContext context) {
+    pp('\n\n$mm .............................. build ... \n\n');
     _calculate();
+    var mark = '';
+    if (arrivals.isNotEmpty) {
+      if (arrivals.last.landmarkName != null) {
+        mark = arrivals.last.landmarkName!;
+      }
+    }
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Taxi Activity'),
+          title: const Text('Car Activity Demo'),
+
         ),
         body: SafeArea(
             child: Stack(
@@ -408,7 +419,7 @@ class ManageCarDemoState extends State<ManageCarDemo> {
                     arrivals: arrivals.length,
                     cashPayments: cashPayments.length,
                     telemetry: telemetry.length,
-                    landmarkName: arrivals.isEmpty? '': arrivals.last.landmarkName!),
+                    landmarkName: mark),
                 gapH32,
                 _myCurrentCameraPosition == null
                     ? gapW32
@@ -426,9 +437,13 @@ class ManageCarDemoState extends State<ManageCarDemo> {
                           },
                           onMapCreated: (GoogleMapController controller) async {
                             pp('$mm ......... GoogleMap: onMapCreated : ${controller.toString()} ....... on to Cleveland!');
-                            _mapController.complete(controller);
-                            googleMapController = controller;
-                            _addPolyLine();
+                            try {
+                              _mapController.complete(controller);
+                              googleMapController = controller;
+                              _addPolyLine();
+                            } catch (e) {
+                              pp('$mm .......... error : $e .');
+                            }
                           },
                         ),
                       ),

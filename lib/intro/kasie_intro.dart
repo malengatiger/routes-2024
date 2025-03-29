@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kasie_transie_library/auth/email_auth_signin.dart';
 import 'package:kasie_transie_library/auth/phone_auth_signin2.dart';
 import 'package:kasie_transie_library/bloc/data_api_dog.dart';
@@ -83,7 +84,7 @@ class KasieIntroState extends State<KasieIntro>
         }
 
         if (mounted) {
-          _navigateToAssociationList();
+          context.goNamed('association_list');
         }
       } else {
         //normal association admin user ....
@@ -105,21 +106,23 @@ class KasieIntroState extends State<KasieIntro>
   _navigateToAssociationList() {
     pp('\n\n$mm ; NavigationUtils.navigateTo  .......  AssociationList');
 
-    NavigationUtils.navigateTo(
-        context: context,
-        widget: AssociationList(),
-        transitionType: PageTransitionType.leftToRight);
+    context.goNamed('association_list');
+    // NavigationUtils.navigateTo(
+    //     context: context,
+    //     widget: AssociationList(),
+    //     transitionType: PageTransitionType.leftToRight);
   }
 
   _navigateToRouteDataWidget(Association association) {
-    pp('\n\n$mm ; NavigationUtils.navigateTo  .......  AssociationList');
+    pp('\n\n$mm ; NavigationUtils.navigateTo  .......  AssociationMain');
 
-    NavigationUtils.navigateTo(
-        context: context,
-        widget: RouteDataWidget(
-          association: association,
-        ),
-        transitionType: PageTransitionType.leftToRight);
+    context.goNamed('association_main');
+    // NavigationUtils.navigateTo(
+    //     context: context,
+    //     widget: RouteDataWidget(
+    //       association: association,
+    //     ),
+    //     transitionType: PageTransitionType.leftToRight);
   }
 
   onSignInWithEmail() async {

@@ -160,7 +160,7 @@ void dispose() {
 Widget build(BuildContext context) {
   return Scaffold(
       appBar: AppBar(
-        title: Text('Taxi Activity', style: myTextStyleBold()),
+        title: Text('Taxi Activity Demo', style: myTextStyleBold()),
       ),
       body: SafeArea(
           child: Stack(
