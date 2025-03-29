@@ -12,7 +12,7 @@ import 'package:kasie_transie_library/utils/functions.dart';
 import 'package:kasie_transie_library/utils/navigator_utils.dart';
 import 'package:kasie_transie_library/utils/prefs.dart';
 import 'package:routes_2024/ui/association/manage_car_demo.dart';
-import 'package:badges/badges.dart' as bd;
+
 import '../../library/firebase_messaging_handler.dart';
 
 class AssociationTaxiActivity extends StatefulWidget {
@@ -298,78 +298,91 @@ class AssociationTaxiActivityState extends State<AssociationTaxiActivity>
                     telemetry: telemetry.length,
                     landmarkName: landmarkName),
                 gapH32,
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 64),
+                gapH8,
+                Expanded(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      DropdownButton<lib.Vehicle>(
-                          elevation: 8,
-                          hint: Text('Monitored Cars'),
-                          items: items,
-                          onChanged: (car) {
-                            if (car != null) {
-                              pp('$mm tapped ${car.vehicleReg}');
-                            }
-                          }),
+                      Padding(
+                        padding: EdgeInsets.all(
+                          16,
+                        ),
+                        child: SizedBox(
+                          width: 240,
+                          child: ListView.builder(
+                              itemCount: selectedCars.length,
+                              itemBuilder: (_, index) {
+                                return Card(
+                                    elevation: 4,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(16),
+                                      child: Text(
+                                          selectedCars[index].vehicleReg!,
+                                          style: myTextStyleBold(fontSize: 16)),
+                                    ));
+                              }),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 1200,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 64),
+                          child: SizedBox(
+                            width: 1200,
+                            height: 600,
+                            child: bd.Badge(
+                              position:
+                                  bd.BadgePosition.topEnd(top: -64, end: 24),
+                              badgeStyle: bd.BadgeStyle(
+                                  elevation: 12,
+                                  badgeColor: Colors.black,
+                                  padding: EdgeInsets.all(20)),
+                              badgeContent: Text(
+                                '${arrivals.length}',
+                                style: myTextStyle(color: Colors.yellow),
+                              ),
+                              child: arrivals.isNotEmpty? ListView.builder(
+                                  itemCount: arrivals.length,
+                                  itemBuilder: (_, index) {
+                                    var arrival = arrivals[index];
+                                    var date = DateTime.parse(arrival.created!)
+                                        .toLocal();
+                                    var sDate = df.format(date);
+                                    return Card(
+                                        elevation: 4,
+                                        child: Padding(
+                                            padding: EdgeInsets.all(8),
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 28,
+                                                  child: Text('${index + 1}',
+                                                      style: myTextStyleBold(
+                                                          fontSize: 18,
+                                                          color: Colors.blue)),
+                                                ),
+                                                gapW16,
+                                                SizedBox(
+                                                  width: 200,
+                                                  child: Text(sDate),
+                                                ),
+                                                Text('${arrival.vehicleReg}',
+                                                    style: myTextStyleBold(
+                                                        fontSize: 24)),
+                                                gapW32,
+                                                Text('${arrival.routeName}'),
+                                                gapW32,
+                                                Text('${arrival.landmarkName}')
+                                              ],
+                                            )));
+                                  }) : Center(child: Text('Waiting for Godot ...',
+                              style: myTextStyleBold(fontSize: 24))),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                gapH8,
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 64),
-                    child: SizedBox(
-                      width: 1200,
-                      child: bd.Badge(
-                        position: bd.BadgePosition.topEnd(top: -64, end: 24),
-                        badgeStyle: bd.BadgeStyle(
-                            elevation: 12,
-                            badgeColor: Colors.black,
-                            padding: EdgeInsets.all(20)),
-                        badgeContent: Text(
-                          '${arrivals.length}',
-                          style: myTextStyle(color: Colors.yellow),
-                        ),
-                        child: ListView.builder(
-                            itemCount: arrivals.length,
-                            itemBuilder: (_, index) {
-                              var arrival = arrivals[index];
-                              var date =
-                                  DateTime.parse(arrival.created!).toLocal();
-                              var sDate = df.format(date);
-                              return Card(
-                                  elevation: 4,
-                                  child: Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 40,
-                                            child: Text('${index + 1}',
-                                                style: myTextStyleBold(
-                                                    fontSize: 18,
-                                                    color: Colors.blue)),
-                                          ),
-                                          gapW16,
-                                          SizedBox(
-                                            width: 200,
-                                            child: Text(sDate),
-                                          ),
-                                          Text('${arrival.vehicleReg}',
-                                              style: myTextStyleBold(
-                                                  fontSize: 24)),
-                                          gapW32,
-                                          Text('${arrival.routeName}'),
-                                          gapW32,
-                                          Text('${arrival.landmarkName}')
-                                        ],
-                                      )));
-                            }),
-                      ),
-                    ),
-                  ),
-                )
               ],
             )
           ],
